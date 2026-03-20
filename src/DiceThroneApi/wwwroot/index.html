@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dice Throne Roll Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        select, input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.4);
+        }
+        
+        .btn-secondary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .die {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none;
+        }
+        
+        .die:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .die.keep {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #764ba2;
+        }
+        
+        .die.reroll {
+            background: #f8f9fa;
+            color: #999;
+            border-color: #ddd;
+        }
+        
+        .objectives {
+            margin-top: 30px;
+        }
+        
+        .objective-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+        }
+        
+        .objective-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .objective-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .objective-name {
+            font-weight: 600;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .probability {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .keep-suggestion {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .suggestion-die {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .suggestion-die.keep {
+            background: #667eea;
+            color: white;
+        }
+        
+        .suggestion-die.reroll {
+            background: #e0e0e0;
+            color: #999;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .error {
+            background: #fee;
+            border: 2px solid #f88;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #c00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Dice Throne Roll Calculator</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="heroSelect">Select Hero:</label>
+                <select id="heroSelect">
+                    <option value="">Loading heroes...</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="diceCount">Number of Dice:</label>
+                <select id="diceCount">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5" selected>5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="methodSelect">Calculation Method:</label>
+                <select id="methodSelect">
+                    <option value="analytic">Analytic</option>
+                    <option value="montecarlo">Monte Carlo</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="rollDice()">🎲 Roll Dice</button>
+            <button class="btn-secondary" id="rerollBtn" onclick="rerollDice()" disabled>🔄 Re-roll Selected</button>
+        </div>
+        
+        <div id="status" class="status">Click "Roll Dice" to start!</div>
+        
+        <div id="diceContainer" class="dice-container"></div>
+        
+        <div id="objectives" class="objectives"></div>
+    </div>
+
+    <script>
+        let currentHero = null;
+        let currentDice = [];
+        let rollsRemaining = 2;
+        let diceToKeep = [];
+        
+        async function loadHeroes() {
+            try {
+                const response = await fetch('/api/heroes');
+                const heroes = await response.json();
+                
+                const select = document.getElementById('heroSelect');
+                select.innerHTML = heroes.map(hero => 
+                    `<option value="${hero.id}">${hero.name}</option>`
+                ).join('');
+                
+                if (heroes.length > 0) {
+                    await loadHero(heroes[0].id);
+                }
+            } catch (error) {
+                console.error('Error loading heroes:', error);
+                document.getElementById('heroSelect').innerHTML = '<option>Error loading heroes</option>';
+            }
+        }
+        
+        async function loadHero(heroId) {
+            try {
+                const response = await fetch(`/api/heroes/${heroId}`);
+                currentHero = await response.json();
+            } catch (error) {
+                console.error('Error loading hero:', error);
+            }
+        }
+        
+        document.getElementById('heroSelect').addEventListener('change', (e) => {
+            loadHero(e.target.value);
+        });
+        
+        async function rollDice() {
+            if (!currentHero) return;
+            
+            const diceCount = parseInt(document.getElementById('diceCount').value);
+            const method = document.getElementById('methodSelect').value;
+            
+            document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
+            
+            try {
+                const response = await fetch('/api/roll/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        heroId: currentHero.id,
+                        diceCount: diceCount,
+                        method: method
+                    })
+                });
+                
+                const result = await response.json();
+                currentDice = result.dice;
+                rollsRemaining = result.rollsRemaining;
+                diceToKeep = new Array(currentDice.length).fill(true);
+                
+                updateDisplay(result.suggestions);
+            } catch (error) {
+                console.error('Error rolling dice:', error);
+                document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
+            }
+        }
+        
+        async function rerollDice() {
+            if (!currentHero || rollsRemaining <= 0) return;
+            
+            const keptDice = currentDice.filter((_, i) => diceToKeep[i]);
+            const rerollCount = currentDice.length - keptDice.length;
+            
+            if (rerollCount === 0) {
+                alert('Please select at least one die to re-roll!');
+                return;
+            }
+            
+            const newRolls = Array.from({length: rerollCount}, () => Math.floor(Math.random() * 6) + 1);
+            currentDice = [...keptDice, ...newRolls];
+            rollsRemaining--;
+            
+            const method = document.getElementById('methodSelect').value;
+            
+            document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
+            
+            try {
+                const response = await fetch('/api/roll/advice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        heroId: currentHero.id,
+                        currentDice: currentDice,
+                        rollsRemaining: rollsRemaining,
+                        method: method
+                    })
+                });
+                
+                const suggestions = await response.json();
+                diceToKeep = new Array(currentDice.length).fill(true);
+                
+                updateDisplay(suggestions);
+            } catch (error) {
+                console.error('Error getting advice:', error);
+                document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
+            }
+        }
+        
+        function updateDisplay(suggestions) {
+            document.getElementById('status').textContent = 
+                `Rolls Remaining: ${rollsRemaining} | Click dice to toggle keep/reroll`;
+            
+            const diceContainer = document.getElementById('diceContainer');
+            diceContainer.innerHTML = currentDice.map((value, index) => 
+                `<div class="die ${diceToKeep[index] ? 'keep' : 'reroll'}" onclick="toggleDie(${index})">${value}</div>`
+            ).join('');
+            
+            const objectivesDiv = document.getElementById('objectives');
+            objectivesDiv.innerHTML = suggestions.map(advice => {
+                const percentage = (advice.probability * 100).toFixed(1);
+                return `
+                    <div class="objective-card">
+                        <div class="objective-header">
+                            <span class="objective-name">${advice.objectiveName}</span>
+                            <span class="probability">${percentage}%</span>
+                        </div>
+                        <div>Suggested keep:</div>
+                        <div class="keep-suggestion">
+                            ${currentDice.map((value, i) => 
+                                `<div class="suggestion-die ${advice.diceToKeep[i] ? 'keep' : 'reroll'}">${value}</div>`
+                            ).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('rerollBtn').disabled = rollsRemaining <= 0;
+        }
+        
+        function toggleDie(index) {
+            diceToKeep[index] = !diceToKeep[index];
+            const diceElements = document.querySelectorAll('.die');
+            diceElements[index].className = `die ${diceToKeep[index] ? 'keep' : 'reroll'}`;
+        }
+        
+        loadHeroes();
+    </script>
+</body>
+</html>

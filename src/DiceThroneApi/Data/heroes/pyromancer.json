@@ -1,0 +1,13 @@
+{
+  "id": "pyromancer",
+  "name": "Pyromancer",
+  "objectives": [
+    { "name": "Engulf in Flames (CP2)", "notation": "[(12)(12)(12)]" },
+    { "name": "Engulf in Flames (CP4)", "notation": "[(12)(12)(12)(12)]" },
+    { "name": "Fireball", "notation": "[(456)(456)(456)]" },
+    { "name": "Inferno (CP2)", "notation": "[(123)(456)(456)(456)]" },
+    { "name": "Ultimate Attack", "notation": "[66666]" },
+    { "name": "Fire Shield", "notation": "[6666]" },
+    { "name": "Backdraft", "notation": "SmallStraight" }
+  ]
+}

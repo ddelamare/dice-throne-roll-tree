@@ -1,0 +1,9 @@
+namespace DiceThroneApi.Models;
+
+public class RollAdvice
+{
+    public string ObjectiveName { get; set; } = string.Empty;
+    public List<bool> DiceToKeep { get; set; } = new();
+    public double Probability { get; set; }
+    public string CalculationMethod { get; set; } = string.Empty;
+}

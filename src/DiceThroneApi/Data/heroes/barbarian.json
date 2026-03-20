@@ -1,0 +1,13 @@
+{
+  "id": "barbarian",
+  "name": "Barbarian",
+  "objectives": [
+    { "name": "Whirlwind (CP2)", "notation": "[(123)(123)(123)]" },
+    { "name": "Whirlwind (CP4)", "notation": "[(123)(123)(123)(123)]" },
+    { "name": "Barbaric Roar", "notation": "[6666]" },
+    { "name": "Savage Slash (CP2)", "notation": "[(123)(456)(456)]" },
+    { "name": "Ultimate Attack", "notation": "[66666]" },
+    { "name": "Defensive Maneuver", "notation": "SmallStraight" },
+    { "name": "Iron Will", "notation": "[(456)(456)(456)]" }
+  ]
+}

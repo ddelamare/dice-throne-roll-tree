@@ -1,0 +1,6 @@
+@DiceThroneApi_HostAddress = http://localhost:5022
+
+GET {{DiceThroneApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
