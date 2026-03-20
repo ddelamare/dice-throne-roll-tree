@@ -73,7 +73,7 @@
         
         button {
             flex: 1;
-            padding: 15px;
+            padding: 12px 15px;
             font-size: 16px;
             font-weight: 600;
             border: none;
@@ -81,6 +81,16 @@
             cursor: pointer;
             transition: all 0.3s;
             color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        button .btn-subtitle {
+            font-size: 11px;
+            font-weight: 400;
+            opacity: 0.85;
         }
         
         .btn-primary {
@@ -229,6 +239,13 @@
             font-weight: 600;
         }
         
+        .dice-hint {
+            text-align: center;
+            font-size: 13px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+        
         .error {
             background: #fee;
             border: 2px solid #f88;
@@ -274,13 +291,22 @@
         </div>
         
         <div class="button-group">
-            <button class="btn-primary" onclick="rollDice()">🎲 Roll Dice</button>
-            <button class="btn-secondary" id="rerollBtn" onclick="rerollDice()" disabled>🔄 Re-roll Selected</button>
+            <button class="btn-primary" onclick="rollDice()">
+                🎲 Roll Dice
+                <span class="btn-subtitle">Start a new turn — rolls all dice fresh</span>
+            </button>
+            <button class="btn-secondary" id="rerollBtn" onclick="rerollDice()" disabled>
+                🔄 Re-roll Unselected
+                <span class="btn-subtitle">Re-rolls gray dice, keeps highlighted dice</span>
+            </button>
         </div>
         
-        <div id="status" class="status">Click "Roll Dice" to start!</div>
+        <div id="status" class="status">Click "Roll Dice" to start a new turn!</div>
         
         <div id="diceContainer" class="dice-container"></div>
+        <div id="diceHint" class="dice-hint" style="display:none;">
+            🔵 Highlighted = keep &nbsp;|&nbsp; ⬜ Gray = re-roll &nbsp;·&nbsp; Click any die to toggle
+        </div>
         
         <div id="objectives" class="objectives"></div>
     </div>
@@ -343,7 +369,7 @@
                 });
                 
                 const result = await response.json();
-                currentDice = result.dice;
+                currentDice = result.dice.slice().sort((a, b) => a - b);
                 rollsRemaining = result.rollsRemaining;
                 diceToKeep = new Array(currentDice.length).fill(true);
                 
@@ -366,7 +392,7 @@
             }
             
             const newRolls = Array.from({length: rerollCount}, () => Math.floor(Math.random() * 6) + 1);
-            currentDice = [...keptDice, ...newRolls];
+            currentDice = [...keptDice, ...newRolls].sort((a, b) => a - b);
             rollsRemaining--;
             
             const method = document.getElementById('methodSelect').value;
@@ -397,7 +423,11 @@
         
         function updateDisplay(suggestions) {
             document.getElementById('status').textContent = 
-                `Rolls Remaining: ${rollsRemaining} | Click dice to toggle keep/reroll`;
+                rollsRemaining > 0
+                    ? `Rolls Remaining: ${rollsRemaining}`
+                    : `No re-rolls left`;
+            
+            document.getElementById('diceHint').style.display = 'block';
             
             const diceContainer = document.getElementById('diceContainer');
             diceContainer.innerHTML = currentDice.map((value, index) => 
