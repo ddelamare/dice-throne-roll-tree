@@ -13,7 +13,6 @@ public class RollController : ControllerBase
     private readonly ProbabilityCalculator _calculator;
     private readonly MonteCarloSimulator _simulator;
     private readonly DiceNotationParser _parser;
-    private readonly Random _random = new();
 
     public RollController(
         HeroService heroService,
@@ -99,7 +98,7 @@ public class RollController : ControllerBase
         var result = new List<int>();
         for (int i = 0; i < count; i++)
         {
-            result.Add(_random.Next(1, 7));
+            result.Add(Random.Shared.Next(1, 7));
         }
         return result;
     }

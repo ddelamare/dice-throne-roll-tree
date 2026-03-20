@@ -5,7 +5,6 @@ namespace DiceThroneApi.Services;
 public class ProbabilityCalculator
 {
     private readonly ObjectiveMatcher _matcher;
-    private Dictionary<string, double> _memo = new();
 
     public ProbabilityCalculator(ObjectiveMatcher matcher)
     {
@@ -14,20 +13,19 @@ public class ProbabilityCalculator
 
     public double Calculate(RollObjective objective, int totalDice, int initialRolls = 1, int rerolls = 2)
     {
-        _memo.Clear();
-        
+        var memo = new Dictionary<string, double>();
         var totalProb = 0.0;
         var totalOutcomes = (long)Math.Pow(6, totalDice);
 
         foreach (var initialRoll in GenerateAllRolls(totalDice))
         {
-            totalProb += OptimalProbability(initialRoll, rerolls, objective);
+            totalProb += OptimalProbability(initialRoll, rerolls, objective, memo);
         }
 
         return totalProb / totalOutcomes;
     }
 
-    private double OptimalProbability(List<int> dice, int rerollsLeft, RollObjective objective)
+    private double OptimalProbability(List<int> dice, int rerollsLeft, RollObjective objective, Dictionary<string, double> memo)
     {
         if (_matcher.IsMatch(dice, objective))
         {
@@ -42,9 +40,9 @@ public class ProbabilityCalculator
         var sortedDice = dice.OrderBy(x => x).ToList();
         var key = $"{string.Join(",", sortedDice)}:{rerollsLeft}";
 
-        if (_memo.ContainsKey(key))
+        if (memo.TryGetValue(key, out var cached))
         {
-            return _memo[key];
+            return cached;
         }
 
         var bestProb = 0.0;
@@ -78,14 +76,14 @@ public class ProbabilityCalculator
             {
                 var newDice = new List<int>(kept);
                 newDice.AddRange(rerollResult);
-                prob += OptimalProbability(newDice, rerollsLeft - 1, objective);
+                prob += OptimalProbability(newDice, rerollsLeft - 1, objective, memo);
             }
 
             prob /= totalOutcomes;
             bestProb = Math.Max(bestProb, prob);
         }
 
-        _memo[key] = bestProb;
+        memo[key] = bestProb;
         return bestProb;
     }
 
@@ -123,6 +121,7 @@ public class ProbabilityCalculator
             return 0.0;
         }
 
+        var memo = new Dictionary<string, double>();
         var bestProb = 0.0;
         var bestMask = 0;
 
@@ -155,7 +154,7 @@ public class ProbabilityCalculator
             {
                 var newDice = new List<int>(kept);
                 newDice.AddRange(rerollResult);
-                prob += OptimalProbability(newDice, rerollsLeft - 1, objective);
+                prob += OptimalProbability(newDice, rerollsLeft - 1, objective, memo);
             }
 
             prob /= totalOutcomes;

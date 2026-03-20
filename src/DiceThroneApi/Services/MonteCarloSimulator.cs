@@ -5,12 +5,10 @@ namespace DiceThroneApi.Services;
 public class MonteCarloSimulator
 {
     private readonly ObjectiveMatcher _matcher;
-    private readonly Random _random;
 
     public MonteCarloSimulator(ObjectiveMatcher matcher)
     {
         _matcher = matcher;
-        _random = new Random();
     }
 
     public double Simulate(RollObjective objective, int totalDice, int iterations = 10000, int rerolls = 2)
@@ -66,7 +64,7 @@ public class MonteCarloSimulator
         var result = new List<int>();
         for (int i = 0; i < count; i++)
         {
-            result.Add(_random.Next(1, 7));
+            result.Add(Random.Shared.Next(1, 7));
         }
         return result;
     }
