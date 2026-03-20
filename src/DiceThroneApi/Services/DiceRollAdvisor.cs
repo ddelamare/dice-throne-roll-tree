@@ -29,7 +29,9 @@ public class DiceRollAdvisor
                     ObjectiveName = objective.Name,
                     DiceToKeep = toKeep,
                     Probability = prob,
-                    CalculationMethod = "Monte Carlo"
+                    CalculationMethod = "Monte Carlo",
+                    Damage = objective.Damage,
+                    ExpectedDamage = prob * objective.Damage
                 });
             }
             else
@@ -41,7 +43,9 @@ public class DiceRollAdvisor
                     ObjectiveName = objective.Name,
                     DiceToKeep = toKeep,
                     Probability = prob,
-                    CalculationMethod = "Analytic"
+                    CalculationMethod = "Analytic",
+                    Damage = objective.Damage,
+                    ExpectedDamage = prob * objective.Damage
                 });
             }
         }

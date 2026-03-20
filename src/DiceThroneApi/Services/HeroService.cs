@@ -67,6 +67,7 @@ public class HeroService
             foreach (var objData in heroData.Objectives)
             {
                 var objective = _parser.Parse(objData.Name, objData.Notation);
+                objective.Damage = objData.Damage;
                 hero.Objectives.Add(objective);
             }
 
@@ -89,5 +90,6 @@ public class HeroService
     {
         public string Name { get; set; } = string.Empty;
         public string Notation { get; set; } = string.Empty;
+        public int Damage { get; set; }
     }
 }

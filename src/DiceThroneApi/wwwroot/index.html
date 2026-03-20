@@ -205,6 +205,19 @@
             color: #667eea;
         }
         
+        .objective-meta {
+            display: flex;
+            gap: 20px;
+            margin-top: 6px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .expected-damage {
+            font-weight: 600;
+            color: #e05c00;
+        }
+        
         .keep-suggestion {
             display: flex;
             gap: 10px;
@@ -437,12 +450,17 @@
             const objectivesDiv = document.getElementById('objectives');
             objectivesDiv.innerHTML = suggestions.map(advice => {
                 const percentage = (advice.probability * 100).toFixed(1);
+                const damageInfo = advice.damage > 0
+                    ? `<span>Damage: <strong>${advice.damage}</strong></span>
+                       <span class="expected-damage">Expected: ${advice.expectedDamage.toFixed(2)} dmg</span>`
+                    : '';
                 return `
                     <div class="objective-card">
                         <div class="objective-header">
                             <span class="objective-name">${advice.objectiveName}</span>
                             <span class="probability">${percentage}%</span>
                         </div>
+                        <div class="objective-meta">${damageInfo}</div>
                         <div>Suggested keep:</div>
                         <div class="keep-suggestion">
                             ${currentDice.map((value, i) => 

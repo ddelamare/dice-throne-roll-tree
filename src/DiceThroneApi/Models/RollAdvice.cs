@@ -6,4 +6,6 @@ public class RollAdvice
     public List<bool> DiceToKeep { get; set; } = new();
     public double Probability { get; set; }
     public string CalculationMethod { get; set; } = string.Empty;
+    public int Damage { get; set; }
+    public double ExpectedDamage { get; set; }
 }
