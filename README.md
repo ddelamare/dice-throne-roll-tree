@@ -119,6 +119,23 @@ Uses backtracking algorithm to match dice to objectives:
 - Checks for consecutive sequences for Straight objectives
 - Handles flexible group requirements
 
+## Documentation
+
+For detailed documentation on the mathematics and algorithms used, see:
+
+- **[Probability Calculation Mathematics](docs/PROBABILITY_MATH.md)** - Comprehensive documentation of the exact probability calculations, including:
+  - State representation using histogram encoding
+  - Dynamic programming algorithm for optimal play
+  - Multinomial coefficient calculations
+  - Monte Carlo simulation approach
+  - Mathematical proofs of correctness
+
+- **[Dice Suggestion Algorithm Analysis](docs/DICE_SUGGESTION_ANALYSIS.md)** - Analysis of the dice suggestion (roll advisor) algorithm:
+  - Current implementation overview
+  - Identified limitations and edge cases
+  - Proposed improvements
+  - Implementation recommendations
+
 ## License
 
 MIT License - see LICENSE file for details
