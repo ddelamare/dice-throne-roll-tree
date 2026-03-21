@@ -19,35 +19,28 @@ public class DiceRollAdvisor
 
         foreach (var objective in objectives)
         {
-            if (method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase))
+            // Always use optimal keep strategy from the analytic calculator
+            var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
+            
+            // Calculate baseline probability (if we reroll all dice)
+            var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
+            
+            // Use Monte Carlo for probability if requested, but always use optimal keep strategy
+            var prob = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase)
+                ? _simulator.Simulate(objective, currentDice.Count, 10000, rollsRemaining)
+                : optimalProb;
+            
+            advice.Add(new RollAdvice
             {
-                var prob = _simulator.Simulate(objective, currentDice.Count, 10000, rollsRemaining);
-                var toKeep = GreedyKeep(currentDice, objective);
-                
-                advice.Add(new RollAdvice
-                {
-                    ObjectiveName = objective.Name,
-                    DiceToKeep = toKeep,
-                    Probability = prob,
-                    CalculationMethod = "Monte Carlo",
-                    Damage = objective.Damage,
-                    ExpectedDamage = prob * objective.Damage
-                });
-            }
-            else
-            {
-                var prob = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
-                
-                advice.Add(new RollAdvice
-                {
-                    ObjectiveName = objective.Name,
-                    DiceToKeep = toKeep,
-                    Probability = prob,
-                    CalculationMethod = "Analytic",
-                    Damage = objective.Damage,
-                    ExpectedDamage = prob * objective.Damage
-                });
-            }
+                ObjectiveName = objective.Name,
+                DiceToKeep = toKeep,
+                Probability = prob,
+                CalculationMethod = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) ? "Monte Carlo" : "Analytic",
+                Damage = objective.Damage,
+                ExpectedDamage = prob * objective.Damage,
+                BaselineProbability = baselineProb,
+                ProbabilityImprovement = optimalProb - baselineProb
+            });
         }
 
         // Compute fallback for each objective: given the dice locked in for this objective,
@@ -91,6 +84,56 @@ public class DiceRollAdvisor
         }
 
         return advice.OrderByDescending(a => a.Probability).ThenByDescending(a => a.ExpectedDamage).ToList()  ;
+    }
+
+    /// <summary>
+    /// Computes the globally optimal strategy across all damage-dealing objectives,
+    /// returning the advice for the objective with the highest expected damage.
+    /// </summary>
+    public RollAdvice? GetBestOverallStrategy(List<int> currentDice, int rollsRemaining, List<RollObjective> objectives)
+    {
+        RollAdvice? bestAdvice = null;
+        double bestExpectedDamage = 0;
+
+        foreach (var objective in objectives.Where(o => o.Damage > 0))
+        {
+            var prob = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
+            var expectedDamage = prob * objective.Damage;
+
+            if (expectedDamage > bestExpectedDamage)
+            {
+                bestExpectedDamage = expectedDamage;
+                var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
+                
+                bestAdvice = new RollAdvice
+                {
+                    ObjectiveName = objective.Name,
+                    DiceToKeep = toKeep,
+                    Probability = prob,
+                    CalculationMethod = "Analytic",
+                    Damage = objective.Damage,
+                    ExpectedDamage = expectedDamage,
+                    BaselineProbability = baselineProb,
+                    ProbabilityImprovement = prob - baselineProb
+                };
+            }
+        }
+
+        return bestAdvice;
+    }
+
+    /// <summary>
+    /// Calculates the probability of hitting an objective if all dice are rerolled.
+    /// </summary>
+    private double CalculateBaselineProbability(List<int> currentDice, int rollsRemaining, RollObjective objective)
+    {
+        if (rollsRemaining <= 0)
+        {
+            return 0.0;
+        }
+        
+        var baselineKeep = Enumerable.Repeat(false, currentDice.Count).ToList();
+        return _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep);
     }
 
     private List<bool> GreedyKeep(List<int> dice, RollObjective objective)
