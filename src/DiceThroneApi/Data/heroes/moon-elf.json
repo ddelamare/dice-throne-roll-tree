@@ -1,0 +1,13 @@
+{
+  "id": "moon-elf",
+  "name": "Moon Elf",
+  "objectives": [
+    { "name": "Arrow of Blazing Skies (CP2)", "notation": "[(12)(12)(12)]", "damage": 3 },
+    { "name": "Arrow of Blazing Skies (CP4)", "notation": "[(12)(12)(12)(12)]", "damage": 5 },
+    { "name": "Crescent Blades (CP2)", "notation": "[(345)(345)]", "damage": 3 },
+    { "name": "Crescent Blades (CP4)", "notation": "[(345)(345)(345)]", "damage": 5 },
+    { "name": "Ultimate Attack", "notation": "[66666]", "damage": 8 },
+    { "name": "Defensive Maneuver", "notation": "LargeStraight", "damage": 0 },
+    { "name": "Fleet Footed", "notation": "[6666]", "damage": 0 }
+  ]
+}
