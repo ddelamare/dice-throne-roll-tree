@@ -16,7 +16,7 @@ This document describes the mathematical foundations of the probability calculat
 ## Overview
 
 The application calculates the probability of achieving various dice roll objectives in Dice Throne, where players:
-- Roll 5 dice (configurable 1-7)
+- Roll 5 dice (configurable from 1 to 7 dice)
 - Get 1 initial roll + 2 rerolls per turn
 - Can choose which dice to keep between rolls
 - Must achieve specific patterns (e.g., four 6s, small straight, etc.)
@@ -47,7 +47,7 @@ Where `cᵢ` is the count of dice showing face value `i`.
 ### Why Histograms?
 
 1. **Canonical form**: Multiple orderings of the same dice map to the same histogram
-2. **Smaller state space**: For `n` dice, there are only `C(n+5, 5)` distinct histograms vs `6ⁿ` ordered tuples
+2. **Smaller state space**: For `n` dice, there are only `C(n+5, 5)` distinct histograms vs `6^n` ordered tuples
 3. **Efficient memoization**: Reduces cache collisions and memory usage
 
 ### Memo Key Encoding
@@ -183,19 +183,26 @@ function OptimalProbability(histogram, rerollsLeft, objective, memo):
 
 Let `n` be the number of dice and `r` be the number of rerolls.
 
-- **State space**: `O(C(n+5,5) × r)` = `O(n⁵ × r)` states
-- **Keep strategies per state**: `O(∏(cᵢ+1))` ≤ `O(nⁿ)` in worst case
-- **Reroll outcomes per strategy**: `O(C(n+5,5))` = `O(n⁵)`
+- **State space**: `O(C(n+5,5) × r)` states. The binomial coefficient `C(n+5,5) = (n+5)!/(5!×n!)` is polynomial in `n`, specifically `O(n^5/120)` for large `n`.
+- **Keep strategies per state**: `O(∏(cᵢ+1))` — this depends on the histogram distribution. In the worst case (e.g., one die per face), this is `O(2^n)`, but for typical histograms (many duplicates), it's much smaller.
+- **Reroll outcomes per strategy**: `O(C(m+5,5))` where `m` is the number of rerolled dice.
 
-**Total complexity**: `O(n⁵ × r × n⁵) = O(n¹⁰ × r)`
+**Practical complexity analysis:**
 
-For n=5 dice with r=2 rerolls, this is manageable (~500K states × ~100 strategies × ~250 outcomes).
+For realistic game scenarios with 5-7 dice:
+- State space: ~250-460 distinct histograms × `r` reroll stages
+- Keep strategies: typically 10-100 per state (due to duplicate dice)
+- With memoization, each state is computed only once
+
+For n=5 dice with r=2 rerolls, this is manageable with typical computation times of 10-50ms.
+
+**Note:** The theoretical worst-case complexity is higher, but memoization and the structure of dice histograms (often with duplicates) keep practical performance fast.
 
 ### Space Complexity
 
-- **Memoization table**: `O(n⁵ × r)` entries
+- **Memoization table**: `O(C(n+5,5) × r)` entries — approximately 252 states for n=5, 462 for n=6
 - Each entry stores one `double`: 8 bytes
-- For n=5, r=2: ~500 × 2 × 8 = 8 KB
+- For n=5, r=2: ~250 × 2 × 8 ≈ 4 KB
 
 ---
 
@@ -328,10 +335,12 @@ The Monte Carlo simulation uses a **greedy** heuristic rather than optimal play.
 |--------|----------|-------------|
 | **Accuracy** | Exact | Statistical estimate |
 | **Optimality** | Assumes optimal play | Uses greedy heuristic |
-| **Speed (5 dice)** | Fast (~10ms) | Medium (~100ms for 10K iterations) |
-| **Speed (7 dice)** | Slower (~1s) | Same (~100ms) |
+| **Speed (5 dice)** | Fast (~10-50ms) | Medium (~100ms for 10K iterations) |
+| **Speed (6-7 dice)** | Slower (~100-500ms) | Same (~100ms) |
 | **Memory** | Higher (memoization) | Low (constant) |
 | **Determinism** | Deterministic | Random (varies between runs) |
+
+*Note: Speed estimates are approximate and depend on hardware and JIT compilation state.*
 
 ### When to Use Each Method
 
