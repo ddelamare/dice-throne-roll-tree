@@ -4,6 +4,7 @@ namespace DiceThroneApi.Services;
 
 public class DiceRollAdvisor
 {
+    private const double ExpectedDamageTieTolerance = 1e-12;
     private readonly ProbabilityCalculator _calculator;
     private readonly MonteCarloSimulator _simulator;
 
@@ -105,7 +106,7 @@ public class DiceRollAdvisor
             var expectedDamage = prob * objective.Damage;
 
             if (expectedDamage > bestExpectedDamage
-                || (Math.Abs(expectedDamage - bestExpectedDamage) < 1e-12 && prob > bestProbability))
+                || (Math.Abs(expectedDamage - bestExpectedDamage) < ExpectedDamageTieTolerance && prob > bestProbability))
             {
                 bestExpectedDamage = expectedDamage;
                 bestProbability = prob;
