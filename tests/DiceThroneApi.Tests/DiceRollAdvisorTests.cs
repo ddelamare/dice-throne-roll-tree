@@ -169,4 +169,105 @@ public class DiceRollAdvisorTests
         // Need one more 6 from 2 dice with 2 rerolls — should be a moderate probability
         Assert.InRange(prob, 0.3, 1.0);
     }
+
+    // ── New Improvement Tests ────────────────────────────────────────────────
+
+    [Fact]
+    public void GetAdvice_MonteCarloUsesOptimalKeepSuggestions()
+    {
+        // Test that Monte Carlo now uses optimal keep strategy instead of greedy
+        var objective = _parser.Parse("Test", "[6666]");
+        objective.Damage = 4;
+
+        var dice = new List<int> { 6, 6, 1, 2, 3 };
+        var analyticAdvice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective }, method: "analytic");
+        var monteCarloAdvice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective }, method: "montecarlo");
+
+        // Both should suggest the same dice to keep (optimal strategy)
+        Assert.Equal(analyticAdvice[0].DiceToKeep, monteCarloAdvice[0].DiceToKeep);
+    }
+
+    [Fact]
+    public void GetAdvice_PopulatesBaselineProbability()
+    {
+        var objective = _parser.Parse("Test", "[6666]");
+        objective.Damage = 4;
+
+        var dice = new List<int> { 6, 6, 6, 1, 2 };
+        var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective });
+
+        Assert.Single(advice);
+        // Baseline probability should be > 0 (probability if rerolling all dice)
+        Assert.True(advice[0].BaselineProbability >= 0);
+        // Probability improvement should be positive when keeping 3 sixes vs rerolling all
+        Assert.True(advice[0].ProbabilityImprovement >= 0);
+    }
+
+    [Fact]
+    public void GetAdvice_ProbabilityImprovementEqualsProb_MinusBaseline()
+    {
+        var objective = _parser.Parse("Test", "[6666]");
+        objective.Damage = 4;
+
+        var dice = new List<int> { 6, 6, 6, 1, 2 };
+        var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective });
+
+        Assert.Single(advice);
+        // ProbabilityImprovement should equal Probability - BaselineProbability
+        var expectedImprovement = advice[0].Probability - advice[0].BaselineProbability;
+        Assert.Equal(expectedImprovement, advice[0].ProbabilityImprovement, precision: 10);
+    }
+
+    [Fact]
+    public void GetBestOverallStrategy_ReturnsHighestExpectedDamage()
+    {
+        // High damage but hard objective
+        var hardObj = _parser.Parse("Hard Attack", "[66666]");
+        hardObj.Damage = 10;
+
+        // Lower damage but easier objective
+        var easyObj = _parser.Parse("Easy Attack", "[66]");
+        easyObj.Damage = 2;
+
+        var dice = new List<int> { 6, 6, 1, 2, 3 };
+        var objectives = new List<RollObjective> { hardObj, easyObj };
+
+        var best = _advisor.GetBestOverallStrategy(dice, 2, objectives);
+
+        Assert.NotNull(best);
+        // With 2 sixes already, the easy [66] objective has 100% probability
+        // Easy: 1.0 * 2 = 2.0 expected damage
+        // Hard: low probability * 10 < 2.0 expected damage
+        Assert.Equal("Easy Attack", best.ObjectiveName);
+    }
+
+    [Fact]
+    public void GetBestOverallStrategy_ReturnsNull_WhenNoDamageObjectives()
+    {
+        var obj = _parser.Parse("No Damage", "[6666]");
+        obj.Damage = 0;
+
+        var dice = new List<int> { 6, 6, 1, 2, 3 };
+        var objectives = new List<RollObjective> { obj };
+
+        var best = _advisor.GetBestOverallStrategy(dice, 2, objectives);
+
+        Assert.Null(best);
+    }
+
+    [Fact]
+    public void GetBestOverallStrategy_IncludesProbabilityDelta()
+    {
+        var obj = _parser.Parse("Attack", "[6666]");
+        obj.Damage = 4;
+
+        var dice = new List<int> { 6, 6, 6, 1, 2 };
+        var objectives = new List<RollObjective> { obj };
+
+        var best = _advisor.GetBestOverallStrategy(dice, 2, objectives);
+
+        Assert.NotNull(best);
+        Assert.True(best.BaselineProbability >= 0);
+        Assert.True(best.ProbabilityImprovement >= 0);
+    }
 }

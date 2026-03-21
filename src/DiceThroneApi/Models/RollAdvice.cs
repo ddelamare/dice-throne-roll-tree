@@ -11,4 +11,15 @@ public class RollAdvice
     public string? FallbackObjectiveName { get; set; }
     public double FallbackProbability { get; set; }
     public double FallbackExpectedDamage { get; set; }
+    
+    /// <summary>
+    /// Probability of hitting the objective if all dice are rerolled (baseline comparison).
+    /// </summary>
+    public double BaselineProbability { get; set; }
+    
+    /// <summary>
+    /// Improvement in probability from optimal keep strategy vs rerolling all dice.
+    /// Calculated as (Probability - BaselineProbability).
+    /// </summary>
+    public double ProbabilityImprovement { get; set; }
 }
