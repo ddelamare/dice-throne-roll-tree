@@ -83,7 +83,10 @@ public class DiceRollAdvisor
             }
         }
 
-        return advice.OrderByDescending(a => a.Probability).ThenByDescending(a => a.ExpectedDamage).ToList()  ;
+        return advice
+            .OrderByDescending(a => a.ExpectedDamage)
+            .ThenByDescending(a => a.Probability)
+            .ToList();
     }
 
     /// <summary>
@@ -93,16 +96,19 @@ public class DiceRollAdvisor
     public RollAdvice? GetBestOverallStrategy(List<int> currentDice, int rollsRemaining, List<RollObjective> objectives)
     {
         RollAdvice? bestAdvice = null;
-        double bestExpectedDamage = 0;
+        double bestExpectedDamage = double.NegativeInfinity;
+        double bestProbability = double.NegativeInfinity;
 
         foreach (var objective in objectives.Where(o => o.Damage > 0))
         {
             var prob = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
             var expectedDamage = prob * objective.Damage;
 
-            if (expectedDamage > bestExpectedDamage)
+            if (expectedDamage > bestExpectedDamage
+                || (Math.Abs(expectedDamage - bestExpectedDamage) < 1e-12 && prob > bestProbability))
             {
                 bestExpectedDamage = expectedDamage;
+                bestProbability = prob;
                 var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
                 
                 bestAdvice = new RollAdvice

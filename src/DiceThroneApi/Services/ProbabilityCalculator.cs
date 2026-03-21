@@ -120,8 +120,8 @@ public class ProbabilityCalculator
             for (int f = 0; f < 6; f++) keptCount += keepHistogram[f];
             var rerollCount = currentDice.Count - keptCount;
 
-            // Must keep at least one die and reroll at least one die
-            if (keptCount == 0 || rerollCount == 0)
+            // Rerolling all dice is a valid strategy, but rerolling none is not.
+            if (rerollCount == 0)
             {
                 continue;
             }
