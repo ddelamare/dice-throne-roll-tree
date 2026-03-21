@@ -5,10 +5,20 @@ namespace DiceThroneApi.Services;
 public class MonteCarloSimulator
 {
     private readonly ObjectiveMatcher _matcher;
+    private readonly ProbabilityCalculator? _calculator;
+    private readonly bool _useOptimalStrategy;
 
     public MonteCarloSimulator(ObjectiveMatcher matcher)
     {
         _matcher = matcher;
+        _useOptimalStrategy = false;
+    }
+
+    public MonteCarloSimulator(ObjectiveMatcher matcher, ProbabilityCalculator calculator, bool useOptimalStrategy = false)
+    {
+        _matcher = matcher;
+        _calculator = calculator;
+        _useOptimalStrategy = useOptimalStrategy;
     }
 
     public double Simulate(RollObjective objective, int totalDice, int iterations = 10000, int rerolls = 2)
@@ -39,7 +49,18 @@ public class MonteCarloSimulator
 
             if (roll < rerollsLeft)
             {
-                var toKeep = DecideKeep(dice, objective);
+                List<bool> toKeep;
+                
+                // Use optimal strategy if enabled and calculator is available
+                if (_useOptimalStrategy && _calculator != null)
+                {
+                    _calculator.CalculateBestKeep(dice, rerollsLeft - roll, objective, out toKeep);
+                }
+                else
+                {
+                    toKeep = DecideKeep(dice, objective);
+                }
+                
                 var kept = new List<int>();
                 for (int i = 0; i < dice.Count; i++)
                 {
@@ -95,31 +116,95 @@ public class MonteCarloSimulator
         }
         else if (objective.Type == ObjectiveType.SmallStraight)
         {
-            var straightVals = new HashSet<int> { 1, 2, 3, 4, 5 };
-            for (int i = 0; i < dice.Count; i++)
-            {
-                toKeep.Add(straightVals.Contains(dice[i]));
-            }
+            toKeep = DecideKeepSmallStraight(dice);
         }
         else if (objective.Type == ObjectiveType.LargeStraight)
         {
-            var straightVals = new HashSet<int> { 1, 2, 3, 4, 5, 6 };
-            var diceSet = dice.ToHashSet();
-            bool has12345 = new[] { 1, 2, 3, 4, 5 }.All(v => diceSet.Contains(v));
-            bool has23456 = new[] { 2, 3, 4, 5, 6 }.All(v => diceSet.Contains(v));
+            toKeep = DecideKeepLargeStraight(dice);
+        }
 
-            if (has12345)
-            {
-                straightVals = new HashSet<int> { 1, 2, 3, 4, 5 };
-            }
-            else if (has23456)
-            {
-                straightVals = new HashSet<int> { 2, 3, 4, 5, 6 };
-            }
+        return toKeep;
+    }
 
-            for (int i = 0; i < dice.Count; i++)
+    /// <summary>
+    /// Improved SmallStraight keep strategy:
+    /// 1. Considers all three possible small straights (1234, 2345, 3456)
+    /// 2. Picks the one with the most matching dice
+    /// 3. Keeps at most one of each value (handles duplicates)
+    /// </summary>
+    private List<bool> DecideKeepSmallStraight(List<int> dice)
+    {
+        var candidates = new[]
+        {
+            new HashSet<int> { 1, 2, 3, 4 },
+            new HashSet<int> { 2, 3, 4, 5 },
+            new HashSet<int> { 3, 4, 5, 6 }
+        };
+
+        // Score each candidate by how many unique values we already have
+        var diceSet = dice.ToHashSet();
+        var bestCandidate = candidates
+            .Select(c => (candidate: c, score: c.Count(v => diceSet.Contains(v))))
+            .OrderByDescending(x => x.score)
+            .First()
+            .candidate;
+
+        // Keep at most one of each value
+        var keptValues = new HashSet<int>();
+        var toKeep = new List<bool>();
+
+        foreach (var d in dice)
+        {
+            if (bestCandidate.Contains(d) && !keptValues.Contains(d))
             {
-                toKeep.Add(straightVals.Contains(dice[i]));
+                toKeep.Add(true);
+                keptValues.Add(d);
+            }
+            else
+            {
+                toKeep.Add(false);
+            }
+        }
+
+        return toKeep;
+    }
+
+    /// <summary>
+    /// Improved LargeStraight keep strategy:
+    /// 1. Considers both possible large straights (12345, 23456)
+    /// 2. Picks the one with the most matching dice
+    /// 3. Keeps at most one of each value (handles duplicates)
+    /// </summary>
+    private List<bool> DecideKeepLargeStraight(List<int> dice)
+    {
+        var candidates = new[]
+        {
+            new HashSet<int> { 1, 2, 3, 4, 5 },
+            new HashSet<int> { 2, 3, 4, 5, 6 }
+        };
+
+        // Score each candidate by how many unique values we already have
+        var diceSet = dice.ToHashSet();
+        var bestCandidate = candidates
+            .Select(c => (candidate: c, score: c.Count(v => diceSet.Contains(v))))
+            .OrderByDescending(x => x.score)
+            .First()
+            .candidate;
+
+        // Keep at most one of each value
+        var keptValues = new HashSet<int>();
+        var toKeep = new List<bool>();
+
+        foreach (var d in dice)
+        {
+            if (bestCandidate.Contains(d) && !keptValues.Contains(d))
+            {
+                toKeep.Add(true);
+                keptValues.Add(d);
+            }
+            else
+            {
+                toKeep.Add(false);
             }
         }
 

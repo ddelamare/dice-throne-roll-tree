@@ -12,8 +12,8 @@ public class MonteCarloSimulatorTests
     public MonteCarloSimulatorTests()
     {
         var matcher = new ObjectiveMatcher();
-        _simulator = new MonteCarloSimulator(matcher);
         _calculator = new ProbabilityCalculator(matcher);
+        _simulator = new MonteCarloSimulator(matcher);
         _parser = new DiceNotationParser();
     }
 
@@ -65,5 +65,44 @@ public class MonteCarloSimulatorTests
         
         Assert.InRange(probability, 0.0, 1.0);
         Assert.True(probability > 0);
+    }
+
+    // ── Improved Straight Handling Tests ────────────────────────────────────
+
+    [Fact]
+    public void Simulate_LargeStraight_ReturnsReasonableProbability()
+    {
+        var objective = _parser.Parse("Test", "LargeStraight");
+        var probability = _simulator.Simulate(objective, 5, iterations: 5000);
+        
+        Assert.InRange(probability, 0.0, 1.0);
+        Assert.True(probability > 0);
+    }
+
+    [Fact]
+    public void Simulate_SmallStraight_ImprovedStrategyWorks()
+    {
+        // Test that the improved SmallStraight strategy works
+        var objective = _parser.Parse("Test", "SmallStraight");
+        var probability = _simulator.Simulate(objective, 5, iterations: 10000);
+        
+        // SmallStraight with 5 dice and 2 rerolls should have decent probability
+        // The improved strategy considers all three straights (1234, 2345, 3456)
+        Assert.InRange(probability, 0.3, 1.0);
+    }
+
+    [Fact]
+    public void Simulate_WithOptimalStrategy_IsAvailable()
+    {
+        // Test that optimal strategy mode can be constructed
+        var matcher = new ObjectiveMatcher();
+        var calculatorForTest = new ProbabilityCalculator(matcher);
+        var simulatorWithOptimal = new MonteCarloSimulator(matcher, calculatorForTest, useOptimalStrategy: true);
+        
+        var objective = _parser.Parse("Test", "[66]");
+        
+        // Just verify it runs without error on small iterations
+        var probability = simulatorWithOptimal.Simulate(objective, 2, iterations: 100);
+        Assert.InRange(probability, 0.0, 1.0);
     }
 }
