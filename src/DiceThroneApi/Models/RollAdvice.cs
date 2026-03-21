@@ -8,4 +8,7 @@ public class RollAdvice
     public string CalculationMethod { get; set; } = string.Empty;
     public int Damage { get; set; }
     public double ExpectedDamage { get; set; }
+    public string? FallbackObjectiveName { get; set; }
+    public double FallbackProbability { get; set; }
+    public double FallbackExpectedDamage { get; set; }
 }

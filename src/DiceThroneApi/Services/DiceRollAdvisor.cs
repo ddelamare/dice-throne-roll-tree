@@ -50,6 +50,46 @@ public class DiceRollAdvisor
             }
         }
 
+        // Compute fallback for each objective: given the dice locked in for this objective,
+        // which other damage-dealing objective has the best expected value?
+        if (rollsRemaining > 0)
+        {
+            var damageObjectives = objectives.Where(o => o.Damage > 0).ToList();
+
+            foreach (var a in advice)
+            {
+                var thisObjective = objectives.FirstOrDefault(o => o.Name == a.ObjectiveName);
+                if (thisObjective == null || thisObjective.Damage == 0) continue;
+
+                var others = damageObjectives.Where(o => o.Name != a.ObjectiveName).ToList();
+                if (others.Count == 0) continue;
+
+                RollObjective? bestFallbackObj = null;
+                double bestFallbackProb = 0.0;
+                double bestFallbackExpected = 0.0;
+
+                foreach (var other in others)
+                {
+                    var fallbackProb = _calculator.CalculateWithForcedKeep(
+                        currentDice, rollsRemaining, other, a.DiceToKeep);
+                    var expected = fallbackProb * other.Damage;
+                    if (expected > bestFallbackExpected)
+                    {
+                        bestFallbackExpected = expected;
+                        bestFallbackProb = fallbackProb;
+                        bestFallbackObj = other;
+                    }
+                }
+
+                if (bestFallbackObj != null && bestFallbackExpected > 0)
+                {
+                    a.FallbackObjectiveName = bestFallbackObj.Name;
+                    a.FallbackProbability = bestFallbackProb;
+                    a.FallbackExpectedDamage = bestFallbackExpected;
+                }
+            }
+        }
+
         return advice;
     }
 
