@@ -90,7 +90,7 @@ public class DiceRollAdvisor
             }
         }
 
-        return advice;
+        return advice.OrderByDescending(a => a.Probability).ThenByDescending(a => a.ExpectedDamage).ToList()  ;
     }
 
     private List<bool> GreedyKeep(List<int> dice, RollObjective objective)
