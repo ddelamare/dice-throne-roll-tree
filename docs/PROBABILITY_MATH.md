@@ -24,7 +24,7 @@ The application calculates the probability of achieving various dice roll object
 Two calculation methods are provided:
 
 1. **Analytic (Exact)**: Uses dynamic programming to compute exact probabilities assuming optimal play
-2. **Monte Carlo**: Uses statistical simulation with a greedy heuristic
+2. **Monte Carlo**: Uses statistical simulation with improved heuristics (or optional optimal play mode)
 
 ---
 
@@ -210,7 +210,7 @@ For n=5 dice with r=2 rerolls, this is manageable with typical computation times
 
 ### Algorithm Overview
 
-The `MonteCarloSimulator` estimates probabilities by running many random simulations and counting successes.
+The `MonteCarloSimulator` estimates probabilities by running many random simulations and counting successes. It supports both an improved greedy heuristic and an optional optimal play mode.
 
 ### Core Algorithm
 
@@ -232,7 +232,10 @@ function SimulateOneGame(objective, totalDice, rerollsLeft):
             return true
         
         if roll < rerollsLeft:
-            toKeep = DecideKeep(dice, objective)  // Greedy heuristic
+            if useOptimalStrategy:
+                toKeep = CalculateBestKeep(dice, rerollsLeft-roll, objective)
+            else:
+                toKeep = DecideKeep(dice, objective)  // Improved heuristic
             kept = FilterKept(dice, toKeep)
             rerolled = RollDice(totalDice - |kept|)
             dice = kept ∪ rerolled
@@ -240,9 +243,9 @@ function SimulateOneGame(objective, totalDice, rerollsLeft):
     return IsMatch(dice, objective)
 ```
 
-### Greedy Keep Heuristic
+### Improved Keep Heuristics
 
-The Monte Carlo simulator uses a **greedy** dice selection strategy:
+The Monte Carlo simulator uses improved dice selection strategies:
 
 #### For Standard Objectives (e.g., `[6666]`, `[(123)(123)(123)]`)
 
@@ -264,34 +267,69 @@ function DecideKeep(dice, objective):
     return toKeep
 ```
 
-**Key behavior:**
-- Greedily matches dice to objective groups in order
-- First matching group "claims" a die
-- Remaining dice are rerolled
+#### For Small Straight (Improved)
 
-#### For Small Straight
+The improved strategy considers all three possible small straights and picks the best candidate:
 
 ```
-function DecideKeep(dice, objective):
-    straightVals = {1, 2, 3, 4, 5}  // Prefer low values
-    return [d in straightVals for d in dice]
-```
-
-#### For Large Straight
-
-```
-function DecideKeep(dice, objective):
-    straightVals = {1, 2, 3, 4, 5, 6}
-    diceSet = ToSet(dice)
+function DecideKeepSmallStraight(dice):
+    candidates = [{1,2,3,4}, {2,3,4,5}, {3,4,5,6}]
     
-    # Check if already have a complete straight
-    if {1,2,3,4,5} ⊆ diceSet:
-        straightVals = {1, 2, 3, 4, 5}
-    else if {2,3,4,5,6} ⊆ diceSet:
-        straightVals = {2, 3, 4, 5, 6}
+    // Pick candidate with most matching dice
+    bestCandidate = candidates.MaxBy(c => CountUniqueMatches(dice, c))
     
-    return [d in straightVals for d in dice]
+    // Keep at most one of each value
+    keptValues = {}
+    toKeep = []
+    
+    for each d in dice:
+        if d in bestCandidate and d not in keptValues:
+            toKeep.Add(true)
+            keptValues.Add(d)
+        else:
+            toKeep.Add(false)
+    
+    return toKeep
 ```
+
+**Benefits:**
+- Targets the most achievable straight based on current dice
+- Handles duplicates correctly (keeps only one of each value)
+
+#### For Large Straight (Improved)
+
+Similar to SmallStraight, considers both possible large straights:
+
+```
+function DecideKeepLargeStraight(dice):
+    candidates = [{1,2,3,4,5}, {2,3,4,5,6}]
+    
+    // Pick candidate with most matching dice
+    bestCandidate = candidates.MaxBy(c => CountUniqueMatches(dice, c))
+    
+    // Keep at most one of each value
+    keptValues = {}
+    toKeep = []
+    
+    for each d in dice:
+        if d in bestCandidate and d not in keptValues:
+            toKeep.Add(true)
+            keptValues.Add(d)
+        else:
+            toKeep.Add(false)
+    
+    return toKeep
+```
+
+### Optional Optimal Play Mode
+
+For higher accuracy (at the cost of performance), the simulator supports an optional optimal play mode:
+
+```csharp
+var simulator = new MonteCarloSimulator(matcher, calculator, useOptimalStrategy: true);
+```
+
+In this mode, the simulator uses `CalculateBestKeep()` instead of heuristics, making results converge closely to analytic probabilities.
 
 ### Statistical Properties
 
@@ -319,26 +357,32 @@ This gives a ±1% margin of error.
 | 100,000    | ±0.3%            |
 | 1,000,000  | ±0.1%            |
 
-### Bias from Greedy Heuristic
+### Accuracy Notes
 
-The Monte Carlo simulation uses a **greedy** heuristic rather than optimal play. This introduces systematic bias:
+The Monte Carlo simulation accuracy depends on the strategy used:
 
-1. **Underestimation**: Greedy play is generally suboptimal, so estimated probabilities are lower than true optimal probabilities
-2. **Bias magnitude**: Depends on objective complexity; simple objectives have minimal bias
-3. **Mitigation**: Use analytic method for precise calculations
+1. **With Improved Heuristics (default)**: 
+   - Good approximation for most objectives
+   - Slight underestimation compared to optimal play for complex straight objectives
+   - Efficient and fast
+
+2. **With Optimal Play Mode**: 
+   - Results converge to analytic probabilities
+   - Slower due to optimal calculation per simulation step
+   - Use when high accuracy is needed
 
 ---
 
 ## Comparison of Methods
 
-| Aspect | Analytic | Monte Carlo |
-|--------|----------|-------------|
-| **Accuracy** | Exact | Statistical estimate |
-| **Optimality** | Assumes optimal play | Uses greedy heuristic |
-| **Speed (5 dice)** | Fast (~10-50ms) | Medium (~100ms for 10K iterations) |
-| **Speed (6-7 dice)** | Slower (~100-500ms) | Same (~100ms) |
-| **Memory** | Higher (memoization) | Low (constant) |
-| **Determinism** | Deterministic | Random (varies between runs) |
+| Aspect | Analytic | Monte Carlo (Heuristic) | Monte Carlo (Optimal) |
+|--------|----------|-------------------------|------------------------|
+| **Accuracy** | Exact | Good estimate | Near-exact estimate |
+| **Optimality** | Optimal play | Improved heuristics | Optimal play |
+| **Speed (5 dice)** | Fast (~10-50ms) | Fast (~100ms for 10K) | Slower (~500ms for 10K) |
+| **Speed (6-7 dice)** | Slower (~100-500ms) | Same (~100ms) | Same (~500ms) |
+| **Memory** | Higher (memoization) | Low (constant) | Low (constant) |
+| **Determinism** | Deterministic | Random (varies) | Random (varies) |
 
 *Note: Speed estimates are approximate and depend on hardware and JIT compilation state.*
 
@@ -350,11 +394,16 @@ The Monte Carlo simulation uses a **greedy** heuristic rather than optimal play.
 - Dice count is ≤ 5
 - Making strategic decisions
 
-**Use Monte Carlo when:**
+**Use Monte Carlo (Heuristic) when:**
 - You want fast estimation
 - Dice count is high (6-7)
-- You want to understand "realistic" play with a greedy strategy
-- Exact computation is too slow
+- Approximation is acceptable
+- Testing or exploration
+
+**Use Monte Carlo (Optimal) when:**
+- You want statistical validation of analytic results
+- You need to understand variance in outcomes
+- Studying convergence properties
 
 ---
 

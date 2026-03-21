@@ -109,7 +109,8 @@ Uses dynamic programming with memoization to calculate optimal play probabilitie
 
 Runs configurable iterations (default 10,000) to estimate probabilities:
 - Simulates full game with random rolls
-- Uses greedy strategy for dice selection
+- Uses improved heuristics for dice selection (considers all straights, handles duplicates)
+- Optional optimal play mode for higher accuracy
 - Returns success rate as probability estimate
 
 ### Objective Matcher
@@ -127,14 +128,14 @@ For detailed documentation on the mathematics and algorithms used, see:
   - State representation using histogram encoding
   - Dynamic programming algorithm for optimal play
   - Multinomial coefficient calculations
-  - Monte Carlo simulation approach
+  - Monte Carlo simulation with improved heuristics
   - Mathematical proofs of correctness
 
-- **[Dice Suggestion Algorithm Analysis](docs/DICE_SUGGESTION_ANALYSIS.md)** - Analysis of the dice suggestion (roll advisor) algorithm:
-  - Current implementation overview
-  - Identified limitations and edge cases
-  - Proposed improvements
-  - Implementation recommendations
+- **[Dice Suggestion Algorithm](docs/DICE_SUGGESTION_ANALYSIS.md)** - Documentation of the dice suggestion (roll advisor) algorithm:
+  - Implementation overview and optimal strategy calculation
+  - Smart straight handling (considers all possible straights, eliminates duplicates)
+  - Best overall strategy for maximizing expected damage
+  - Probability delta fields for decision analysis
 
 ## License
 
