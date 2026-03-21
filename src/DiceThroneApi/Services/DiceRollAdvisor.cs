@@ -23,10 +23,7 @@ public class DiceRollAdvisor
             var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
             
             // Calculate baseline probability (if we reroll all dice)
-            var baselineKeep = Enumerable.Repeat(false, currentDice.Count).ToList();
-            var baselineProb = rollsRemaining > 0 
-                ? _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep)
-                : 0.0;
+            var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
             
             // Use Monte Carlo for probability if requested, but always use optimal keep strategy
             var prob = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase)
@@ -106,12 +103,7 @@ public class DiceRollAdvisor
             if (expectedDamage > bestExpectedDamage)
             {
                 bestExpectedDamage = expectedDamage;
-                
-                // Calculate baseline probability
-                var baselineKeep = Enumerable.Repeat(false, currentDice.Count).ToList();
-                var baselineProb = rollsRemaining > 0
-                    ? _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep)
-                    : 0.0;
+                var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
                 
                 bestAdvice = new RollAdvice
                 {
@@ -128,6 +120,20 @@ public class DiceRollAdvisor
         }
 
         return bestAdvice;
+    }
+
+    /// <summary>
+    /// Calculates the probability of hitting an objective if all dice are rerolled.
+    /// </summary>
+    private double CalculateBaselineProbability(List<int> currentDice, int rollsRemaining, RollObjective objective)
+    {
+        if (rollsRemaining <= 0)
+        {
+            return 0.0;
+        }
+        
+        var baselineKeep = Enumerable.Repeat(false, currentDice.Count).ToList();
+        return _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep);
     }
 
     private List<bool> GreedyKeep(List<int> dice, RollObjective objective)

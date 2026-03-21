@@ -5,7 +5,7 @@ namespace DiceThroneApi.Services;
 public class MonteCarloSimulator
 {
     private readonly ObjectiveMatcher _matcher;
-    private readonly ProbabilityCalculator? _calculator;
+    private readonly ProbabilityCalculator? _probabilityCalculator;
     private readonly bool _useOptimalStrategy;
 
     public MonteCarloSimulator(ObjectiveMatcher matcher)
@@ -14,10 +14,10 @@ public class MonteCarloSimulator
         _useOptimalStrategy = false;
     }
 
-    public MonteCarloSimulator(ObjectiveMatcher matcher, ProbabilityCalculator calculator, bool useOptimalStrategy = false)
+    public MonteCarloSimulator(ObjectiveMatcher matcher, ProbabilityCalculator probabilityCalculator, bool useOptimalStrategy = false)
     {
         _matcher = matcher;
-        _calculator = calculator;
+        _probabilityCalculator = probabilityCalculator;
         _useOptimalStrategy = useOptimalStrategy;
     }
 
@@ -52,9 +52,9 @@ public class MonteCarloSimulator
                 List<bool> toKeep;
                 
                 // Use optimal strategy if enabled and calculator is available
-                if (_useOptimalStrategy && _calculator != null)
+                if (_useOptimalStrategy && _probabilityCalculator != null)
                 {
-                    _calculator.CalculateBestKeep(dice, rerollsLeft - roll, objective, out toKeep);
+                    _probabilityCalculator.CalculateBestKeep(dice, rerollsLeft - roll, objective, out toKeep);
                 }
                 else
                 {
