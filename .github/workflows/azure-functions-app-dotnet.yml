@@ -33,7 +33,7 @@ jobs:
         SSH_PRIVATE_KEY: ${{ secrets.KEY }}
         REMOTE_HOST: ${{ secrets.HOST }}
         REMOTE_USER: ${{ secrets.USERNAME }}
-        ARGS: "-avz"
+        ARGS: "-avz --omit-dir-times"
         SOURCE: "./dist/" # The directory to deploy from
         TARGET: "/var/www/dice.delamare.io" # The destination on the server
         # Optionally, run commands on the remote server after transfer
