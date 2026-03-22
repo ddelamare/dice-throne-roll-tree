@@ -170,6 +170,17 @@ public class DiceRollAdvisorTests
         Assert.InRange(prob, 0.3, 1.0);
     }
 
+    [Fact]
+    public void CalculateBestKeep_AllowsRerollingAllDice_WhenThatIsOptimal()
+    {
+        var objective = _parser.Parse("Test", "[6666]");
+        var dice = new List<int> { 1, 2, 3, 4, 5 };
+
+        _calculator.CalculateBestKeep(dice, 2, objective, out var toKeep);
+
+        Assert.Equal(new List<bool> { false, false, false, false, false }, toKeep);
+    }
+
     // ── New Improvement Tests ────────────────────────────────────────────────
 
     [Fact]
@@ -239,6 +250,23 @@ public class DiceRollAdvisorTests
         // Easy: 1.0 * 2 = 2.0 expected damage
         // Hard: low probability * 10 < 2.0 expected damage
         Assert.Equal("Easy Attack", best.ObjectiveName);
+    }
+
+    [Fact]
+    public void GetAdvice_OrdersByExpectedDamage_BeforeProbability()
+    {
+        var highProbabilityLowDamage = _parser.Parse("Safe Attack", "[66]");
+        highProbabilityLowDamage.Damage = 2;
+
+        var lowerProbabilityHighDamage = _parser.Parse("Big Swing", "[66666]");
+        lowerProbabilityHighDamage.Damage = 40;
+
+        var dice = new List<int> { 6, 6, 6, 6, 1 };
+        var advice = _advisor.GetAdvice(dice, 1, new List<RollObjective> { highProbabilityLowDamage, lowerProbabilityHighDamage });
+
+        Assert.Equal("Big Swing", advice[0].ObjectiveName);
+        Assert.True(advice[0].ExpectedDamage > advice[1].ExpectedDamage);
+        Assert.True(advice[0].Probability < advice[1].Probability);
     }
 
     [Fact]
