@@ -1,5 +1,5 @@
 {
-  "id": "drstange",
+  "id": "strange",
   "name": "Doctor Strange",
   "objectives": [
     { "name": "Augury", "notation": "[(34)(34)66]", "damage": 8 },
