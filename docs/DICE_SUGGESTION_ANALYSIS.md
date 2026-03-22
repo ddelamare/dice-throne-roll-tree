@@ -87,6 +87,10 @@ Optimal P = max over all keep strategies K of:
    a. Compute expected probability over all reroll outcomes
    b. Use memoized OptimalProbability for future states
 5. Return best strategy and its probability
+
+The keep-strategy search includes the "reroll everything" option when that maximizes the
+chance of converting into damage. This avoids forced keeps on dice that do not help the
+current plan.
 ```
 
 ### Monte Carlo Method: Improved Heuristics
@@ -117,7 +121,8 @@ var prob = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase)
     : optimalProb;
 ```
 
-**Benefit:** Users always get optimal keep suggestions, regardless of probability method.
+**Benefit:** Users always get optimal keep suggestions, including full-reroll lines when no
+current dice are worth anchoring.
 
 ### ✅ Improvement 2: Fixed Straight Duplicate Handling
 
@@ -199,7 +204,8 @@ public RollAdvice? GetBestOverallStrategy(
 }
 ```
 
-**Benefit:** Strategic players can now maximize expected damage across all objectives.
+**Benefit:** Strategic players can now maximize expected damage across all objectives, while
+preferring the higher-probability line when two options have the same expected damage.
 
 ### ✅ Improvement 5: Monte Carlo Optimal Play Mode
 
