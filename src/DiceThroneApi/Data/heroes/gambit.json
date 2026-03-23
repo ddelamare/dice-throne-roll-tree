@@ -1,0 +1,16 @@
+{
+  "id": "gambit",
+  "name": "Gambit",
+  "objectives": [
+    { "name": "Bo Staff (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Bo Staff (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Bo Staff (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Poker Face", "notation": "[(123)44]", "damage": 0 },
+    { "name": "Bokutsu", "notation": "[(123)(123)55]", "damage": 2 },
+    { "name": "Sleight of Hand", "notation": "[(123)(123)46]", "damage": 7 },
+    { "name": "Card Shark (Small)", "notation": "SmallStraight", "damage": 7 },
+    { "name": "Card Shark (Large)", "notation": "LargeStraight", "damage": 9 },
+    { "name": "Ragin' Cajun", "notation": "[6666]", "damage": 6 },
+    { "name": "Le Diable Blanc!", "notation": "[66666]", "damage": 11 }
+]
+}
