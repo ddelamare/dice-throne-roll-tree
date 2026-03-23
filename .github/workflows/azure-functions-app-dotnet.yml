@@ -37,4 +37,4 @@ jobs:
         SOURCE: "./dist/" # The directory to deploy from
         TARGET: "/var/www/dice.delamare.io" # The destination on the server
         # Optionally, run commands on the remote server after transfer
-        # SCRIPT_AFTER: "cd /var/www/dice.delamare.io && ./restart_service.sh"
+        SCRIPT_AFTER: "sudo systemctl restart kestrel-dice-delamare-io.service"
