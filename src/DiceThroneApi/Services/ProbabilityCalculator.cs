@@ -32,6 +32,12 @@ public class ProbabilityCalculator
         return totalProb / totalOutcomes;
     }
 
+    /// <summary>
+    /// Calculates the probability of hitting <paramref name="objective"/> from a fresh turn before
+    /// any dice are rolled, optionally forcing specific dice positions to remain locked after the
+    /// opening roll. Unlike <see cref="Calculate"/>, this models hero rules such as Psylocke's
+    /// manifest die by averaging over the initial locked-die outcomes and then applying optimal play.
+    /// </summary>
     public double CalculatePreRoll(RollObjective objective, int totalDice, List<bool>? lockedDiceMask = null, int rerolls = 2)
     {
         var normalizedLockedDiceMask = NormalizeKeepMask(lockedDiceMask, totalDice);
@@ -317,6 +323,11 @@ public class ProbabilityCalculator
         return GenerateDistinctRollsHelper(new int[6], 0, rerollCount);
     }
 
+    /// <summary>
+    /// Generates all ordered roll combinations for <paramref name="diceCount"/> dice (6^n outcomes).
+    /// This differs from <see cref="GenerateDistinctRolls(int)"/>, which collapses permutations into
+    /// histogram counts paired with multiplicities.
+    /// </summary>
     private static IEnumerable<int[]> GenerateOrderedRolls(int diceCount)
     {
         return GenerateOrderedRollsHelper(new int[diceCount], 0);
@@ -368,19 +379,34 @@ public class ProbabilityCalculator
         return result;
     }
 
+    /// <summary>
+    /// Builds an initial dice list by placing the ordered locked values at their fixed indexes and
+    /// filling the remaining positions from the unlocked histogram values.
+    /// </summary>
     private static List<int> BuildInitialDice(int totalDice, List<int> lockedIndexes, int[] lockedValues, int[] unlockedHistogram)
     {
+        if (lockedIndexes.Count != lockedValues.Length)
+        {
+            throw new ArgumentException("Locked index count must match locked value count.", nameof(lockedValues));
+        }
+
         var dice = Enumerable.Repeat(0, totalDice).ToList();
-        for (var i = 0; i < lockedIndexes.Count && i < lockedValues.Length; i++)
+        for (var i = 0; i < lockedIndexes.Count; i++)
         {
             dice[lockedIndexes[i]] = lockedValues[i];
         }
 
         var unlockedValues = HistogramToDice(unlockedHistogram);
-        var unlockedIndex = 0;
-        for (var i = 0; i < dice.Count && unlockedIndex < unlockedValues.Count; i++)
+        if (unlockedValues.Count != totalDice - lockedIndexes.Count)
         {
-            if (lockedIndexes.Contains(i))
+            throw new ArgumentException("Unlocked histogram does not match the expected dice count.", nameof(unlockedHistogram));
+        }
+
+        var lockedIndexSet = lockedIndexes.ToHashSet();
+        var unlockedIndex = 0;
+        for (var i = 0; i < dice.Count; i++)
+        {
+            if (lockedIndexSet.Contains(i))
             {
                 continue;
             }

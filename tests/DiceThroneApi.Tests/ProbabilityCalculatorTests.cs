@@ -74,7 +74,7 @@ public class ProbabilityCalculatorTests
     }
 
     [Fact]
-    public void CalculatePreRoll_WithoutLockedDice_MatchesStandardCalculation()
+    public void CalculatePreRoll_WithNoLockedDice_MatchesStandardCalculation()
     {
         var objective = _parser.Parse("Test", "[66]");
 

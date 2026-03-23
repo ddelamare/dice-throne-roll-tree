@@ -403,6 +403,8 @@
         let hasManifestDie = false;
         let manifestDieIndex = -1;
         let isBusy = false;
+        const defaultStatusText = 'Click "Roll Dice" to start a new turn!';
+        const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
         
         async function loadHeroes() {
             try {
@@ -429,7 +431,7 @@
                 currentHero = await response.json();
                 hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
                 manifestDieIndex = hasManifestDie ? 0 : -1;
-                resetTurnDisplay('Click "Roll Dice" to start a new turn!');
+                resetTurnDisplay(defaultStatusText);
             } catch (error) {
                 console.error('Error loading hero:', error);
             }
@@ -581,7 +583,7 @@
                 });
 
                 const suggestions = await response.json();
-                document.getElementById('status').textContent = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
+                document.getElementById('status').textContent = preRollStatusText;
                 renderObjectives(suggestions, false);
             } catch (error) {
                 console.error('Error calculating objective odds:', error);
