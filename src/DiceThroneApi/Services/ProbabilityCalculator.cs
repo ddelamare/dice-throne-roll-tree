@@ -32,6 +32,40 @@ public class ProbabilityCalculator
         return totalProb / totalOutcomes;
     }
 
+    public double CalculatePreRoll(RollObjective objective, int totalDice, List<bool>? lockedDiceMask = null, int rerolls = 2)
+    {
+        var normalizedLockedDiceMask = NormalizeKeepMask(lockedDiceMask, totalDice);
+        if (!normalizedLockedDiceMask.Any(isLocked => isLocked))
+        {
+            return Calculate(objective, totalDice, rerolls: rerolls);
+        }
+
+        var lockedIndexes = normalizedLockedDiceMask
+            .Select((isLocked, index) => new { isLocked, index })
+            .Where(x => x.isLocked)
+            .Select(x => x.index)
+            .ToList();
+
+        var unlockedDiceCount = totalDice - lockedIndexes.Count;
+        var totalProb = 0.0;
+        var totalOutcomes = (long)Math.Pow(6, totalDice);
+
+        foreach (var lockedValues in GenerateOrderedRolls(lockedIndexes.Count))
+        {
+            foreach (var (unlockedHistogram, multiplicity) in GenerateDistinctRolls(unlockedDiceCount))
+            {
+                var initialDice = BuildInitialDice(totalDice, lockedIndexes, lockedValues, unlockedHistogram);
+                var probability = unlockedDiceCount == 0
+                    ? (_matcher.IsMatch(initialDice, objective) ? 1.0 : 0.0)
+                    : CalculateBestKeep(initialDice, rerolls, objective, out _, normalizedLockedDiceMask);
+
+                totalProb += multiplicity * probability;
+            }
+        }
+
+        return totalProb / totalOutcomes;
+    }
+
     // Optimization 1: long memo key; Optimization 2: histogram state
     private double OptimalProbability(int[] histogram, int rerollsLeft, RollObjective objective, Dictionary<long, double> memo)
     {
@@ -283,6 +317,11 @@ public class ProbabilityCalculator
         return GenerateDistinctRollsHelper(new int[6], 0, rerollCount);
     }
 
+    private static IEnumerable<int[]> GenerateOrderedRolls(int diceCount)
+    {
+        return GenerateOrderedRollsHelper(new int[diceCount], 0);
+    }
+
     private static IEnumerable<(int[], long)> GenerateDistinctRollsHelper(int[] counts, int face, int remaining)
     {
         // Recursion break case when die is a 6
@@ -302,6 +341,24 @@ public class ProbabilityCalculator
         }
     }
 
+    private static IEnumerable<int[]> GenerateOrderedRollsHelper(int[] values, int index)
+    {
+        if (index >= values.Length)
+        {
+            yield return (int[])values.Clone();
+            yield break;
+        }
+
+        for (var face = 1; face <= 6; face++)
+        {
+            values[index] = face;
+            foreach (var result in GenerateOrderedRollsHelper(values, index + 1))
+            {
+                yield return result;
+            }
+        }
+    }
+
     // Compute the multinomial coefficient n! / (counts[0]! * counts[1]! * ... * counts[5]!)
     private static long Multinomial(int n, int[] counts)
     {
@@ -309,6 +366,29 @@ public class ProbabilityCalculator
         foreach (int c in counts)
             result /= _factorials[c];
         return result;
+    }
+
+    private static List<int> BuildInitialDice(int totalDice, List<int> lockedIndexes, int[] lockedValues, int[] unlockedHistogram)
+    {
+        var dice = Enumerable.Repeat(0, totalDice).ToList();
+        for (var i = 0; i < lockedIndexes.Count && i < lockedValues.Length; i++)
+        {
+            dice[lockedIndexes[i]] = lockedValues[i];
+        }
+
+        var unlockedValues = HistogramToDice(unlockedHistogram);
+        var unlockedIndex = 0;
+        for (var i = 0; i < dice.Count && unlockedIndex < unlockedValues.Count; i++)
+        {
+            if (lockedIndexes.Contains(i))
+            {
+                continue;
+            }
+
+            dice[i] = unlockedValues[unlockedIndex++];
+        }
+
+        return dice;
     }
 
     // Map a keep histogram (how many of each face to keep) back to per-position booleans
