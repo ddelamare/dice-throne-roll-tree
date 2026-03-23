@@ -25,7 +25,7 @@ jobs:
     - name: 'Resolve Project Dependencies Using Dotnet'
       shell: bash
       run: |
-        dotnet build --configuration Release --output ./dist
+        dotnet publish --configuration Release --output ./dist
 
     - name: Deploy with rsync
       uses: easingthemes/ssh-deploy@main
