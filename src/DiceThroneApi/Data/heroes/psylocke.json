@@ -1,0 +1,16 @@
+{
+  "id": "psylocke",
+  "name": "Psylocke",
+  "objectives": [
+    { "name": "Lunge (3)", "notation": "[(12)(12)(12)]", "damage": 5 },
+    { "name": "Lunge (4)", "notation": "[(12)(12)(12)(12)]", "damage": 6 },
+    { "name": "Lunge (5)", "notation": "[(12)(12)(12)(12)(12)]", "damage": 7 },
+    { "name": "Devise", "notation": "[(12)(34)56]", "damage": 3 },
+    { "name": "Parry", "notation": "[(12)(12)(34)(34)6]", "damage": 7 },
+    { "name": "Stealth (Small)", "notation": "SmallStraight", "damage": 6 },
+    { "name": "Stealth (Large)", "notation": "LargeStraight", "damage": 8 },
+    { "name": "Paralyze", "notation": "[(12)(12)55]", "damage": 6 },
+    { "name": "Blade Dance", "notation": "[6666]", "damage": 6 },
+    { "name": "Otherworlder!", "notation": "[66666]", "damage": 11 }
+  ]
+}

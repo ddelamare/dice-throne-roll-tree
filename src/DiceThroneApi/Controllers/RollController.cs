@@ -37,16 +37,21 @@ public class RollController : ControllerBase
             return NotFound("Hero not found");
         }
 
-        var dice = request.CurrentDice ?? RollDice(request.DiceCount).OrderBy(d => d).ToList();
+        var hasManifestDie = HasManifestDie(hero.Id);
+        var totalDiceToRoll = request.DiceCount + (hasManifestDie ? 1 : 0);
+        var dice = request.CurrentDice ?? RollDice(totalDiceToRoll);
         var rollsRemaining = request.RollsRemaining ?? 2;
+        var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
 
-        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic");
+        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask);
 
         return Ok(new
         {
             dice,
             rollsRemaining,
-            suggestions
+            suggestions,
+            hasManifestDie,
+            manifestDieIndex = hasManifestDie ? 0 : -1
         });
     }
 
@@ -88,9 +93,27 @@ public class RollController : ControllerBase
             return NotFound("Hero not found");
         }
 
-        var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic");
+        var lockedDiceMask = BuildLockedDiceMask(request.CurrentDice.Count, HasManifestDie(hero.Id));
+
+        var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask);
 
         return Ok(advice);
+    }
+
+    private static bool HasManifestDie(string heroId)
+    {
+        return heroId.Equals("psylocke", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static List<bool> BuildLockedDiceMask(int diceCount, bool hasManifestDie)
+    {
+        var lockedDiceMask = Enumerable.Repeat(false, diceCount).ToList();
+        if (hasManifestDie && diceCount > 0)
+        {
+            lockedDiceMask[0] = true;
+        }
+
+        return lockedDiceMask;
     }
 
     private List<int> RollDice(int count)

@@ -167,6 +167,31 @@
             color: #999;
             border-color: #ddd;
         }
+
+        .die.manifest {
+            background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+            color: white;
+            border-color: #0d47a1;
+            cursor: not-allowed;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            line-height: 1;
+            font-size: 28px;
+        }
+
+        .die.manifest:hover {
+            transform: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .manifest-tag {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
         
         .objectives {
             margin-top: 30px;
@@ -277,6 +302,15 @@
             background: #e0e0e0;
             color: #999;
         }
+
+        .suggestion-die.manifest {
+            background: #1565c0;
+            color: white;
+            border: 2px solid #0d47a1;
+            font-size: 13px;
+            line-height: 1.1;
+            padding-top: 2px;
+        }
         
         .loading {
             text-align: center;
@@ -362,6 +396,8 @@
         let currentDice = [];
         let rollsRemaining = 2;
         let diceToKeep = [];
+        let hasManifestDie = false;
+        let manifestDieIndex = -1;
         
         async function loadHeroes() {
             try {
@@ -386,6 +422,8 @@
             try {
                 const response = await fetch(`/api/heroes/${heroId}`);
                 currentHero = await response.json();
+                hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
+                manifestDieIndex = hasManifestDie ? 0 : -1;
             } catch (error) {
                 console.error('Error loading hero:', error);
             }
@@ -415,9 +453,14 @@
                 });
                 
                 const result = await response.json();
-                currentDice = result.dice.slice().sort((a, b) => a - b);
+                currentDice = result.dice.slice();
                 rollsRemaining = result.rollsRemaining;
+                hasManifestDie = !!result.hasManifestDie;
+                manifestDieIndex = hasManifestDie ? result.manifestDieIndex : -1;
                 diceToKeep = new Array(currentDice.length).fill(true);
+                if (hasManifestDie && manifestDieIndex >= 0 && manifestDieIndex < diceToKeep.length) {
+                    diceToKeep[manifestDieIndex] = true;
+                }
                 
                 updateDisplay(result.suggestions);
             } catch (error) {
@@ -428,9 +471,19 @@
         
         async function rerollDice() {
             if (!currentHero || rollsRemaining <= 0) return;
-            
-            const keptDice = currentDice.filter((_, i) => diceToKeep[i]);
-            const rerollCount = currentDice.length - keptDice.length;
+
+            const rerollIndexes = [];
+            for (let i = 0; i < currentDice.length; i++) {
+                if (isManifestDie(i)) {
+                    continue;
+                }
+
+                if (!diceToKeep[i]) {
+                    rerollIndexes.push(i);
+                }
+            }
+
+            const rerollCount = rerollIndexes.length;
             
             if (rerollCount === 0) {
                 alert('Please select at least one die to re-roll!');
@@ -438,7 +491,11 @@
             }
             
             const newRolls = Array.from({length: rerollCount}, () => Math.floor(Math.random() * 6) + 1);
-            currentDice = [...keptDice, ...newRolls].sort((a, b) => a - b);
+            const nextDice = currentDice.slice();
+            rerollIndexes.forEach((dieIndex, rerollIndex) => {
+                nextDice[dieIndex] = newRolls[rerollIndex];
+            });
+            currentDice = nextDice;
             rollsRemaining--;
             
             const method = document.getElementById('methodSelect').value;
@@ -459,6 +516,9 @@
                 
                 const suggestions = await response.json();
                 diceToKeep = new Array(currentDice.length).fill(true);
+                if (hasManifestDie && manifestDieIndex >= 0 && manifestDieIndex < diceToKeep.length) {
+                    diceToKeep[manifestDieIndex] = true;
+                }
                 
                 updateDisplay(suggestions);
             } catch (error) {
@@ -474,10 +534,15 @@
                     : `No re-rolls left`;
             
             document.getElementById('diceHint').style.display = 'block';
+            document.getElementById('diceHint').textContent = hasManifestDie
+                ? '🔵 Highlighted = keep | ⬜ Gray = re-roll | 🧿 Manifest Die (first die) is locked for Psylocke'
+                : '🔵 Highlighted = keep | ⬜ Gray = re-roll · Click any die to toggle';
             
             const diceContainer = document.getElementById('diceContainer');
             diceContainer.innerHTML = currentDice.map((value, index) => 
-                `<div class="die ${diceToKeep[index] ? 'keep' : 'reroll'}" onclick="toggleDie(${index})">${value}</div>`
+                isManifestDie(index)
+                    ? `<div class="die manifest" title="Manifest Die (locked)"><span>${value}</span><span class="manifest-tag">Manifest</span></div>`
+                    : `<div class="die ${diceToKeep[index] ? 'keep' : 'reroll'}" onclick="toggleDie(${index})">${value}</div>`
             ).join('');
             
             const objectivesDiv = document.getElementById('objectives');
@@ -516,7 +581,9 @@
                         <div>Suggested keep:</div>
                         <div class="keep-suggestion">
                             ${currentDice.map((value, i) => 
-                                `<div class="suggestion-die ${advice.diceToKeep[i] ? 'keep' : 'reroll'}">${value}</div>`
+                                isManifestDie(i)
+                                    ? `<div class="suggestion-die manifest">${value}<br>MAN</div>`
+                                    : `<div class="suggestion-die ${advice.diceToKeep[i] ? 'keep' : 'reroll'}">${value}</div>`
                             ).join('')}
                         </div>
                     </div>
@@ -527,9 +594,17 @@
         }
         
         function toggleDie(index) {
+            if (isManifestDie(index)) {
+                return;
+            }
+
             diceToKeep[index] = !diceToKeep[index];
             const diceElements = document.querySelectorAll('.die');
             diceElements[index].className = `die ${diceToKeep[index] ? 'keep' : 'reroll'}`;
+        }
+
+        function isManifestDie(index) {
+            return hasManifestDie && index === manifestDieIndex;
         }
         
         loadHeroes();

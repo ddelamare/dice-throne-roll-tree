@@ -96,4 +96,18 @@ public class ProbabilityCalculatorTests
         Assert.Equal(currentDice.Count, bestKeep.Count);
         Assert.InRange(probability, 0.0, 1.0);
     }
+
+    [Fact]
+    public void CalculateBestKeep_WithRequiredKeep_AlwaysKeepsRequiredDie()
+    {
+        var objective = _parser.Parse("Test", "[66]");
+        var currentDice = new List<int> { 1, 6, 2, 3, 4, 5 };
+        var requiredKeep = new List<bool> { true, false, false, false, false, false };
+
+        var probability = _calculator.CalculateBestKeep(currentDice, 2, objective, out var bestKeep, requiredKeep);
+
+        Assert.Equal(currentDice.Count, bestKeep.Count);
+        Assert.True(bestKeep[0]);
+        Assert.InRange(probability, 0.0, 1.0);
+    }
 }

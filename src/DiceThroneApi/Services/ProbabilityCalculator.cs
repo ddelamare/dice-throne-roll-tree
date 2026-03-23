@@ -95,7 +95,19 @@ public class ProbabilityCalculator
 
     public double CalculateBestKeep(List<int> currentDice, int rerollsLeft, RollObjective objective, out List<bool> bestKeep)
     {
+        return CalculateBestKeep(currentDice, rerollsLeft, objective, out bestKeep, null);
+    }
+
+    public double CalculateBestKeep(
+        List<int> currentDice,
+        int rerollsLeft,
+        RollObjective objective,
+        out List<bool> bestKeep,
+        List<bool>? requiredKeep)
+    {
         bestKeep = new List<bool>();
+        var requiredKeepMask = NormalizeKeepMask(requiredKeep, currentDice.Count);
+        var requiredFaceCounts = GetRequiredFaceCounts(currentDice, requiredKeepMask);
 
         if (_matcher.IsMatch(currentDice, objective))
         {
@@ -116,6 +128,11 @@ public class ProbabilityCalculator
 
         foreach (var keepHistogram in EnumerateKeepStrategies(histogram))
         {
+            if (!SatisfiesRequiredFaceCounts(keepHistogram, requiredFaceCounts))
+            {
+                continue;
+            }
+
             var keptCount = 0;
             for (int f = 0; f < 6; f++) keptCount += keepHistogram[f];
             var rerollCount = currentDice.Count - keptCount;
@@ -148,8 +165,8 @@ public class ProbabilityCalculator
         }
 
         bestKeep = bestKeepHistogram != null
-            ? HistogramKeepToMask(currentDice, bestKeepHistogram)
-            : Enumerable.Repeat(false, currentDice.Count).ToList();
+            ? HistogramKeepToMask(currentDice, bestKeepHistogram, requiredKeepMask)
+            : new List<bool>(requiredKeepMask);
 
         return bestProb;
     }
@@ -268,6 +285,7 @@ public class ProbabilityCalculator
 
     private static IEnumerable<(int[], long)> GenerateDistinctRollsHelper(int[] counts, int face, int remaining)
     {
+        // Recursion break case when die is a 6
         if (face == 5)
         {
             counts[5] = remaining;
@@ -295,14 +313,23 @@ public class ProbabilityCalculator
 
     // Map a keep histogram (how many of each face to keep) back to per-position booleans
     // for the original dice list, marking the first keepHistogram[f] dice of each face as kept.
-    private static List<bool> HistogramKeepToMask(List<int> dice, int[] keepHistogram)
+    private static List<bool> HistogramKeepToMask(List<int> dice, int[] keepHistogram, List<bool>? requiredKeepMask = null)
     {
+        requiredKeepMask ??= Enumerable.Repeat(false, dice.Count).ToList();
         var keepCount = new int[6];
         var result = new List<bool>(dice.Count);
-        foreach (int d in dice)
+
+        for (int i = 0; i < dice.Count; i++)
         {
+            var d = dice[i];
             int face = d - 1;
-            if (keepCount[face] < keepHistogram[face])
+
+            if (requiredKeepMask[i])
+            {
+                result.Add(true);
+                keepCount[face]++;
+            }
+            else if (keepCount[face] < keepHistogram[face])
             {
                 result.Add(true);
                 keepCount[face]++;
@@ -313,5 +340,52 @@ public class ProbabilityCalculator
             }
         }
         return result;
+    }
+
+    private static List<bool> NormalizeKeepMask(List<bool>? keepMask, int diceCount)
+    {
+        if (keepMask == null)
+        {
+            return Enumerable.Repeat(false, diceCount).ToList();
+        }
+
+        if (keepMask.Count == diceCount)
+        {
+            return new List<bool>(keepMask);
+        }
+
+        var normalized = Enumerable.Repeat(false, diceCount).ToList();
+        var copyCount = Math.Min(keepMask.Count, diceCount);
+        for (int i = 0; i < copyCount; i++)
+        {
+            normalized[i] = keepMask[i];
+        }
+        return normalized;
+    }
+
+    private static int[] GetRequiredFaceCounts(List<int> dice, List<bool> requiredKeepMask)
+    {
+        var faceCounts = new int[6];
+        for (int i = 0; i < dice.Count && i < requiredKeepMask.Count; i++)
+        {
+            if (requiredKeepMask[i])
+            {
+                faceCounts[dice[i] - 1]++;
+            }
+        }
+        return faceCounts;
+    }
+
+    private static bool SatisfiesRequiredFaceCounts(int[] keepHistogram, int[] requiredFaceCounts)
+    {
+        for (int f = 0; f < 6; f++)
+        {
+            if (keepHistogram[f] < requiredFaceCounts[f])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

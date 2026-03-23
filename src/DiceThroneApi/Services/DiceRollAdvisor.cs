@@ -14,17 +14,22 @@ public class DiceRollAdvisor
         _simulator = simulator;
     }
 
-    public List<RollAdvice> GetAdvice(List<int> currentDice, int rollsRemaining, List<RollObjective> objectives, string method = "analytic")
+    public List<RollAdvice> GetAdvice(
+        List<int> currentDice,
+        int rollsRemaining,
+        List<RollObjective> objectives,
+        string method = "analytic",
+        List<bool>? lockedDiceMask = null)
     {
         var advice = new List<RollAdvice>();
 
         foreach (var objective in objectives)
         {
             // Always use optimal keep strategy from the analytic calculator
-            var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
+            var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep, lockedDiceMask);
             
             // Calculate baseline probability (if we reroll all dice)
-            var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
+            var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective, lockedDiceMask);
             
             // Use Monte Carlo for probability if requested, but always use optimal keep strategy
             var prob = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase)
@@ -111,7 +116,7 @@ public class DiceRollAdvisor
             {
                 bestExpectedDamage = expectedDamage;
                 bestProbability = prob;
-                var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective);
+                var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective, null);
                 
                 bestAdvice = new RollAdvice
                 {
@@ -134,14 +139,21 @@ public class DiceRollAdvisor
     /// <summary>
     /// Calculates the probability of hitting an objective if all dice are rerolled.
     /// </summary>
-    private double CalculateBaselineProbability(List<int> currentDice, int rollsRemaining, RollObjective objective)
+    private double CalculateBaselineProbability(
+        List<int> currentDice,
+        int rollsRemaining,
+        RollObjective objective,
+        List<bool>? lockedDiceMask)
     {
         if (rollsRemaining <= 0)
         {
             return 0.0;
         }
         
-        var baselineKeep = Enumerable.Repeat(false, currentDice.Count).ToList();
+        var baselineKeep = lockedDiceMask != null && lockedDiceMask.Count == currentDice.Count
+            ? new List<bool>(lockedDiceMask)
+            : Enumerable.Repeat(false, currentDice.Count).ToList();
+
         return _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep);
     }
 
