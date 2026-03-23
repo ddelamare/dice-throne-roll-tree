@@ -34,6 +34,7 @@ public class DiceRollAdvisor
             advice.Add(new RollAdvice
             {
                 ObjectiveName = objective.Name,
+                ObjectiveNotation = objective.Notation,
                 DiceToKeep = toKeep,
                 Probability = prob,
                 CalculationMethod = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) ? "Monte Carlo" : "Analytic",
@@ -115,6 +116,7 @@ public class DiceRollAdvisor
                 bestAdvice = new RollAdvice
                 {
                     ObjectiveName = objective.Name,
+                    ObjectiveNotation = objective.Notation,
                     DiceToKeep = toKeep,
                     Probability = prob,
                     CalculationMethod = "Analytic",

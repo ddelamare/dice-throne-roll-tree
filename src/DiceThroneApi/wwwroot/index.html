@@ -199,10 +199,29 @@
             color: #333;
         }
         
+        .objective-notation {
+            font-size: 13px;
+            font-weight: 400;
+            color: #777;
+            margin-left: 8px;
+        }
+        
         .probability {
             font-size: 24px;
             font-weight: bold;
             color: #667eea;
+        }
+        
+        .probability-hit {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        
+        .probability-miss {
+            font-size: 28px;
+            font-weight: bold;
+            color: #c62828;
         }
         
         .objective-meta {
@@ -464,6 +483,21 @@
             const objectivesDiv = document.getElementById('objectives');
             objectivesDiv.innerHTML = suggestions.map(advice => {
                 const percentage = (advice.probability * 100).toFixed(1);
+                const notationHtml = advice.objectiveNotation
+                    ? `<span class="objective-notation">${advice.objectiveNotation}</span>`
+                    : '';
+                let probabilityHtml;
+                if (rollsRemaining === 0) {
+                    if (advice.probability >= 1.0) {
+                        probabilityHtml = `<span class="probability-hit">✓</span>`;
+                    } else if (advice.probability <= 0.0) {
+                        probabilityHtml = `<span class="probability-miss">✗</span>`;
+                    } else {
+                        probabilityHtml = `<span class="probability">${percentage}%</span>`;
+                    }
+                } else {
+                    probabilityHtml = `<span class="probability">${percentage}%</span>`;
+                }
                 const damageInfo = advice.damage > 0
                     ? `<span>Damage: <strong>${advice.damage}</strong></span>
                        <span class="expected-damage">Expected: ${advice.expectedDamage.toFixed(2)} dmg</span>`
@@ -474,8 +508,8 @@
                 return `
                     <div class="objective-card">
                         <div class="objective-header">
-                            <span class="objective-name">${advice.objectiveName}</span>
-                            <span class="probability">${percentage}%</span>
+                            <span class="objective-name">${advice.objectiveName}${notationHtml}</span>
+                            ${probabilityHtml}
                         </div>
                         <div class="objective-meta">${damageInfo}</div>
                         ${fallbackInfo}
