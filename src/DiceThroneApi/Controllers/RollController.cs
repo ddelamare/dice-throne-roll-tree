@@ -37,7 +37,7 @@ public class RollController : ControllerBase
             return NotFound("Hero not found");
         }
 
-        var dice = request.CurrentDice ?? RollDice(request.DiceCount);
+        var dice = request.CurrentDice ?? RollDice(request.DiceCount).OrderBy(d => d).ToList();
         var rollsRemaining = request.RollsRemaining ?? 2;
 
         var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic");

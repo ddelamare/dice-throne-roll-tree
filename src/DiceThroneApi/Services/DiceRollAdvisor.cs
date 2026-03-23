@@ -67,7 +67,7 @@ public class DiceRollAdvisor
                     var fallbackProb = _calculator.CalculateWithForcedKeep(
                         currentDice, rollsRemaining, other, a.DiceToKeep);
                     var expected = fallbackProb * other.Damage;
-                    if (expected > bestFallbackExpected)
+                    if (fallbackProb > bestFallbackProb)
                     {
                         bestFallbackExpected = expected;
                         bestFallbackProb = fallbackProb;
@@ -75,7 +75,7 @@ public class DiceRollAdvisor
                     }
                 }
 
-                if (bestFallbackObj != null && bestFallbackExpected > 0)
+                if (bestFallbackObj != null)
                 {
                     a.FallbackObjectiveName = bestFallbackObj.Name;
                     a.FallbackProbability = bestFallbackProb;
