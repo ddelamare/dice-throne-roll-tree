@@ -73,8 +73,9 @@ public class HeroService
 
             return hero;
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Error loading hero from {filePath}: {ex.Message}");
             return null;
         }
     }
