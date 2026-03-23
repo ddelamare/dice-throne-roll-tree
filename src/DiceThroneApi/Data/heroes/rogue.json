@@ -9,9 +9,9 @@
     { "name": "Regenerate", "notation": "[(123)(123)66]", "damage": 0 },
     { "name": "Sass", "notation": "[(45)(45)66]", "damage": 3 },
     { "name": "Skybound", "notation": "[(45)(45)66]", "damage": 7 },
-    { "name": "Absporption (Small)", "notation": "SmallStraight", "damage": 7 },
-    { "name": "Absporption (Large)", "notation": "LargeStraight", "damage": 9 },
-    { "name": "Power Level Nine", "notation": "[6666]", "damage": 6 },
-    { "name": "Berserker Rage!", "notation": "[66666]", "damage": 11 }
+    { "name": "Absorption (Small)", "notation": "SmallStraight", "damage": 7 },
+    { "name": "Absorption (Large)", "notation": "LargeStraight", "damage": 9 },
+    { "name": "Influential", "notation": "[6666]", "damage": 6 },
+    { "name": "High Altitude!", "notation": "[66666]", "damage": 11 }
 ]
 }
