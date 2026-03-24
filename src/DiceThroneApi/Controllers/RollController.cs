@@ -84,6 +84,46 @@ public class RollController : ControllerBase
         }
     }
 
+    [HttpPost("preroll")]
+    public async Task<IActionResult> GetPreRollAdvice([FromBody] PreRollAdviceRequest request)
+    {
+        var hero = await _heroService.GetHeroByIdAsync(request.HeroId);
+        if (hero == null)
+        {
+            return NotFound("Hero not found");
+        }
+
+        var hasManifestDie = HasManifestDie(hero.Id);
+        var totalDice = request.DiceCount + (hasManifestDie ? 1 : 0);
+        var lockedDiceMask = BuildLockedDiceMask(totalDice, hasManifestDie);
+        var requestedMethod = request.Method ?? "analytic";
+        var useMonteCarlo = requestedMethod.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) && !hasManifestDie;
+        var calculationMethod = useMonteCarlo ? "Monte Carlo" : "Analytic";
+
+        var advice = hero.Objectives
+            .Select(objective =>
+            {
+                var probability = useMonteCarlo
+                    ? _simulator.Simulate(objective, totalDice, 10000)
+                    : _calculator.CalculatePreRoll(objective, totalDice, lockedDiceMask);
+
+                return new RollAdvice
+                {
+                    ObjectiveName = objective.Name,
+                    ObjectiveNotation = objective.Notation,
+                    Probability = probability,
+                    CalculationMethod = calculationMethod,
+                    Damage = objective.Damage,
+                    ExpectedDamage = probability * objective.Damage
+                };
+            })
+            .OrderByDescending(a => a.ExpectedDamage)
+            .ThenByDescending(a => a.Probability)
+            .ToList();
+
+        return Ok(advice);
+    }
+
     [HttpPost("advice")]
     public async Task<IActionResult> GetAdvice([FromBody] AdviceRequest request)
     {
@@ -148,5 +188,12 @@ public class AdviceRequest
     public string HeroId { get; set; } = string.Empty;
     public List<int> CurrentDice { get; set; } = new();
     public int RollsRemaining { get; set; }
+    public string? Method { get; set; }
+}
+
+public class PreRollAdviceRequest
+{
+    public string HeroId { get; set; } = string.Empty;
+    public int DiceCount { get; set; } = 5;
     public string? Method { get; set; }
 }

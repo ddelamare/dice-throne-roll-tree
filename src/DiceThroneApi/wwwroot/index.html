@@ -371,9 +371,13 @@
         </div>
         
         <div class="button-group">
-            <button class="btn-primary" onclick="rollDice()">
+            <button class="btn-primary" id="rollBtn" onclick="rollDice()">
                 🎲 Roll Dice
                 <span class="btn-subtitle">Start a new turn — rolls all dice fresh</span>
+            </button>
+            <button class="btn-secondary" id="preRollBtn" onclick="calculateObjectiveOdds()">
+                📊 Show Objective Odds
+                <span class="btn-subtitle">See each objective's chance before rolling</span>
             </button>
             <button class="btn-secondary" id="rerollBtn" onclick="rerollDice()" disabled>
                 🔄 Re-roll Unselected
@@ -398,6 +402,9 @@
         let diceToKeep = [];
         let hasManifestDie = false;
         let manifestDieIndex = -1;
+        let isBusy = false;
+        const defaultStatusText = 'Click "Roll Dice" to start a new turn!';
+        const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
         
         async function loadHeroes() {
             try {
@@ -424,21 +431,100 @@
                 currentHero = await response.json();
                 hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
                 manifestDieIndex = hasManifestDie ? 0 : -1;
+                resetTurnDisplay(defaultStatusText);
             } catch (error) {
                 console.error('Error loading hero:', error);
             }
+
+            updateActionButtons();
         }
         
         document.getElementById('heroSelect').addEventListener('change', (e) => {
             loadHero(e.target.value);
         });
+
+        function updateActionButtons() {
+            document.getElementById('rollBtn').disabled = isBusy || !currentHero;
+            document.getElementById('preRollBtn').disabled = isBusy || !currentHero;
+            document.getElementById('rerollBtn').disabled = isBusy || rollsRemaining <= 0 || currentDice.length === 0;
+        }
+
+        function clearDiceDisplay() {
+            currentDice = [];
+            diceToKeep = [];
+            rollsRemaining = 2;
+            document.getElementById('diceContainer').innerHTML = '';
+            document.getElementById('diceHint').style.display = 'none';
+        }
+
+        function resetTurnDisplay(statusText) {
+            clearDiceDisplay();
+            document.getElementById('status').textContent = statusText;
+            document.getElementById('objectives').innerHTML = '';
+        }
+
+        function renderObjectives(suggestions, showKeepSuggestions = true) {
+            const objectivesDiv = document.getElementById('objectives');
+            objectivesDiv.innerHTML = suggestions.map(advice => {
+                const percentage = (advice.probability * 100).toFixed(1);
+                const notationHtml = advice.objectiveNotation
+                    ? `<span class="objective-notation">${advice.objectiveNotation}</span>`
+                    : '';
+                let probabilityHtml;
+                if (rollsRemaining === 0) {
+                    if (advice.probability >= 1.0) {
+                        probabilityHtml = `<span class="probability-hit">✓</span>`;
+                    } else if (advice.probability <= 0.0) {
+                        probabilityHtml = `<span class="probability-miss">✗</span>`;
+                    } else {
+                        probabilityHtml = `<span class="probability">${percentage}%</span>`;
+                    }
+                } else {
+                    probabilityHtml = `<span class="probability">${percentage}%</span>`;
+                }
+                const damageInfo = advice.damage > 0
+                    ? `<span>Damage: <strong>${advice.damage}</strong></span>
+                       <span class="expected-damage">Expected: ${advice.expectedDamage.toFixed(2)} dmg</span>`
+                    : '';
+                const fallbackInfo = showKeepSuggestions && advice.probability < 0.9 && advice.fallbackObjectiveName && advice.fallbackExpectedDamage > 0
+                    ? `<div class="fallback-info">↩ Fallback: <strong>${advice.fallbackObjectiveName}</strong> — ${(advice.fallbackProbability * 100).toFixed(1)}% chance (${advice.fallbackExpectedDamage.toFixed(2)} expected dmg)</div>`
+                    : '';
+                const keepSuggestion = showKeepSuggestions
+                    ? `<div>Suggested keep:</div>
+                       <div class="keep-suggestion">
+                           ${currentDice.map((value, i) => 
+                               isManifestDie(i)
+                                   ? `<div class="suggestion-die manifest">${value}<br>MAN</div>`
+                                   : `<div class="suggestion-die ${advice.diceToKeep[i] ? 'keep' : 'reroll'}">${value}</div>`
+                           ).join('')}
+                       </div>`
+                    : '';
+
+                return `
+                    <div class="objective-card">
+                        <div class="objective-header">
+                            <span class="objective-name">${advice.objectiveName}${notationHtml}</span>
+                            ${probabilityHtml}
+                        </div>
+                        <div class="objective-meta">${damageInfo}</div>
+                        ${fallbackInfo}
+                        ${keepSuggestion}
+                    </div>
+                `;
+            }).join('');
+        }
         
         async function rollDice() {
-            if (!currentHero) return;
+            if (!currentHero || isBusy) return;
+
+            isBusy = true;
+            updateActionButtons();
             
             const diceCount = parseInt(document.getElementById('diceCount').value);
             const method = document.getElementById('methodSelect').value;
             
+            clearDiceDisplay();
+            document.getElementById('status').textContent = 'Rolling dice...';
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
             
             try {
@@ -466,11 +552,50 @@
             } catch (error) {
                 console.error('Error rolling dice:', error);
                 document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
+            } finally {
+                isBusy = false;
+                updateActionButtons();
+            }
+        }
+
+        async function calculateObjectiveOdds() {
+            if (!currentHero || isBusy) return;
+
+            isBusy = true;
+            updateActionButtons();
+
+            const diceCount = parseInt(document.getElementById('diceCount').value);
+            const method = document.getElementById('methodSelect').value;
+
+            clearDiceDisplay();
+            document.getElementById('status').textContent = 'Calculating pre-roll objective odds...';
+            document.getElementById('objectives').innerHTML = '<div class="loading">Calculating objective odds...</div>';
+
+            try {
+                const response = await fetch('/api/roll/preroll', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        heroId: currentHero.id,
+                        diceCount: diceCount,
+                        method: method
+                    })
+                });
+
+                const suggestions = await response.json();
+                document.getElementById('status').textContent = preRollStatusText;
+                renderObjectives(suggestions, false);
+            } catch (error) {
+                console.error('Error calculating objective odds:', error);
+                document.getElementById('objectives').innerHTML = '<div class="error">Error calculating objective odds</div>';
+            } finally {
+                isBusy = false;
+                updateActionButtons();
             }
         }
         
         async function rerollDice() {
-            if (!currentHero || rollsRemaining <= 0) return;
+            if (!currentHero || rollsRemaining <= 0 || isBusy) return;
 
             const rerollIndexes = [];
             for (let i = 0; i < currentDice.length; i++) {
@@ -489,6 +614,9 @@
                 alert('Please select at least one die to re-roll!');
                 return;
             }
+
+            isBusy = true;
+            updateActionButtons();
             
             const newRolls = Array.from({length: rerollCount}, () => Math.floor(Math.random() * 6) + 1);
             const nextDice = currentDice.slice();
@@ -524,6 +652,9 @@
             } catch (error) {
                 console.error('Error getting advice:', error);
                 document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
+            } finally {
+                isBusy = false;
+                updateActionButtons();
             }
         }
         
@@ -545,52 +676,8 @@
                     : `<div class="die ${diceToKeep[index] ? 'keep' : 'reroll'}" onclick="toggleDie(${index})">${value}</div>`
             ).join('');
             
-            const objectivesDiv = document.getElementById('objectives');
-            objectivesDiv.innerHTML = suggestions.map(advice => {
-                const percentage = (advice.probability * 100).toFixed(1);
-                const notationHtml = advice.objectiveNotation
-                    ? `<span class="objective-notation">${advice.objectiveNotation}</span>`
-                    : '';
-                let probabilityHtml;
-                if (rollsRemaining === 0) {
-                    if (advice.probability >= 1.0) {
-                        probabilityHtml = `<span class="probability-hit">✓</span>`;
-                    } else if (advice.probability <= 0.0) {
-                        probabilityHtml = `<span class="probability-miss">✗</span>`;
-                    } else {
-                        probabilityHtml = `<span class="probability">${percentage}%</span>`;
-                    }
-                } else {
-                    probabilityHtml = `<span class="probability">${percentage}%</span>`;
-                }
-                const damageInfo = advice.damage > 0
-                    ? `<span>Damage: <strong>${advice.damage}</strong></span>
-                       <span class="expected-damage">Expected: ${advice.expectedDamage.toFixed(2)} dmg</span>`
-                    : '';
-                const fallbackInfo = advice.probability < 0.9 && advice.fallbackObjectiveName && advice.fallbackExpectedDamage > 0
-                    ? `<div class="fallback-info">↩ Fallback: <strong>${advice.fallbackObjectiveName}</strong> — ${(advice.fallbackProbability * 100).toFixed(1)}% chance (${advice.fallbackExpectedDamage.toFixed(2)} expected dmg)</div>`
-                    : '';
-                return `
-                    <div class="objective-card">
-                        <div class="objective-header">
-                            <span class="objective-name">${advice.objectiveName}${notationHtml}</span>
-                            ${probabilityHtml}
-                        </div>
-                        <div class="objective-meta">${damageInfo}</div>
-                        ${fallbackInfo}
-                        <div>Suggested keep:</div>
-                        <div class="keep-suggestion">
-                            ${currentDice.map((value, i) => 
-                                isManifestDie(i)
-                                    ? `<div class="suggestion-die manifest">${value}<br>MAN</div>`
-                                    : `<div class="suggestion-die ${advice.diceToKeep[i] ? 'keep' : 'reroll'}">${value}</div>`
-                            ).join('')}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            document.getElementById('rerollBtn').disabled = rollsRemaining <= 0;
+            renderObjectives(suggestions);
+            updateActionButtons();
         }
         
         function toggleDie(index) {
@@ -607,6 +694,7 @@
             return hasManifestDie && index === manifestDieIndex;
         }
         
+        updateActionButtons();
         loadHeroes();
     </script>
 </body>

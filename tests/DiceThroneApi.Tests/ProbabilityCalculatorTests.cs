@@ -74,6 +74,27 @@ public class ProbabilityCalculatorTests
     }
 
     [Fact]
+    public void CalculatePreRoll_WithNoLockedDice_MatchesStandardCalculation()
+    {
+        var objective = _parser.Parse("Test", "[66]");
+
+        var probability = _calculator.CalculatePreRoll(objective, 2);
+        var baselineProbability = _calculator.Calculate(objective, 2);
+
+        Assert.Equal(baselineProbability, probability, precision: 10);
+    }
+
+    [Fact]
+    public void CalculatePreRoll_WithLockedSingleDie_DoesNotUseRerollsForLockedDie()
+    {
+        var objective = _parser.Parse("Test", "[6]");
+
+        var probability = _calculator.CalculatePreRoll(objective, 1, new List<bool> { true });
+
+        Assert.InRange(probability, 0.165, 0.168);
+    }
+
+    [Fact]
     public void CalculateBestKeep_WithMatchingDice_SuggestsKeepAll()
     {
         var objective = _parser.Parse("Test", "[6666]");
