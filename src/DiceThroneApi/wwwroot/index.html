@@ -70,7 +70,72 @@
             gap: 10px;
             margin-bottom: 20px;
         }
-        
+
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            min-width: 220px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            z-index: 1000;
+            padding: 8px;
+        }
+
+        .dropdown-content button {
+            width: 100%;
+            margin: 4px 0;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .dropdown.show .dropdown-content {
+            display: block;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
         button {
             flex: 1;
             padding: 12px 15px;
@@ -360,10 +425,6 @@
                     <option value="7">7</option>
                 </select>
             </div>
-            <div class="control-group">
-                <label for="diceValuesInput">Set Dice Values (comma-separated):</label>
-                <input id="diceValuesInput" type="text" placeholder="e.g. 1,2,3,4,5" />
-            </div>
             
             <div class="control-group">
                 <label for="methodSelect">Calculation Method:</label>
@@ -379,18 +440,33 @@
                 🎲 Roll Dice
                 <span class="btn-subtitle">Start a new turn — rolls all dice fresh</span>
             </button>
-            <button class="btn-secondary" id="preRollBtn" onclick="calculateObjectiveOdds()">
-                📊 Show Objective Odds
-                <span class="btn-subtitle">See each objective's chance before rolling</span>
-            </button>
             <button class="btn-secondary" id="rerollBtn" onclick="rerollDice()" disabled>
                 🔄 Re-roll Unselected
                 <span class="btn-subtitle">Re-rolls gray dice, keeps highlighted dice</span>
             </button>
-            <button class="btn-secondary" id="setDiceBtn" onclick="setDiceValues()" disabled>
-                🛠️ Set Dice & Recalculate
-                <span class="btn-subtitle">Apply manual values and refresh advice</span>
-            </button>
+            <div class="dropdown" id="menuContainer">
+                <button class="btn-secondary" id="menuButton" onclick="toggleMenu()">
+                    ☰ Actions
+                    <span class="btn-subtitle">Set values / objective odds</span>
+                </button>
+                <div class="dropdown-content" id="menuDropdown">
+                    <button id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
+                    <button id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="setDiceModalOverlay" onclick="setDiceModalClose()">
+            <div class="modal" onclick="event.stopPropagation();">
+                <button class="modal-close" onclick="setDiceModalClose()">✕</button>
+                <h3>Set Dice Values</h3>
+                <p>Enter exactly the number of dice you selected. For manifest heroes (Psylocke), include the manifest die first.</p>
+                <input id="diceValuesInput" type="text" placeholder="e.g. 1,2,3,4,5" style="margin-top: 10px; width: 100%;" />
+                <div class="button-group" style="margin-top: 12px; justify-content: flex-end;">
+                    <button class="btn-secondary" type="button" onclick="setDiceModalClose()">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="setDiceValues()">Apply</button>
+                </div>
+            </div>
         </div>
         
         <div id="status" class="status">Click "Roll Dice" to start a new turn!</div>
@@ -453,9 +529,10 @@
 
         function updateActionButtons() {
             document.getElementById('rollBtn').disabled = isBusy || !currentHero;
-            document.getElementById('preRollBtn').disabled = isBusy || !currentHero;
-            document.getElementById('rerollBtn').disabled = isBusy || rollsRemaining <= 0 || currentDice.length === 0;
-            document.getElementById('setDiceBtn').disabled = isBusy || !currentHero;
+            const rerollBtn = document.getElementById('rerollBtn');
+            if (rerollBtn) rerollBtn.disabled = isBusy || rollsRemaining <= 0 || currentDice.length === 0;
+            const menuButton = document.getElementById('menuButton');
+            if (menuButton) menuButton.disabled = isBusy || !currentHero;
         }
 
         function clearDiceDisplay() {
@@ -570,6 +647,7 @@
         async function calculateObjectiveOdds() {
             if (!currentHero || isBusy) return;
 
+            document.getElementById('menuContainer').classList.remove('show');
             isBusy = true;
             updateActionButtons();
 
@@ -725,10 +803,31 @@
                 console.error('Error setting dice values:', error);
                 document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
             } finally {
+                setDiceModalClose();
                 updateActionButtons();
             }
         }
-        
+
+        function setDiceModalOpen() {
+            document.getElementById('setDiceModalOverlay').classList.add('active');
+            document.getElementById('menuContainer').classList.remove('show');
+            const input = document.getElementById('diceValuesInput');
+            if (currentDice.length > 0) {
+                input.value = currentDice.join(',');
+            } else {
+                input.value = '';
+            }
+        }
+
+        function setDiceModalClose() {
+            document.getElementById('setDiceModalOverlay').classList.remove('active');
+        }
+
+        function toggleMenu() {
+            const container = document.getElementById('menuContainer');
+            container.classList.toggle('show');
+        }
+
         function updateDisplay(suggestions) {
             document.getElementById('status').textContent = 
                 rollsRemaining > 0
