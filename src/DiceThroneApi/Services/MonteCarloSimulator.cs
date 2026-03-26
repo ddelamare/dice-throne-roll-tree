@@ -21,6 +21,66 @@ public class MonteCarloSimulator
         _useOptimalStrategy = useOptimalStrategy;
     }
 
+    /// <summary>
+    /// Simulates the probability of hitting <paramref name="objective"/> when the caller has
+    /// already committed to keeping the dice specified by <paramref name="forcedKeep"/> and
+    /// re-rolling the remaining dice.  After that forced re-roll, optimal play (when a
+    /// <see cref="ProbabilityCalculator"/> was supplied and <c>useOptimalStrategy</c> is
+    /// <c>true</c>) or the greedy heuristic continues for the remaining
+    /// <c>rollsRemaining - 1</c> rerolls.
+    /// </summary>
+    public double SimulateWithForcedKeep(
+        List<int> currentDice,
+        int rollsRemaining,
+        RollObjective objective,
+        List<bool> forcedKeep,
+        int iterations = 50000)
+    {
+        var successes = 0;
+        for (int i = 0; i < iterations; i++)
+        {
+            if (SimulateFromForcedKeep(currentDice, rollsRemaining, objective, forcedKeep))
+                successes++;
+        }
+        return (double)successes / iterations;
+    }
+
+    private bool SimulateFromForcedKeep(
+        List<int> currentDice,
+        int rollsRemaining,
+        RollObjective objective,
+        List<bool> forcedKeep)
+    {
+        var totalDice = currentDice.Count;
+
+        // Apply the forced keep: keep the specified dice, re-roll the rest.
+        var kept = currentDice.Zip(forcedKeep, (d, k) => (d, k))
+                              .Where(x => x.k).Select(x => x.d).ToList();
+        var dice = new List<int>(kept);
+        dice.AddRange(RollDice(totalDice - kept.Count));
+
+        if (_matcher.IsMatch(dice, objective)) return true;
+
+        // Play out the remaining rerolls using optimal or greedy strategy.
+        for (var rerollsLeft = rollsRemaining - 1; rerollsLeft > 0; rerollsLeft--)
+        {
+            List<bool> toKeep;
+            if (_useOptimalStrategy && _probabilityCalculator != null)
+                _probabilityCalculator.CalculateBestKeep(dice, rerollsLeft, objective, out toKeep);
+            else
+                toKeep = DecideKeep(dice, objective);
+
+            kept = dice.Zip(toKeep, (d, k) => (d, k))
+                       .Where(x => x.k).Select(x => x.d).ToList();
+            dice = new List<int>(kept);
+            dice.AddRange(RollDice(totalDice - kept.Count));
+
+            if (_matcher.IsMatch(dice, objective)) return true;
+        }
+
+        return false;
+    }
+
     public double Simulate(RollObjective objective, int totalDice, int iterations = 10000, int rerolls = 2)
     {
         var successes = 0;
