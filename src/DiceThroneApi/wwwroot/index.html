@@ -444,6 +444,8 @@
                 🔄 Re-roll Unselected
                 <span class="btn-subtitle">Re-rolls gray dice, keeps highlighted dice</span>
             </button>
+        </div>
+        <div class="button-group">
             <div class="dropdown" id="menuContainer">
                 <button class="btn-secondary" id="menuButton" onclick="toggleMenu()">
                     ☰ Actions
@@ -759,7 +761,9 @@
                 .map(v => parseInt(v.trim(), 10))
                 .filter(v => !Number.isNaN(v));
 
-            const expectedCount = parseInt(document.getElementById('diceCount').value, 10);
+            let expectedCount = parseInt(document.getElementById('diceCount').value, 10);
+
+            expectedCount = hasManifestDie ? expectedCount + 1 : expectedCount;
 
             if (values.length !== expectedCount) {
                 alert(`Expected ${expectedCount} dice values, got ${values.length}.`);
