@@ -55,6 +55,37 @@ public class RollController : ControllerBase
         });
     }
 
+    [HttpPost("setdice")]
+    public async Task<IActionResult> SetDice([FromBody] SetDiceRequest request)
+    {
+        var hero = await _heroService.GetHeroByIdAsync(request.HeroId);
+        if (hero == null)
+        {
+            return NotFound("Hero not found");
+        }
+
+        if (request.CurrentDice == null || request.CurrentDice.Count == 0)
+        {
+            return BadRequest("CurrentDice must be provided with at least one value.");
+        }
+
+        var hasManifestDie = HasManifestDie(hero.Id);
+        var dice = request.CurrentDice;
+        var rollsRemaining = request.RollsRemaining ?? 2;
+        var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
+
+        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask);
+
+        return Ok(new
+        {
+            dice,
+            rollsRemaining,
+            suggestions,
+            hasManifestDie,
+            manifestDieIndex = hasManifestDie ? 0 : -1
+        });
+    }
+
     [HttpPost("probability")]
     public IActionResult CalculateProbability([FromBody] ProbabilityRequest request)
     {
@@ -188,6 +219,14 @@ public class AdviceRequest
     public string HeroId { get; set; } = string.Empty;
     public List<int> CurrentDice { get; set; } = new();
     public int RollsRemaining { get; set; }
+    public string? Method { get; set; }
+}
+
+public class SetDiceRequest
+{
+    public string HeroId { get; set; } = string.Empty;
+    public List<int> CurrentDice { get; set; } = new();
+    public int? RollsRemaining { get; set; }
     public string? Method { get; set; }
 }
 

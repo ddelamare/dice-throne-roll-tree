@@ -360,6 +360,10 @@
                     <option value="7">7</option>
                 </select>
             </div>
+            <div class="control-group">
+                <label for="diceValuesInput">Set Dice Values (comma-separated):</label>
+                <input id="diceValuesInput" type="text" placeholder="e.g. 1,2,3,4,5" />
+            </div>
             
             <div class="control-group">
                 <label for="methodSelect">Calculation Method:</label>
@@ -382,6 +386,10 @@
             <button class="btn-secondary" id="rerollBtn" onclick="rerollDice()" disabled>
                 🔄 Re-roll Unselected
                 <span class="btn-subtitle">Re-rolls gray dice, keeps highlighted dice</span>
+            </button>
+            <button class="btn-secondary" id="setDiceBtn" onclick="setDiceValues()" disabled>
+                🛠️ Set Dice & Recalculate
+                <span class="btn-subtitle">Apply manual values and refresh advice</span>
             </button>
         </div>
         
@@ -447,6 +455,7 @@
             document.getElementById('rollBtn').disabled = isBusy || !currentHero;
             document.getElementById('preRollBtn').disabled = isBusy || !currentHero;
             document.getElementById('rerollBtn').disabled = isBusy || rollsRemaining <= 0 || currentDice.length === 0;
+            document.getElementById('setDiceBtn').disabled = isBusy || !currentHero;
         }
 
         function clearDiceDisplay() {
@@ -654,6 +663,68 @@
                 document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
             } finally {
                 isBusy = false;
+                updateActionButtons();
+            }
+        }
+
+        async function setDiceValues() {
+            if (!currentHero || isBusy) return;
+
+            const raw = document.getElementById('diceValuesInput').value.trim();
+            if (!raw) {
+                alert('Please enter dice values before setting.');
+                return;
+            }
+
+            const values = raw
+                .split(',')
+                .map(v => parseInt(v.trim(), 10))
+                .filter(v => !Number.isNaN(v));
+
+            const expectedCount = parseInt(document.getElementById('diceCount').value, 10);
+
+            if (values.length !== expectedCount) {
+                alert(`Expected ${expectedCount} dice values, got ${values.length}.`);
+                return;
+            }
+
+            if (!values.every(v => v >= 1 && v <= 6)) {
+                alert('Dice values must be integers between 1 and 6.');
+                return;
+            }
+
+            currentDice = values;
+            diceToKeep = new Array(currentDice.length).fill(true);
+            if (hasManifestDie && manifestDieIndex >= 0 && manifestDieIndex < diceToKeep.length) {
+                diceToKeep[manifestDieIndex] = true;
+            }
+
+            document.getElementById('status').textContent = 'Manual dice values set. Calculating probabilities...';
+            document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
+
+            try {
+                const response = await fetch('/api/roll/setdice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        heroId: currentHero.id,
+                        currentDice: currentDice,
+                        rollsRemaining: rollsRemaining,
+                        method: document.getElementById('methodSelect').value
+                    })
+                });
+
+                const result = await response.json();
+                currentDice = result.dice.slice();
+                rollsRemaining = result.rollsRemaining;
+                hasManifestDie = !!result.hasManifestDie;
+                manifestDieIndex = hasManifestDie ? result.manifestDieIndex : -1;
+
+                updateDisplay(result.suggestions);
+            } catch (error) {
+                console.error('Error setting dice values:', error);
+                document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
+            } finally {
                 updateActionButtons();
             }
         }

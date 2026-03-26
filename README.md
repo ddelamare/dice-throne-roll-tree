@@ -78,6 +78,7 @@ Open your browser to the displayed URL to access the interactive web interface.
 - `POST /api/roll/simulate` - Simulate dice roll with suggestions
 - `POST /api/roll/probability` - Calculate probability for objective
 - `POST /api/roll/advice` - Get advice for current dice state
+- `POST /api/roll/setdice` - Set custom dice values and recalculate advice
 
 ## Heroes
 
