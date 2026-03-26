@@ -99,6 +99,10 @@
             display: block;
         }
 
+        .menuGroup{
+            float: right;
+        }
+
         .modal-overlay {
             display: none;
             position: fixed;
@@ -445,15 +449,15 @@
                 <span class="btn-subtitle">Re-rolls gray dice, keeps highlighted dice</span>
             </button>
         </div>
-        <div class="button-group">
+        <div class="button-group" id="menuGroup">
             <div class="dropdown" id="menuContainer">
                 <button class="btn-secondary" id="menuButton" onclick="toggleMenu()">
                     ☰ Actions
                     <span class="btn-subtitle">Set values / objective odds</span>
                 </button>
                 <div class="dropdown-content" id="menuDropdown">
-                    <button id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
-                    <button id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
+                    <button class="btn-primary" id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
+                    <button class="btn-primary" id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
                 </div>
             </div>
         </div>
