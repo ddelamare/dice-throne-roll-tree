@@ -6,7 +6,7 @@
     { "name": "Punch (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Punch (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
     { "name": "C-c-c-combo", "notation": "[(123)(123)66]", "damage": 5 },
-    { "name": "Web Crawler", "notation": "[(123)(123)(45)(45)]", "damage": 7 },
+    { "name": "Web Crawler", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7 },
     { "name": "Spider Reflexes", "notation": "[(123)(45)(45)6]", "damage": 7 },
     { "name": "Ensnare (Small)", "notation": "SmallStraight", "damage": 5 },
     { "name": "Ensnare (Large)", "notation": "LargeStraight", "damage": 8 },
