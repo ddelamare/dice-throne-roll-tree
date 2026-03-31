@@ -28,7 +28,7 @@ public class HeroService
             }
         }
 
-        return heroes;
+        return heroes.OrderBy(h => h.Name).ToList();
     }
 
     public async Task<Hero?> GetHeroByIdAsync(string id)
