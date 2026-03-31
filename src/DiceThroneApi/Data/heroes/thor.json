@@ -1,0 +1,16 @@
+{
+  "id": "thor",
+  "name": "Thor",
+  "objectives": [
+    { "name": "Hammered (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Hammered (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Hammered (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Mighty Summon", "notation": "[(123)(45)(45)6]", "damage": 3 },
+    { "name": "Odinforce", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7 },
+    { "name": "Chain Lightning", "notation": "[(123)(123)(123)66]", "damage": 8 },
+    { "name": "Lightning Rod", "notation": "SmallStraight", "damage": 8},
+    { "name": "Thunderbolt", "notation": "LargeStraight", "damage": 10 },
+    { "name": "Bottled Lightning", "notation": "[6666]", "damage": 7 },
+    { "name": "For Asgard!", "notation": "[66666]", "damage": 14 }
+]
+}
