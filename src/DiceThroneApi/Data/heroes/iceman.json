@@ -1,6 +1,6 @@
 {
   "id": "iceman",
-  "name": "iceman",
+  "name": "Iceman",
   "objectives": [
     { "name": "Frostbite (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Frostbite (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },

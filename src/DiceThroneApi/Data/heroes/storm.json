@@ -1,6 +1,6 @@
 {
-  "id": "iceman",
-  "name": "iceman",
+  "id": "storm",
+  "name": "Storm",
   "objectives": [
     { "name": "Lightning Field (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Lightning Field (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
