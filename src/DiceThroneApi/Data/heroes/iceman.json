@@ -1,0 +1,16 @@
+{
+  "id": "iceman",
+  "name": "iceman",
+  "objectives": [
+    { "name": "Frostbite (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Frostbite (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Frostbite (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Ice To Meet You", "notation": "[(45)(45)(45)(45)]", "damage": 3 },
+    { "name": "Everybody Chill", "notation": "[(123)666]", "damage": 5 },
+    { "name": "Cold Treat", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7 },
+    { "name": "Thawsome", "notation": "SmallStraight", "damage": 6 },
+    { "name": "Hoarfrost", "notation": "LargeStraight", "damage": 8 },
+    { "name": "Hail The King", "notation": "[6666]", "damage": 5 },
+    { "name": "Ice Storm!", "notation": "[66666]", "damage": 13 }
+]
+}

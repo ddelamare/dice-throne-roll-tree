@@ -11,7 +11,7 @@
     { "name": "Bewitch", "notation": "[(123)666]", "damage": 9 },
     { "name": "Spellcraft (Small)", "notation": "SmallStraight", "damage": 7},
     { "name": "Spellcraft (Large)", "notation": "LargeStraight", "damage": 9 },
-    { "name": "Bottled Lightning", "notation": "[6666]", "damage": 6 },
-    { "name": "For Asgard!", "notation": "[66666]", "damage": 12 }
+    { "name": "Pure Chaos", "notation": "[6666]", "damage": 6 },
+    { "name": "Sealed Your Fate!", "notation": "[66666]", "damage": 12 }
 ]
 }
