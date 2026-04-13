@@ -1,5 +1,7 @@
+using System.Linq;
 using DiceThroneApi.Models;
 using DiceThroneApi.Services;
+using Microsoft.AspNetCore.Hosting;
 using Xunit;
 
 namespace DiceThroneApi.Tests;
@@ -9,14 +11,30 @@ public class DiceRollAdvisorTests
     private readonly DiceRollAdvisor _advisor;
     private readonly ProbabilityCalculator _calculator;
     private readonly DiceNotationParser _parser;
+    private readonly Xunit.Abstractions.ITestOutputHelper _output;
+    private readonly ObjectiveMatcher _matcher = new ObjectiveMatcher();
 
-    public DiceRollAdvisorTests()
+    public DiceRollAdvisorTests(Xunit.Abstractions.ITestOutputHelper output)
     {
+        _output = output;
         var matcher = new ObjectiveMatcher();
+        _matcher = matcher;
         _calculator = new ProbabilityCalculator(matcher);
         var simulator = new MonteCarloSimulator(matcher);
         _advisor = new DiceRollAdvisor(_calculator, simulator);
         _parser = new DiceNotationParser();
+    }
+
+    private IWebHostEnvironment CreateTestEnvironment()
+    {
+        var contentRootPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "src", "DiceThroneApi"));
+        return new FakeWebHostEnvironment
+        {
+            ContentRootPath = contentRootPath,
+            EnvironmentName = "Development",
+            ApplicationName = "DiceThroneApi",
+            WebRootPath = Path.Combine(contentRootPath, "wwwroot")
+        };
     }
 
     [Fact]
@@ -298,4 +316,79 @@ public class DiceRollAdvisorTests
         Assert.True(best.BaselineProbability >= 0);
         Assert.True(best.ProbabilityImprovement >= 0);
     }
+
+    [Fact]
+    public async Task AnalyticKeepOutperformsGreedyKeep_Top10Improvements()
+    {
+        var env = CreateTestEnvironment();
+        var heroService = new HeroService(env, _parser);
+        var heroes = await heroService.GetAllHeroesAsync();
+        var allObjectives = heroes.SelectMany(h => h.Objectives).Where(o => o.Damage > 0).ToList();
+
+        var greedyKeepMethod = typeof(DiceRollAdvisor).GetMethod("GreedyKeep", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull(greedyKeepMethod);
+
+        const double requiredDelta = 0.05;
+        var deltas = new List<(string ObjectiveName, string ObjNotation, string Dice, double Improvement, double GreedyProb, string OptimalKeep)>();
+
+        foreach (var objective in allObjectives)
+        {
+            if (deltas.Any(d => d.ObjNotation == objective.Notation))
+                continue; // Skip duplicates
+
+            for (int d1 = 1; d1 <= 6; d1++)
+            for (int d2 = 1; d2 <= 6; d2++)
+            for (int d3 = 1; d3 <= 6; d3++)
+            for (int d4 = 1; d4 <= 6; d4++)
+            for (int d5 = 1; d5 <= 6; d5++)
+            {
+                var dice = new List<int> { d1, d2, d3, d4, d5 };
+                var diceString = string.Join("", dice.Order());
+                if (deltas.Any(d => d.ObjNotation == objective.Notation && d.Dice == diceString))
+                continue; // Skip duplicates
+
+                if (_matcher.IsMatch(dice, objective))
+                    continue; // Skip cases where no rerolling is needed
+
+                var bestProb = _calculator.CalculateBestKeep(dice, 2, objective, out var optimalKeep);
+
+                var optimalKeepDescr = string.Join("", dice.Where((die, idx) => optimalKeep[idx]));
+
+                var greedyKeep = (List<bool>)greedyKeepMethod.Invoke(_advisor, new object[] { dice, objective })!;
+                var greedyProb = _calculator.CalculateWithForcedKeep(dice, 2, objective, greedyKeep);
+
+                var delta = bestProb - greedyProb;
+                if (delta > 0 && greedyProb > 0) // Only consider cases where greedy is suboptimal and has a non-zero probability
+                {
+                    deltas.Add((objective.Name, objective.Notation, diceString, delta, greedyProb, optimalKeepDescr));
+                }
+            }
+        }
+
+        var top1000 = deltas
+            .OrderByDescending(x => x.Improvement)
+            .Take(1000)
+            .ToList();
+
+        _output.WriteLine("Top 10 analytic vs greedy improvement (probability delta):");
+        foreach (var entry in top1000)
+        {
+            var percent = entry.Improvement * 100.0;
+            _output.WriteLine($"{entry.ObjectiveName} [{entry.ObjNotation}] dice [{entry.Dice}] => {percent:F2}% (greedy {entry.GreedyProb:P2} vs optimal {entry.GreedyProb + entry.Improvement:P2}, keep [{entry.OptimalKeep}])");
+        }
+
+        Assert.NotEmpty(top1000);
+        Assert.True(top1000.First().Improvement >= requiredDelta, $"Top improvement {top1000.First().Improvement:F4} is smaller than required {requiredDelta:F4}");
+    }
+}
+
+
+internal class FakeWebHostEnvironment : IWebHostEnvironment
+{
+    public string EnvironmentName { get; set; } = string.Empty;
+    public string ApplicationName { get; set; } = string.Empty;
+    public string WebRootPath { get; set; } = string.Empty;
+    public string ContentRootPath { get; set; } = string.Empty;
+    public Microsoft.Extensions.FileProviders.IFileProvider? WebRootFileProvider { get; set; }
+    public Microsoft.Extensions.FileProviders.IFileProvider? ContentRootFileProvider { get; set; }
 }
