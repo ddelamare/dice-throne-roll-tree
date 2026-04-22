@@ -468,6 +468,10 @@
                 <h3>Set Dice Values</h3>
                 <p>Enter exactly the number of dice you selected. For manifest heroes (Psylocke), include the manifest die first.</p>
                 <input id="diceValuesInput" type="text" placeholder="e.g. 1,2,3,4,5" style="margin-top: 10px; width: 100%;" />
+                <div class="control-group" style="margin-top: 10px;">
+                    <label for="rollsRemainingInput">Rolls Remaining:</label>
+                    <input id="rollsRemainingInput" type="number" min="0" max="5" step="1" value="2" style="width: 100%;" />
+                </div>
                 <div class="button-group" style="margin-top: 12px; justify-content: flex-end;">
                     <button class="btn-secondary" type="button" onclick="setDiceModalClose()">Cancel</button>
                     <button class="btn-primary" type="button" onclick="setDiceValues()">Apply</button>
@@ -779,6 +783,14 @@
                 return;
             }
 
+            const rollsRaw = document.getElementById('rollsRemainingInput').value.trim();
+            const parsedRolls = parseInt(rollsRaw, 10);
+            if (Number.isNaN(parsedRolls) || parsedRolls < 0 || parsedRolls > 2) {
+                alert('Rolls remaining must be an integer between 0 and 2.');
+                return;
+            }
+
+            rollsRemaining = parsedRolls;
             currentDice = values;
             diceToKeep = new Array(currentDice.length).fill(true);
             if (hasManifestDie && manifestDieIndex >= 0 && manifestDieIndex < diceToKeep.length) {
@@ -820,11 +832,13 @@
             document.getElementById('setDiceModalOverlay').classList.add('active');
             document.getElementById('menuContainer').classList.remove('show');
             const input = document.getElementById('diceValuesInput');
+            const rollsInput = document.getElementById('rollsRemainingInput');
             if (currentDice.length > 0) {
                 input.value = currentDice.join(',');
             } else {
                 input.value = '';
             }
+            rollsInput.value = rollsRemaining;
         }
 
         function setDiceModalClose() {
