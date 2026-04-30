@@ -23,4 +23,9 @@ public class RollAdvice
     /// Calculated as (Probability - BaselineProbability).
     /// </summary>
     public double ProbabilityImprovement { get; set; }
+    
+    /// <summary>
+    /// The index of the objective in the hero's objectives list (for board order sorting).
+    /// </summary>
+    public int Index { get; set; }
 }

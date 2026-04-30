@@ -23,7 +23,7 @@ public class DiceRollAdvisor
     {
         var advice = new List<RollAdvice>();
 
-        foreach (var objective in objectives)
+        foreach (var (objective, index) in objectives.Select((o, i) => (o, i)))
         {
             // Always use optimal keep strategy from the analytic calculator
             var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep, lockedDiceMask);
@@ -46,7 +46,8 @@ public class DiceRollAdvisor
                 Damage = objective.Damage,
                 ExpectedDamage = prob * objective.Damage,
                 BaselineProbability = baselineProb,
-                ProbabilityImprovement = optimalProb - baselineProb
+                ProbabilityImprovement = optimalProb - baselineProb,
+                Index = index
             });
         }
 

@@ -1,0 +1,1 @@
+dotnet test --logger "console;verbosity=detailed" > test_output.txt 

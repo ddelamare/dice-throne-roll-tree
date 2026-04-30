@@ -437,6 +437,15 @@
                     <option value="montecarlo">Monte Carlo</option>
                 </select>
             </div>
+            
+            <div class="control-group">
+                <label for="sortSelect">Sort By:</label>
+                <select id="sortSelect">
+                    <option value="expectedDamage">Expected Damage</option>
+                    <option value="probability">Probability</option>
+                    <option value="boardOrder">Board Order</option>
+                </select>
+            </div>
         </div>
         
         <div class="button-group">
@@ -497,6 +506,7 @@
         let hasManifestDie = false;
         let manifestDieIndex = -1;
         let isBusy = false;
+        let currentSuggestions = []; // Store current suggestions for re-sorting
         const defaultStatusText = 'Click "Roll Dice" to start a new turn!';
         const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
         
@@ -536,6 +546,13 @@
         document.getElementById('heroSelect').addEventListener('change', (e) => {
             loadHero(e.target.value);
         });
+        
+        document.getElementById('sortSelect').addEventListener('change', () => {
+            // Re-render objectives if we have current suggestions
+            if (currentSuggestions.length > 0) {
+                renderObjectives(currentSuggestions, currentDice.length > 0);
+            }
+        });
 
         function updateActionButtons() {
             document.getElementById('rollBtn').disabled = isBusy || !currentHero;
@@ -560,8 +577,25 @@
         }
 
         function renderObjectives(suggestions, showKeepSuggestions = true) {
+            currentSuggestions = suggestions; // Store for re-sorting
+            
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            // Sort the suggestions based on the selected option
+            const sortedSuggestions = [...suggestions].sort((a, b) => {
+                switch (sortBy) {
+                    case 'probability':
+                        return b.probability - a.probability;
+                    case 'boardOrder':
+                        return a.index - b.index;
+                    case 'expectedDamage':
+                    default:
+                        return b.expectedDamage - a.expectedDamage;
+                }
+            });
+            
             const objectivesDiv = document.getElementById('objectives');
-            objectivesDiv.innerHTML = suggestions.map(advice => {
+            objectivesDiv.innerHTML = sortedSuggestions.map(advice => {
                 const percentage = (advice.probability * 100).toFixed(1);
                 const notationHtml = advice.objectiveNotation
                     ? `<span class="objective-notation">${advice.objectiveNotation}</span>`

@@ -132,7 +132,7 @@ public class RollController : ControllerBase
         var calculationMethod = useMonteCarlo ? "Monte Carlo" : "Analytic";
 
         var advice = hero.Objectives
-            .Select(objective =>
+            .Select((objective, index) =>
             {
                 var probability = useMonteCarlo
                     ? _simulator.Simulate(objective, totalDice, 10000)
@@ -145,7 +145,8 @@ public class RollController : ControllerBase
                     Probability = probability,
                     CalculationMethod = calculationMethod,
                     Damage = objective.Damage,
-                    ExpectedDamage = probability * objective.Damage
+                    ExpectedDamage = probability * objective.Damage,
+                    Index = index
                 };
             })
             .OrderByDescending(a => a.ExpectedDamage)
