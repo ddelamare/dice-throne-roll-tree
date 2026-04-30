@@ -96,7 +96,7 @@ public class RollController : ControllerBase
 
             if (request.Method?.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) == true)
             {
-                probability = _simulator.Simulate(objective, request.DiceCount, 10000);
+                probability = _simulator.Simulate(objective, request.DiceCount, MonteCarloConst.StandardIterations);
             }
             else
             {
@@ -135,7 +135,7 @@ public class RollController : ControllerBase
             .Select((objective, index) =>
             {
                 var probability = useMonteCarlo
-                    ? _simulator.Simulate(objective, totalDice, 10000)
+                    ? _simulator.Simulate(objective, totalDice, MonteCarloConst.StandardIterations)
                     : _calculator.CalculatePreRoll(objective, totalDice, lockedDiceMask);
 
                 return new RollAdvice

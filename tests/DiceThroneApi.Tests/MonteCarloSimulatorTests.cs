@@ -97,7 +97,7 @@ public class MonteCarloSimulatorTests
         // Test that optimal strategy mode can be constructed
         var matcher = new ObjectiveMatcher();
         var calculatorForTest = new ProbabilityCalculator(matcher);
-        var simulatorWithOptimal = new MonteCarloSimulator(matcher, calculatorForTest, useOptimalStrategy: true);
+        var simulatorWithOptimal = new MonteCarloSimulator(matcher, calculatorForTest);
         
         var objective = _parser.Parse("Test", "[66]");
         

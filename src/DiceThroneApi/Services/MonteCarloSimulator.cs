@@ -8,20 +8,14 @@ public class MonteCarloSimulator
     private readonly ProbabilityCalculator? _probabilityCalculator;
     private readonly bool _useOptimalStrategy;
 
-    public MonteCarloSimulator(ObjectiveMatcher matcher)
-    {
-        _matcher = matcher;
-        _useOptimalStrategy = false;
-    }
-
-    public MonteCarloSimulator(ObjectiveMatcher matcher, ProbabilityCalculator probabilityCalculator, bool useOptimalStrategy = false)
+    public MonteCarloSimulator(ObjectiveMatcher matcher, ProbabilityCalculator? probabilityCalculator = null)
     {
         _matcher = matcher;
         _probabilityCalculator = probabilityCalculator;
-        _useOptimalStrategy = useOptimalStrategy;
+        _useOptimalStrategy = probabilityCalculator != null;
     }
 
-    public double Simulate(RollObjective objective, int totalDice, int iterations = 10000, int rerolls = 2)
+    public double Simulate(RollObjective objective, int totalDice, int iterations = MonteCarloConst.StandardIterations, int rerolls = 2)
     {
         var successes = 0;
 

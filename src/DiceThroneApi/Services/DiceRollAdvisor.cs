@@ -31,9 +31,11 @@ public class DiceRollAdvisor
             // Calculate baseline probability (if we reroll all dice)
             var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective, lockedDiceMask);
             
-            // Use Monte Carlo for probability if requested, but always use optimal keep strategy
+            // Use Monte Carlo for probability if requested, but always use optimal keep strategy.
+            // If the current dice already satisfy the objective (optimalProb == 1.0), skip the
+            // simulation and return 100% immediately.
             var prob = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase)
-                ? _simulator.Simulate(objective, currentDice.Count, 10000, rollsRemaining)
+                ? (optimalProb >= 1.0 ? 1.0 : _simulator.Simulate(objective, currentDice.Count, MonteCarloConst.StandardIterations, rollsRemaining))
                 : optimalProb;
             
             advice.Add(new RollAdvice
@@ -201,4 +203,9 @@ public class DiceRollAdvisor
 
         return toKeep;
     }
+}
+
+internal class MonteCarloConst
+{
+    internal const int StandardIterations = 1000;
 }
