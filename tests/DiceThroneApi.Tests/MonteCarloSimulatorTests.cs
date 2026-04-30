@@ -82,12 +82,11 @@ public class MonteCarloSimulatorTests
     [Fact]
     public void Simulate_SmallStraight_ImprovedStrategyWorks()
     {
-        // Test that the improved SmallStraight strategy works
+        // Test that the SmallStraight strategy targets only the higher straight (3456)
         var objective = _parser.Parse("Test", "SmallStraight");
         var probability = _simulator.Simulate(objective, 5, iterations: 10000);
         
         // SmallStraight with 5 dice and 2 rerolls should have decent probability
-        // The improved strategy considers all three straights (1234, 2345, 3456)
         Assert.InRange(probability, 0.3, 1.0);
     }
 
