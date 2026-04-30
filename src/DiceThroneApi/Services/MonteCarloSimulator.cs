@@ -127,27 +127,12 @@ public class MonteCarloSimulator
     }
 
     /// <summary>
-    /// Improved SmallStraight keep strategy:
-    /// 1. Considers all three possible small straights (1234, 2345, 3456)
-    /// 2. Picks the one with the most matching dice
-    /// 3. Keeps at most one of each value (handles duplicates)
+    /// SmallStraight keep strategy: targets only the higher small straight (3,4,5,6).
+    /// Keeps at most one of each value (handles duplicates).
     /// </summary>
     private List<bool> DecideKeepSmallStraight(List<int> dice)
     {
-        var candidates = new[]
-        {
-            new HashSet<int> { 1, 2, 3, 4 },
-            new HashSet<int> { 2, 3, 4, 5 },
-            new HashSet<int> { 3, 4, 5, 6 }
-        };
-
-        // Score each candidate by how many unique values we already have
-        var diceSet = dice.ToHashSet();
-        var bestCandidate = candidates
-            .Select(c => (candidate: c, score: c.Count(v => diceSet.Contains(v))))
-            .OrderByDescending(x => x.score)
-            .First()
-            .candidate;
+        var target = new HashSet<int> { 3, 4, 5, 6 };
 
         // Keep at most one of each value
         var keptValues = new HashSet<int>();
@@ -155,7 +140,7 @@ public class MonteCarloSimulator
 
         foreach (var d in dice)
         {
-            if (bestCandidate.Contains(d) && !keptValues.Contains(d))
+            if (target.Contains(d) && !keptValues.Contains(d))
             {
                 toKeep.Add(true);
                 keptValues.Add(d);
@@ -170,26 +155,12 @@ public class MonteCarloSimulator
     }
 
     /// <summary>
-    /// Improved LargeStraight keep strategy:
-    /// 1. Considers both possible large straights (12345, 23456)
-    /// 2. Picks the one with the most matching dice
-    /// 3. Keeps at most one of each value (handles duplicates)
+    /// LargeStraight keep strategy: targets only the higher large straight (2,3,4,5,6).
+    /// Keeps at most one of each value (handles duplicates).
     /// </summary>
     private List<bool> DecideKeepLargeStraight(List<int> dice)
     {
-        var candidates = new[]
-        {
-            new HashSet<int> { 1, 2, 3, 4, 5 },
-            new HashSet<int> { 2, 3, 4, 5, 6 }
-        };
-
-        // Score each candidate by how many unique values we already have
-        var diceSet = dice.ToHashSet();
-        var bestCandidate = candidates
-            .Select(c => (candidate: c, score: c.Count(v => diceSet.Contains(v))))
-            .OrderByDescending(x => x.score)
-            .First()
-            .candidate;
+        var target = new HashSet<int> { 2, 3, 4, 5, 6 };
 
         // Keep at most one of each value
         var keptValues = new HashSet<int>();
@@ -197,7 +168,7 @@ public class MonteCarloSimulator
 
         foreach (var d in dice)
         {
-            if (bestCandidate.Contains(d) && !keptValues.Contains(d))
+            if (target.Contains(d) && !keptValues.Contains(d))
             {
                 toKeep.Add(true);
                 keptValues.Add(d);

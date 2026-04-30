@@ -112,6 +112,21 @@ public class DiceRollAdvisorTests
         Assert.InRange(result.ExpectedDamage, 0.0, 3.0);
     }
 
+    [Fact]
+    public void GetAdvice_MonteCarlo_AlreadySatisfied_Returns100Percent()
+    {
+        // If current dice already satisfy the objective, Monte Carlo should return 1.0 immediately
+        // without running the simulation.
+        var objective = _parser.Parse("Test", "[66]");
+        objective.Damage = 4;
+
+        var dice = new List<int> { 6, 6, 1, 2, 3 };
+        var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective }, method: "montecarlo");
+
+        Assert.Single(advice);
+        Assert.Equal(1.0, advice[0].Probability);
+    }
+
     // ── Fallback / chase tests ────────────────────────────────────────────────
 
     [Fact]
