@@ -1,0 +1,17 @@
+{
+  "id": "palelady",
+  "name": "Pale Lady",
+  "objectives": [
+    { "name": "Scratch (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Scratch (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Scratch (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "The Cure", "notation": "[(45)(45)(45)6]", "damage": 0, "heal": 3, "cp": 1, "cards": 1, "tokens": ["Moon Shard"] },
+    { "name": "The Hunt", "notation": "[(123)(123)66]", "damage": 6, "tokens": ["Prey"] },
+    { "name": "Conflicted (Small)", "notation": "SmallStraight", "damage": 6, "tokens" : ["Moon Shard"] },
+    { "name": "Conflicted (Large)", "notation": "LargeStraight", "damage": 8, "tokens" : ["Moon Shard", "Moon Shard"] },
+    { "name": "Full Moon", "notation": "[(45)(45)(45)(45)]", "damage": 7, "tokens" : ["Moon Shard"], "cp": 1 },
+    { "name": "Ensnare", "notation": "[6666]", "damage": 5, "tokens": ["Prey", "Prey"] },
+    { "name": "Unleash the Beast!", "notation": "[66666]", "damage": 13,"tokens": ["Prey", "Moon Shard","Moon Shard","Moon Shard","Bleed", "Bleed"] }
+
+  ]
+}
