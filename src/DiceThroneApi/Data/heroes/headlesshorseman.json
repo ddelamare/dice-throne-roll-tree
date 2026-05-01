@@ -4,13 +4,13 @@
   "objectives": [
     { "name": "Cleave (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Cleave (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
-    { "name": "Cleave (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
-    { "name": "Reap", "notation": "[(45)(45)(45)6]", "damage": 3 },
-    { "name": "Ride Down", "notation": "[(123)(123)(123)(45)(45)]", "damage": 6 },
-    { "name": "Sow Despair", "notation": "SmallStraight", "damage": 7 },
-    { "name": "Sow Despair (Large)", "notation": "LargeStraight", "damage": 9 },
-    { "name": "Spectral Assault", "notation": "[(123)(123)(123)66]", "damage": 10 },
-    { "name": "Horrify", "notation": "[6666]", "damage": 6 },
-    { "name": "Dreadful Charge!", "notation": "[66666]", "damage": 14 }
+    { "name": "Cleave (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Reap", "notation": "[(45)(45)(45)6]", "damage": 3, "tokens": ["Dreadful", "Dreadful"] },
+    { "name": "Ride Down", "notation": "[(123)(123)(123)(45)(45)]", "damage": 6 , "tokens": ["Grim Pursuit", "Grim Pursuit"] },
+    { "name": "Sow Despair", "notation": "SmallStraight", "damage": 7, "tokens": ["Dreadful"] },
+    { "name": "Sow Despair (Large)", "notation": "LargeStraight", "damage": 9, "tokens": ["Dreadful", "Dreadful"] },
+    { "name": "Spectral Assault", "notation": "[(123)(123)(123)66]", "damage": 10 , "tokens": ["Dreadful"]},
+    { "name": "Horrify", "notation": "[6666]", "damage": 6, "tokens": ["Dreadful", "Dreadful", "Dreadful"] },
+    { "name": "Dreadful Charge!", "notation": "[66666]", "damage": 14, "tokens": ["Dreadful", "Dreadful", "Dreadful", "Dreadful"]  }
 ]
 }

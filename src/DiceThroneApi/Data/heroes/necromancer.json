@@ -1,0 +1,18 @@
+{
+  "id": "necromancer",
+  "name": "Necromancer",
+  "objectives": [
+    { "name": "Shear (3)", "notation": "[(123)(123)(123)]", "damage": 3 },
+    { "name": "Shear (4)", "notation": "[(123)(123)(123)(123)]", "damage": 4 },
+    { "name": "Shear (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Reanimate (Small)", "notation": "[(45)(45)(45)]", "damage": 0, "tokens": ["Corpse", "Corpse", "Corpse"] },
+    { "name": "Reanimate (Large)", "notation": "[(45)(45)(45)(45)(45)]", "damage": 0, "tokens": ["Corpse", "Corpse", "Corpse","Corpse"] },
+    { "name": "Harvest", "notation": "[(123)(123)(123)6]", "damage": 2, "tokens": ["Corpse"] },
+    { "name": "Corpse Explosion", "notation": "[(123)(45)66]", "damage": 7 },
+    { "name": "Blight (Small)", "notation": "SmallStraight", "damage": 5, "tokens": ["Corpse"] },
+    { "name": "Blight (Large)", "notation": "LargeStraight", "damage": 7, "tokens": ["Corpse", "Decrepify"] },
+    { "name": "Deadman's Party", "notation": "[(45)(45)(45)66]", "damage": 6 },
+    { "name": "Black Shroud", "notation": "[6666]", "damage": 4, "tokens": ["Corpse", "Corpse"] },
+    { "name": "Necro-Dancer!", "notation": "[66666]", "damage": 10, "tokens": ["Decrepify", "Resurrect"] }
+  ]
+}
