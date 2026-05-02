@@ -43,7 +43,8 @@ public class RollController : ControllerBase
         var rollsRemaining = request.RollsRemaining ?? 2;
         var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
 
-        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask);
+        var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
+        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
 
         return Ok(new
         {
@@ -74,7 +75,8 @@ public class RollController : ControllerBase
         var rollsRemaining = request.RollsRemaining ?? 2;
         var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
 
-        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask);
+        var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
+        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
 
         return Ok(new
         {
@@ -134,9 +136,22 @@ public class RollController : ControllerBase
         var advice = hero.Objectives
             .Select((objective, index) =>
             {
+                var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
                 var probability = useMonteCarlo
                     ? _simulator.Simulate(objective, totalDice, MonteCarloConst.StandardIterations)
                     : _calculator.CalculatePreRoll(objective, totalDice, lockedDiceMask);
+
+                double delta = objective.Damage;
+                delta += objective.Heal * evaluation.HealValue;
+                delta += objective.Cards * evaluation.CardValue;
+                delta += objective.Cp * evaluation.CpValue;
+                foreach (var token in objective.Tokens ?? new List<string>())
+                {
+                    if (evaluation.TokenValues != null && evaluation.TokenValues.TryGetValue(token, out var val))
+                        delta += val;
+                    else
+                        delta += evaluation.DefaultTokenValue;
+                }
 
                 return new RollAdvice
                 {
@@ -145,11 +160,11 @@ public class RollController : ControllerBase
                     Probability = probability,
                     CalculationMethod = calculationMethod,
                     Damage = objective.Damage,
-                    ExpectedDamage = probability * objective.Damage,
+                    ExpectedDelta = probability * delta,
                     Index = index
                 };
             })
-            .OrderByDescending(a => a.ExpectedDamage)
+.OrderByDescending(a => a.ExpectedDelta)
             .ThenByDescending(a => a.Probability)
             .ToList();
 
@@ -166,8 +181,9 @@ public class RollController : ControllerBase
         }
 
         var lockedDiceMask = BuildLockedDiceMask(request.CurrentDice.Count, HasManifestDie(hero.Id));
+        var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
 
-        var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask);
+        var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
 
         return Ok(advice);
     }
@@ -206,6 +222,7 @@ public class SimulateRequest
     public List<int>? CurrentDice { get; set; }
     public int? RollsRemaining { get; set; }
     public string? Method { get; set; }
+    public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
 }
 
 public class ProbabilityRequest
@@ -213,6 +230,7 @@ public class ProbabilityRequest
     public string Notation { get; set; } = string.Empty;
     public int DiceCount { get; set; } = 5;
     public string? Method { get; set; }
+    public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
 }
 
 public class AdviceRequest
@@ -221,6 +239,7 @@ public class AdviceRequest
     public List<int> CurrentDice { get; set; } = new();
     public int RollsRemaining { get; set; }
     public string? Method { get; set; }
+    public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
 }
 
 public class SetDiceRequest
@@ -229,6 +248,7 @@ public class SetDiceRequest
     public List<int> CurrentDice { get; set; } = new();
     public int? RollsRemaining { get; set; }
     public string? Method { get; set; }
+    public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
 }
 
 public class PreRollAdviceRequest
@@ -236,4 +256,5 @@ public class PreRollAdviceRequest
     public string HeroId { get; set; } = string.Empty;
     public int DiceCount { get; set; } = 5;
     public string? Method { get; set; }
+    public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
 }

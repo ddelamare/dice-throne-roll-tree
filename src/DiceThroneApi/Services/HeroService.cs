@@ -68,6 +68,10 @@ public class HeroService
             {
                 var objective = _parser.Parse(objData.Name, objData.Notation);
                 objective.Damage = objData.Damage;
+                objective.Heal = objData.Heal;
+                objective.Cards = objData.Cards;
+                objective.Cp = objData.Cp;
+                objective.Tokens = objData.Tokens ?? new List<string>();
                 hero.Objectives.Add(objective);
             }
 
@@ -92,5 +96,9 @@ public class HeroService
         public string Name { get; set; } = string.Empty;
         public string Notation { get; set; } = string.Empty;
         public int Damage { get; set; }
+        public int Heal { get; set; }
+        public int Cards { get; set; }
+        public int Cp { get; set; }
+        public List<string>? Tokens { get; set; }
     }
 }

@@ -8,4 +8,8 @@ public class RollObjective
     public List<RollObjectiveGroup> Groups { get; set; } = new();
     public int DiceRequired { get; set; }
     public int Damage { get; set; }
+    public int Heal { get; set; }
+    public int Cards { get; set; }
+    public int Cp { get; set; }
+    public List<string> Tokens { get; set; } = new();
 }

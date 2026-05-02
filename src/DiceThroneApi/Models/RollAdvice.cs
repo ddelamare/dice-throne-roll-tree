@@ -8,10 +8,13 @@ public class RollAdvice
     public double Probability { get; set; }
     public string CalculationMethod { get; set; } = string.Empty;
     public int Damage { get; set; }
-    public double ExpectedDamage { get; set; }
+    /// <summary>
+    /// Expected delta = probability × (damage + heal + cards×cardValue + cp×cpValue + tokens×tokenValue).
+    /// </summary>
+    public double ExpectedDelta { get; set; }
     public string? FallbackObjectiveName { get; set; }
     public double FallbackProbability { get; set; }
-    public double FallbackExpectedDamage { get; set; }
+    public double FallbackExpectedDelta { get; set; }
     
     /// <summary>
     /// Probability of hitting the objective if all dice are rerolled (baseline comparison).

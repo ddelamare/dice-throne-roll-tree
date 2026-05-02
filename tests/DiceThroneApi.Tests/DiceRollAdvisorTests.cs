@@ -38,7 +38,7 @@ public class DiceRollAdvisorTests
     }
 
     [Fact]
-    public void GetAdvice_WithDamage_PopulatesExpectedDamage()
+    public void GetAdvice_WithDamage_PopulatesExpectedDelta()
     {
         var objective = _parser.Parse("Test", "[6666]");
         objective.Damage = 5;
@@ -49,12 +49,12 @@ public class DiceRollAdvisorTests
         Assert.Single(advice);
         var result = advice[0];
         Assert.Equal(5, result.Damage);
-        Assert.InRange(result.ExpectedDamage, 0.0, 5.0);
-        Assert.Equal(result.Probability * 5, result.ExpectedDamage, precision: 10);
+        Assert.InRange(result.ExpectedDelta, 0.0, 5.0);
+        Assert.Equal(result.Probability * 5, result.ExpectedDelta, precision: 10);
     }
 
     [Fact]
-    public void GetAdvice_WithZeroDamage_ExpectedDamageIsZero()
+    public void GetAdvice_WithZeroDamage_ExpectedDeltaIsZero()
     {
         var objective = _parser.Parse("Test", "[6666]");
         objective.Damage = 0;
@@ -63,11 +63,11 @@ public class DiceRollAdvisorTests
         var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective });
 
         Assert.Single(advice);
-        Assert.Equal(0, advice[0].ExpectedDamage);
+        Assert.Equal(0, advice[0].ExpectedDelta);
     }
 
     [Fact]
-    public void GetAdvice_MatchingDice_ExpectedDamageEqualsFullDamage()
+    public void GetAdvice_MatchingDice_ExpectedDeltaEqualsFullDamage()
     {
         var objective = _parser.Parse("Test", "[6666]");
         objective.Damage = 4;
@@ -78,12 +78,12 @@ public class DiceRollAdvisorTests
 
         Assert.Single(advice);
         var result = advice[0];
-        // With 4 sixes already, expected damage should be close to the full 4 damage
-        Assert.InRange(result.ExpectedDamage, 3.0, 4.0);
+        // With 4 sixes already, expected delta should be close to the full 4 damage
+        Assert.InRange(result.ExpectedDelta, 3.0, 4.0);
     }
 
     [Fact]
-    public void GetAdvice_ImpossibleObjective_ExpectedDamageIsZero()
+    public void GetAdvice_ImpossibleObjective_ExpectedDeltaIsZero()
     {
         // 6 sixes with only 5 dice — impossible
         var objective = _parser.Parse("Test", "[666666]");
@@ -93,11 +93,11 @@ public class DiceRollAdvisorTests
         var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective });
 
         Assert.Single(advice);
-        Assert.Equal(0.0, advice[0].ExpectedDamage);
+        Assert.Equal(0.0, advice[0].ExpectedDelta);
     }
 
     [Fact]
-    public void GetAdvice_MonteCarlo_PopulatesExpectedDamage()
+    public void GetAdvice_MonteCarlo_PopulatesExpectedDelta()
     {
         var objective = _parser.Parse("Test", "[6]");
         objective.Damage = 3;
@@ -108,8 +108,8 @@ public class DiceRollAdvisorTests
         Assert.Single(advice);
         var result = advice[0];
         Assert.Equal(3, result.Damage);
-        Assert.Equal(result.Probability * 3, result.ExpectedDamage, precision: 10);
-        Assert.InRange(result.ExpectedDamage, 0.0, 3.0);
+        Assert.Equal(result.Probability * 3, result.ExpectedDelta, precision: 10);
+        Assert.InRange(result.ExpectedDelta, 0.0, 3.0);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public class DiceRollAdvisorTests
         var chaseAdvice = advice.First(a => a.ObjectiveName == "Ultimate Attack");
         // Chase has a fallback because it's hard and another damage objective exists
         Assert.NotNull(chaseAdvice.FallbackObjectiveName);
-        Assert.True(chaseAdvice.FallbackExpectedDamage > 0);
+        Assert.True(chaseAdvice.FallbackExpectedDelta > 0);
     }
 
     [Fact]
@@ -263,7 +263,7 @@ public class DiceRollAdvisorTests
     }
 
     [Fact]
-    public void GetBestOverallStrategy_ReturnsHighestExpectedDamage()
+    public void GetBestOverallStrategy_ReturnsHighestExpectedDelta()
     {
         // High damage but hard objective
         var hardObj = _parser.Parse("Hard Attack", "[66666]");
@@ -286,7 +286,7 @@ public class DiceRollAdvisorTests
     }
 
     [Fact]
-    public void GetAdvice_OrdersByExpectedDamage_BeforeProbability()
+    public void GetAdvice_OrdersByExpectedDelta_BeforeProbability()
     {
         var highProbabilityLowDamage = _parser.Parse("Safe Attack", "[66]");
         highProbabilityLowDamage.Damage = 2;
@@ -298,7 +298,7 @@ public class DiceRollAdvisorTests
         var advice = _advisor.GetAdvice(dice, 1, new List<RollObjective> { highProbabilityLowDamage, lowerProbabilityHighDamage });
 
         Assert.Equal("Big Swing", advice[0].ObjectiveName);
-        Assert.True(advice[0].ExpectedDamage > advice[1].ExpectedDamage);
+        Assert.True(advice[0].ExpectedDelta > advice[1].ExpectedDelta);
         Assert.True(advice[0].Probability < advice[1].Probability);
     }
 
@@ -330,6 +330,100 @@ public class DiceRollAdvisorTests
         Assert.NotNull(best);
         Assert.True(best.BaselineProbability >= 0);
         Assert.True(best.ProbabilityImprovement >= 0);
+    }
+
+    // ── ExpectedDelta / EvaluationConfig tests ────────────────────────────────
+
+    [Fact]
+    public void GetAdvice_ExpectedDelta_IncludesTokensWithDefaultValue()
+    {
+        // Objective with 2 tokens — default token value = 2 each, so total delta = 5 damage + 2+2 = 9
+        var objective = _parser.Parse("Crit Bash", "[6666]");
+        objective.Damage = 5;
+        objective.Tokens = new List<string> { "Stun", "Stun" };
+
+        var dice = new List<int> { 6, 6, 6, 6, 1 };
+        var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective });
+
+        var result = advice[0];
+        // prob * (5 + 2*2) = 1.0 * 9 = 9
+        Assert.Equal(result.Probability * 9, result.ExpectedDelta, precision: 10);
+    }
+
+    [Fact]
+    public void GetAdvice_ExpectedDelta_IncludesHealAndCards()
+    {
+        var objective = _parser.Parse("The Cure", "[(45)(45)(45)6]");
+        objective.Damage = 0;
+        objective.Heal = 3;
+        objective.Cards = 1;
+
+        var dice = new List<int> { 4, 4, 4, 6, 1 };
+        var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective });
+
+        var result = advice[0];
+        // delta = 0 + 3*1 + 1*1 = 4
+        Assert.Equal(result.Probability * 4, result.ExpectedDelta, precision: 10);
+    }
+
+    [Fact]
+    public void GetAdvice_ExpectedDelta_CustomEvalConfig_PerTokenOverride()
+    {
+        var objective = _parser.Parse("Stun Attack", "[6666]");
+        objective.Damage = 5;
+        objective.Tokens = new List<string> { "Stun" };
+
+        var eval = new DiceThroneApi.Models.EvaluationConfig
+        {
+            TokenValues = new Dictionary<string, double> { ["Stun"] = 5.0 },
+            DefaultTokenValue = 2.0
+        };
+
+        var dice = new List<int> { 6, 6, 6, 6, 1 };
+        var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective }, eval: eval);
+
+        var result = advice[0];
+        // delta = 5 + 5 (Stun override) = 10
+        Assert.Equal(result.Probability * 10, result.ExpectedDelta, precision: 10);
+    }
+
+    [Fact]
+    public void GetAdvice_ExpectedDelta_ZeroTokenValue_ExcludesFromDelta()
+    {
+        var objective = _parser.Parse("Stun Attack", "[6666]");
+        objective.Damage = 5;
+        objective.Tokens = new List<string> { "Stun" };
+
+        var eval = new DiceThroneApi.Models.EvaluationConfig
+        {
+            TokenValues = new Dictionary<string, double> { ["Stun"] = 0.0 }
+        };
+
+        var dice = new List<int> { 6, 6, 6, 6, 1 };
+        var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective }, eval: eval);
+
+        var result = advice[0];
+        // delta = 5 + 0 = 5
+        Assert.Equal(result.Probability * 5, result.ExpectedDelta, precision: 10);
+    }
+
+    [Fact]
+    public void GetAdvice_ExpectedDelta_ZeroDamage_ButNonZeroTokens_IsVisibleToBestStrategy()
+    {
+        // Objective with no damage but tokens should still surface in GetBestOverallStrategy
+        var objective = _parser.Parse("Buff", "[6666]");
+        objective.Damage = 0;
+        objective.Tokens = new List<string> { "Rage" };
+
+        var dice = new List<int> { 6, 6, 6, 6, 1 };
+        var eval = new DiceThroneApi.Models.EvaluationConfig { DefaultTokenValue = 3.0 };
+
+        var best = _advisor.GetBestOverallStrategy(dice, 0, new List<RollObjective> { objective }, eval);
+
+        Assert.NotNull(best);
+        Assert.Equal("Buff", best.ObjectiveName);
+        // delta = 0 + 3 = 3 for the token
+        Assert.Equal(best.Probability * 3, best.ExpectedDelta, precision: 10);
     }
 
     public async Task AnalyticKeepOutperformsGreedyKeep_Top10Improvements()

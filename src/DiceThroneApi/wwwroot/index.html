@@ -403,6 +403,45 @@
             margin-bottom: 20px;
             color: #c00;
         }
+
+        .eval-config-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+        }
+
+        .eval-config-section .control-group label {
+            font-size: 13px;
+        }
+
+        .eval-config-section input {
+            font-size: 14px;
+            padding: 6px 8px;
+        }
+
+        #tokenValuesTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        #tokenValuesTable th {
+            text-align: left;
+            padding: 6px 8px;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #tokenValuesTable td {
+            padding: 4px 8px;
+        }
+
+        #tokenValuesTable input {
+            width: 70px;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -441,7 +480,7 @@
             <div class="control-group">
                 <label for="sortSelect">Sort By:</label>
                 <select id="sortSelect">
-                    <option value="expectedDamage">Expected Damage</option>
+                    <option value="expectedDelta">Expected Delta</option>
                     <option value="probability">Probability</option>
                     <option value="boardOrder">Board Order</option>
                 </select>
@@ -467,6 +506,7 @@
                 <div class="dropdown-content" id="menuDropdown">
                     <button class="btn-primary" id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
                     <button class="btn-primary" id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
+                    <button class="btn-primary" id="dropdownEvalBtn" onclick="evalModalOpen()">⚖️ Evaluation Weights</button>
                 </div>
             </div>
         </div>
@@ -484,6 +524,43 @@
                 <div class="button-group" style="margin-top: 12px; justify-content: flex-end;">
                     <button class="btn-secondary" type="button" onclick="setDiceModalClose()">Cancel</button>
                     <button class="btn-primary" type="button" onclick="setDiceValues()">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-overlay" id="evalModalOverlay" onclick="evalModalClose()">
+            <div class="modal" onclick="event.stopPropagation();" style="max-width: 560px;">
+                <button class="modal-close" onclick="evalModalClose()">✕</button>
+                <h3>Evaluation Weights</h3>
+                <p style="margin-top:6px; font-size:13px; color:#555;">These values convert non-damage outcomes into the same unit as damage for ranking objectives by <em>Expected Delta</em>.</p>
+                <div class="eval-config-section" style="margin-top:14px;">
+                    <div class="control-group">
+                        <label for="evalHeal">Heal Value</label>
+                        <input id="evalHeal" type="number" min="0" step="0.5" value="1" />
+                    </div>
+                    <div class="control-group">
+                        <label for="evalCard">Card Value</label>
+                        <input id="evalCard" type="number" min="0" step="0.5" value="1" />
+                    </div>
+                    <div class="control-group">
+                        <label for="evalCp">CP Value</label>
+                        <input id="evalCp" type="number" min="0" step="0.5" value="1" />
+                    </div>
+                    <div class="control-group">
+                        <label for="evalDefaultToken">Default Token Value</label>
+                        <input id="evalDefaultToken" type="number" min="0" step="0.5" value="2" />
+                    </div>
+                </div>
+                <div id="tokenValueSection" style="margin-top:14px; display:none;">
+                    <strong style="font-size:13px;">Per-Token Overrides</strong>
+                    <table id="tokenValuesTable">
+                        <thead><tr><th>Token</th><th>Value</th></tr></thead>
+                        <tbody id="tokenValuesBody"></tbody>
+                    </table>
+                </div>
+                <div class="button-group" style="margin-top: 14px; justify-content: flex-end;">
+                    <button class="btn-secondary" type="button" onclick="evalModalClose()">Cancel</button>
+                    <button class="btn-primary" type="button" onclick="applyEvalConfig()">Apply</button>
                 </div>
             </div>
         </div>
@@ -509,6 +586,98 @@
         let currentSuggestions = []; // Store current suggestions for re-sorting
         const defaultStatusText = 'Click "Roll Dice" to start a new turn!';
         const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
+
+        // Evaluation config (mirrors EvaluationConfig model)
+        let evalConfig = {
+            healValue: 1,
+            cardValue: 1,
+            cpValue: 1,
+            defaultTokenValue: 2,
+            tokenValues: {}
+        };
+
+        function getEvaluationPayload() {
+            return {
+                healValue: evalConfig.healValue,
+                cardValue: evalConfig.cardValue,
+                cpValue: evalConfig.cpValue,
+                defaultTokenValue: evalConfig.defaultTokenValue,
+                tokenValues: Object.keys(evalConfig.tokenValues).length > 0 ? evalConfig.tokenValues : {}
+            };
+        }
+
+        function evalModalOpen() {
+            document.getElementById('menuContainer').classList.remove('show');
+            // Populate inputs from current config
+            document.getElementById('evalHeal').value = evalConfig.healValue;
+            document.getElementById('evalCard').value = evalConfig.cardValue;
+            document.getElementById('evalCp').value = evalConfig.cpValue;
+            document.getElementById('evalDefaultToken').value = evalConfig.defaultTokenValue;
+            // Populate per-token table from current hero objectives
+            const tokens = collectHeroTokens();
+            const section = document.getElementById('tokenValueSection');
+            const tbody = document.getElementById('tokenValuesBody');
+            tbody.innerHTML = '';
+            if (tokens.length > 0) {
+                section.style.display = '';
+                tokens.forEach(token => {
+                    const val = evalConfig.tokenValues[token] !== undefined
+                        ? evalConfig.tokenValues[token]
+                        : evalConfig.defaultTokenValue;
+                    tbody.innerHTML += `<tr><td>${token}</td><td><input type="number" min="0" step="0.5" value="${val}" data-token="${token}" /></td></tr>`;
+                });
+            } else {
+                section.style.display = 'none';
+            }
+            document.getElementById('evalModalOverlay').classList.add('active');
+        }
+
+        function evalModalClose() {
+            document.getElementById('evalModalOverlay').classList.remove('active');
+        }
+
+        function applyEvalConfig() {
+            evalConfig.healValue = parseFloat(document.getElementById('evalHeal').value) || 0;
+            evalConfig.cardValue = parseFloat(document.getElementById('evalCard').value) || 0;
+            evalConfig.cpValue = parseFloat(document.getElementById('evalCp').value) || 0;
+            evalConfig.defaultTokenValue = parseFloat(document.getElementById('evalDefaultToken').value) || 0;
+            evalConfig.tokenValues = {};
+            document.querySelectorAll('#tokenValuesBody input[data-token]').forEach(input => {
+                const token = input.getAttribute('data-token');
+                const val = parseFloat(input.value);
+                if (!isNaN(val)) evalConfig.tokenValues[token] = val;
+            });
+            evalModalClose();
+            // Re-fetch advice with new weights if we have current dice
+            if (currentDice.length > 0) {
+                const method = document.getElementById('methodSelect').value;
+                fetch('/api/roll/advice', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        heroId: currentHero.id,
+                        currentDice,
+                        rollsRemaining,
+                        method,
+                        evaluation: getEvaluationPayload()
+                    })
+                })
+                .then(r => r.json())
+                .then(suggestions => { updateDisplay(suggestions); })
+                .catch(() => {});
+            } else if (currentSuggestions.length > 0) {
+                renderObjectives(currentSuggestions, false);
+            }
+        }
+
+        function collectHeroTokens() {
+            if (!currentHero || !currentHero.objectives) return [];
+            const seen = new Set();
+            currentHero.objectives.forEach(obj => {
+                (obj.tokens || []).forEach(t => seen.add(t));
+            });
+            return Array.from(seen).sort();
+        }
         
         async function loadHeroes() {
             try {
@@ -588,9 +757,9 @@
                         return b.probability - a.probability;
                     case 'boardOrder':
                         return a.index - b.index;
-                    case 'expectedDamage':
+                    case 'expectedDelta':
                     default:
-                        return b.expectedDamage - a.expectedDamage;
+                        return b.expectedDelta - a.expectedDelta;
                 }
             });
             
@@ -612,12 +781,12 @@
                 } else {
                     probabilityHtml = `<span class="probability">${percentage}%</span>`;
                 }
-                const damageInfo = advice.damage > 0
+                const damageInfo = advice.damage > 0 || advice.expectedDelta > 0
                     ? `<span>Damage: <strong>${advice.damage}</strong></span>
-                       <span class="expected-damage">Expected: ${advice.expectedDamage.toFixed(2)} dmg</span>`
+                       <span class="expected-damage">Expected Delta: ${advice.expectedDelta.toFixed(2)}</span>`
                     : '';
-                const fallbackInfo = showKeepSuggestions && advice.probability < 0.9 && advice.fallbackObjectiveName && advice.fallbackExpectedDamage > 0
-                    ? `<div class="fallback-info">↩ Fallback: <strong>${advice.fallbackObjectiveName}</strong> — ${(advice.fallbackProbability * 100).toFixed(1)}% chance (${advice.fallbackExpectedDamage.toFixed(2)} expected dmg)</div>`
+                const fallbackInfo = showKeepSuggestions && advice.probability < 0.9 && advice.fallbackObjectiveName && advice.fallbackExpectedDelta > 0
+                    ? `<div class="fallback-info">↩ Fallback: <strong>${advice.fallbackObjectiveName}</strong> — ${(advice.fallbackProbability * 100).toFixed(1)}% chance (${advice.fallbackExpectedDelta.toFixed(2)} expected delta)</div>`
                     : '';
                 const keepSuggestion = showKeepSuggestions
                     ? `<div>Suggested keep:</div>
@@ -664,7 +833,8 @@
                     body: JSON.stringify({
                         heroId: currentHero.id,
                         diceCount: diceCount,
-                        method: method
+                        method: method,
+                        evaluation: getEvaluationPayload()
                     })
                 });
                 
@@ -709,7 +879,8 @@
                     body: JSON.stringify({
                         heroId: currentHero.id,
                         diceCount: diceCount,
-                        method: method
+                        method: method,
+                        evaluation: getEvaluationPayload()
                     })
                 });
 
@@ -769,7 +940,8 @@
                         heroId: currentHero.id,
                         currentDice: currentDice,
                         rollsRemaining: rollsRemaining,
-                        method: method
+                        method: method,
+                        evaluation: getEvaluationPayload()
                     })
                 });
                 
@@ -842,7 +1014,8 @@
                         heroId: currentHero.id,
                         currentDice: currentDice,
                         rollsRemaining: rollsRemaining,
-                        method: document.getElementById('methodSelect').value
+                        method: document.getElementById('methodSelect').value,
+                        evaluation: getEvaluationPayload()
                     })
                 });
 

@@ -19,9 +19,11 @@ public class DiceRollAdvisor
         int rollsRemaining,
         List<RollObjective> objectives,
         string method = "analytic",
-        List<bool>? lockedDiceMask = null)
+        List<bool>? lockedDiceMask = null,
+        DiceThroneApi.Models.EvaluationConfig? eval = null)
     {
         var advice = new List<RollAdvice>();
+        eval ??= new DiceThroneApi.Models.EvaluationConfig();
 
         foreach (var (objective, index) in objectives.Select((o, i) => (o, i)))
         {
@@ -38,6 +40,8 @@ public class DiceRollAdvisor
                 ? (optimalProb >= 1.0 ? 1.0 : _simulator.Simulate(objective, currentDice.Count, MonteCarloConst.StandardIterations, rollsRemaining))
                 : optimalProb;
             
+            var objectiveDelta = ComputeDelta(objective, eval);
+
             advice.Add(new RollAdvice
             {
                 ObjectiveName = objective.Name,
@@ -46,7 +50,7 @@ public class DiceRollAdvisor
                 Probability = prob,
                 CalculationMethod = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) ? "Monte Carlo" : "Analytic",
                 Damage = objective.Damage,
-                ExpectedDamage = prob * objective.Damage,
+                ExpectedDelta = prob * objectiveDelta,
                 BaselineProbability = baselineProb,
                 ProbabilityImprovement = optimalProb - baselineProb,
                 Index = index
@@ -57,12 +61,12 @@ public class DiceRollAdvisor
         // which other damage-dealing objective has the best expected value?
         if (rollsRemaining > 0)
         {
-            var damageObjectives = objectives.Where(o => o.Damage > 0).ToList();
+            var damageObjectives = objectives.Where(o => ComputeDelta(o, eval) > 0).ToList();
 
             foreach (var a in advice)
             {
                 var thisObjective = objectives.FirstOrDefault(o => o.Name == a.ObjectiveName);
-                if (thisObjective == null || thisObjective.Damage == 0) continue;
+                if (thisObjective == null || ComputeDelta(thisObjective, eval) == 0) continue;
 
                 var others = damageObjectives.Where(o => o.Name != a.ObjectiveName).ToList();
                 if (others.Count == 0) continue;
@@ -75,7 +79,7 @@ public class DiceRollAdvisor
                 {
                     var fallbackProb = _calculator.CalculateWithForcedKeep(
                         currentDice, rollsRemaining, other, a.DiceToKeep);
-                    var expected = fallbackProb * other.Damage;
+                    var expected = fallbackProb * ComputeDelta(other, eval);
                     if (fallbackProb > bestFallbackProb)
                     {
                         bestFallbackExpected = expected;
@@ -88,13 +92,13 @@ public class DiceRollAdvisor
                 {
                     a.FallbackObjectiveName = bestFallbackObj.Name;
                     a.FallbackProbability = bestFallbackProb;
-                    a.FallbackExpectedDamage = bestFallbackExpected;
+                    a.FallbackExpectedDelta = bestFallbackExpected;
                 }
             }
         }
 
         return advice
-            .OrderByDescending(a => a.ExpectedDamage)
+            .OrderByDescending(a => a.ExpectedDelta)
             .ThenByDescending(a => a.Probability)
             .ToList();
     }
@@ -103,16 +107,17 @@ public class DiceRollAdvisor
     /// Computes the globally optimal strategy across all damage-dealing objectives,
     /// returning the advice for the objective with the highest expected damage.
     /// </summary>
-    public RollAdvice? GetBestOverallStrategy(List<int> currentDice, int rollsRemaining, List<RollObjective> objectives)
+    public RollAdvice? GetBestOverallStrategy(List<int> currentDice, int rollsRemaining, List<RollObjective> objectives, DiceThroneApi.Models.EvaluationConfig? eval = null)
     {
+        eval ??= new DiceThroneApi.Models.EvaluationConfig();
         RollAdvice? bestAdvice = null;
         double bestExpectedDamage = double.NegativeInfinity;
         double bestProbability = double.NegativeInfinity;
 
-        foreach (var objective in objectives.Where(o => o.Damage > 0))
+        foreach (var objective in objectives.Where(o => ComputeDelta(o, eval) > 0))
         {
             var prob = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep);
-            var expectedDamage = prob * objective.Damage;
+            var expectedDamage = prob * ComputeDelta(objective, eval);
 
             if (expectedDamage > bestExpectedDamage
                 || (Math.Abs(expectedDamage - bestExpectedDamage) < ExpectedDamageTieTolerance && prob > bestProbability))
@@ -129,7 +134,7 @@ public class DiceRollAdvisor
                     Probability = prob,
                     CalculationMethod = "Analytic",
                     Damage = objective.Damage,
-                    ExpectedDamage = expectedDamage,
+                    ExpectedDelta = expectedDamage,
                     BaselineProbability = baselineProb,
                     ProbabilityImprovement = prob - baselineProb
                 };
@@ -137,6 +142,30 @@ public class DiceRollAdvisor
         }
 
         return bestAdvice;
+    }
+
+    private double ComputeDelta(RollObjective objective, DiceThroneApi.Models.EvaluationConfig eval)
+    {
+        // Sum base components: damage + heal + cards*cardValue + cp*cpValue + per-token values
+        double delta = 0.0;
+        delta += objective.Damage;
+        delta += objective.Heal * eval.HealValue;
+        delta += objective.Cards * eval.CardValue;
+        delta += objective.Cp * eval.CpValue;
+
+        foreach (var token in objective.Tokens ?? new List<string>())
+        {
+            if (eval.TokenValues != null && eval.TokenValues.TryGetValue(token, out var val))
+            {
+                delta += val;
+            }
+            else
+            {
+                delta += eval.DefaultTokenValue;
+            }
+        }
+
+        return delta;
     }
 
     /// <summary>
