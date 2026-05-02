@@ -12,5 +12,5 @@
     { "name": "Kneel To Me", "notation": "LargeStraight", "damage": 9, "tokens": [ "Bag of Tricks"]  },
     { "name": "Double Take", "notation": "[6666]", "damage": 7 , "tokens": ["Illusion","Spellbound", "Spellbound"] },
     { "name": "Golrious Purpose!", "notation": "[66666]", "damage": 10, "tokens": ["Illusion","Spellbound","Spellbound", "Spellbound"]  }
-  ],
+  ]
 }

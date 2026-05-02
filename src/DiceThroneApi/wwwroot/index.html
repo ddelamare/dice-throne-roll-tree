@@ -343,6 +343,16 @@
             font-size: 12px;
             font-weight: 600;
         }
+
+        .cost-pill {
+            background: #eef3ff;
+            border: 1px solid #c9d7ff;
+            color: #bd4444;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
+        }
         
         .expected-damage {
             font-weight: 600;
@@ -714,12 +724,15 @@
             if (advice.heal > 0) {
                 rewards.push(`<span class="reward-pill">Heal +${advice.heal}</span>`);
             }
+            else if (advice.heal < 0) {
+                rewards.push(`<span class="cost-pill">Self-Damage ${advice.heal}</span>`);
+            }
 
-            if (advice.cp > 0) {
+            if (advice.cp != 0) {
                 rewards.push(`<span class="reward-pill">CP +${advice.cp}</span>`);
             }
 
-            if (advice.cards > 0) {
+            if (advice.cards != 0) {
                 rewards.push(`<span class="reward-pill">Cards +${advice.cards}</span>`);
             }
 
