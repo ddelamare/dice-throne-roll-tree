@@ -160,6 +160,10 @@ public class RollController : ControllerBase
                     Probability = probability,
                     CalculationMethod = calculationMethod,
                     Damage = objective.Damage,
+                    Heal = objective.Heal,
+                    Cards = objective.Cards,
+                    Cp = objective.Cp,
+                    Tokens = new List<string>(objective.Tokens ?? []),
                     ExpectedDelta = probability * delta,
                     Index = index
                 };

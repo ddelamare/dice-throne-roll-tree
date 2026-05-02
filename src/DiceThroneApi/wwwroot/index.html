@@ -324,6 +324,24 @@
             margin-top: 6px;
             font-size: 13px;
             color: #666;
+            flex-wrap: wrap;
+        }
+
+        .objective-rewards {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .reward-pill {
+            background: #eef3ff;
+            border: 1px solid #c9d7ff;
+            color: #334b8f;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 600;
         }
         
         .expected-damage {
@@ -678,6 +696,43 @@
             });
             return Array.from(seen).sort();
         }
+
+        function getCondensedTokenLabels(tokens) {
+            const tokenCounts = new Map();
+            (tokens || []).forEach(token => {
+                tokenCounts.set(token, (tokenCounts.get(token) || 0) + 1);
+            });
+
+            return Array.from(tokenCounts.entries())
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(([token, count]) => count > 1 ? `${token} x ${count}` : token);
+        }
+
+        function buildRewardHtml(advice) {
+            const rewards = [];
+
+            if (advice.heal > 0) {
+                rewards.push(`<span class="reward-pill">Heal +${advice.heal}</span>`);
+            }
+
+            if (advice.cp > 0) {
+                rewards.push(`<span class="reward-pill">CP +${advice.cp}</span>`);
+            }
+
+            if (advice.cards > 0) {
+                rewards.push(`<span class="reward-pill">Cards +${advice.cards}</span>`);
+            }
+
+            getCondensedTokenLabels(advice.tokens).forEach(tokenLabel => {
+                rewards.push(`<span class="reward-pill">${tokenLabel}</span>`);
+            });
+
+            if (rewards.length === 0) {
+                return '';
+            }
+
+            return `<div class="objective-rewards">${rewards.join('')}</div>`;
+        }
         
         async function loadHeroes() {
             try {
@@ -785,6 +840,7 @@
                     ? `<span>Damage: <strong>${advice.damage}</strong></span>
                        <span class="expected-damage">Expected Delta: ${advice.expectedDelta.toFixed(2)}</span>`
                     : '';
+                const rewardInfo = buildRewardHtml(advice);
                 const fallbackInfo = showKeepSuggestions && advice.probability < 0.9 && advice.fallbackObjectiveName && advice.fallbackExpectedDelta > 0
                     ? `<div class="fallback-info">↩ Fallback: <strong>${advice.fallbackObjectiveName}</strong> — ${(advice.fallbackProbability * 100).toFixed(1)}% chance (${advice.fallbackExpectedDelta.toFixed(2)} expected delta)</div>`
                     : '';
@@ -806,6 +862,7 @@
                             ${probabilityHtml}
                         </div>
                         <div class="objective-meta">${damageInfo}</div>
+                        ${rewardInfo}
                         ${fallbackInfo}
                         ${keepSuggestion}
                     </div>

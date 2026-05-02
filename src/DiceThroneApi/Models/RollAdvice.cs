@@ -8,6 +8,10 @@ public class RollAdvice
     public double Probability { get; set; }
     public string CalculationMethod { get; set; } = string.Empty;
     public int Damage { get; set; }
+    public int Heal { get; set; }
+    public int Cards { get; set; }
+    public int Cp { get; set; }
+    public List<string> Tokens { get; set; } = new();
     /// <summary>
     /// Expected delta = probability × (damage + heal + cards×cardValue + cp×cpValue + tokens×tokenValue).
     /// </summary>
