@@ -5,12 +5,12 @@
     { "name": "Mockery (3)", "notation": "[(12)(12)(12)]", "damage": 6 },
     { "name": "Mockery (4)", "notation": "[(12)(12)(12)(12)]", "damage": 7 },
     { "name": "Mockery (5)", "notation": "[(12)(12)(12)(12)(12)]", "damage": 8 },
-    { "name": "Antics", "notation": "[55]", "damage":0 },
-    { "name": "Confuddle", "notation": "[(12)(12)(34)(34)]", "damage": 7 },
-    { "name": "Vilify", "notation": "[(12)(34)56]", "damage": 7 },
-    { "name": "Vex", "notation": "SmallStraight", "damage": 7 },
-    { "name": "Kneel To Me", "notation": "LargeStraight", "damage": 9 },
-    { "name": "Double Take", "notation": "[6666]", "damage": 7 },
-    { "name": "Golrious Purpose!", "notation": "[66666]", "damage": 10 }
-  ]
+    { "name": "Antics", "notation": "[55]", "damage":0, "cards": 1, "tokens": ["Illusion", "Bag of Tricks"] },
+    { "name": "Confuddle", "notation": "[(12)(12)(34)(34)]", "damage": 7, "tokens": ["Spellbound", "Spellbound"] },
+    { "name": "Vilify", "notation": "[(12)(34)56]", "damage": 7, "tokens": ["Illusion", "Bag of Tricks"]  },
+    { "name": "Vex", "notation": "SmallStraight", "damage": 7, "tokens": [ "Bag of Tricks"]  },
+    { "name": "Kneel To Me", "notation": "LargeStraight", "damage": 9, "tokens": [ "Bag of Tricks"]  },
+    { "name": "Double Take", "notation": "[6666]", "damage": 7 , "tokens": ["Illusion","Spellbound", "Spellbound"] },
+    { "name": "Golrious Purpose!", "notation": "[66666]", "damage": 10, "tokens": ["Illusion","Spellbound","Spellbound", "Spellbound"]  }
+  ],
 }

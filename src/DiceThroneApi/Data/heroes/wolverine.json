@@ -5,13 +5,13 @@
     { "name": "Adamantium Claws (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Adamantium Claws (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Adamantium Claws (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
-    { "name": "Hunter", "notation": "[(123)(123)(45)(45)(45)]", "damage": 3 },
-    { "name": "Regenerate", "notation": "[(123)(123)66]", "damage": 0 },
-    { "name": "Healing Factor", "notation": "[(45)(45)66]", "damage": 0 },
-    { "name": "Severe Threat", "notation": "[(123)(123)(123)66]", "damage": 9 },
-    { "name": "Barrage (Small)", "notation": "SmallStraight", "damage": 5 },
-    { "name": "Barrage (Large)", "notation": "LargeStraight", "damage": 7 },
-    { "name": "Power Level Nine", "notation": "[6666]", "damage": 6 },
-    { "name": "Berserker Rage!", "notation": "[66666]", "damage": 12 }
+    { "name": "Regenerate", "notation": "[(123)(123)66]", "damage": 3, "heal": 1 },
+    { "name": "Healing Factor", "notation": "[(45)(45)66]", "damage": 0, "heal": 4, "cards": 1 },
+    { "name": "Hunter", "notation": "[(123)(123)(45)(45)(45)]", "damage": 3,  "tokens": ["Rage"] },
+    { "name": "Barrage (Small)", "notation": "SmallStraight", "damage": 5 , "heal": 1,  "tokens": ["Rage"]},
+    { "name": "Barrage (Large)", "notation": "LargeStraight", "damage": 7, "heal": 2,  "tokens": ["Alpha"] },
+    { "name": "Severe Threat", "notation": "[(123)(123)(123)66]", "damage": 10 },
+    { "name": "Power Level Nine", "notation": "[6666]", "damage": 6, "heal": 1,  "tokens": ["Rage", "Alpha"] },
+    { "name": "Berserker Rage!", "notation": "[66666]", "damage": 12 , "heal": 3,  "tokens": ["Rage"]}
 ]
 }

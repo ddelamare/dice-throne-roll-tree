@@ -5,12 +5,12 @@
     { "name": "Frostbite (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Frostbite (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
     { "name": "Frostbite (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
-    { "name": "Ice To Meet You", "notation": "[(45)(45)(45)(45)]", "damage": 3 },
-    { "name": "Everybody Chill", "notation": "[(123)666]", "damage": 5 },
-    { "name": "Cold Treat", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7 },
-    { "name": "Thawsome", "notation": "SmallStraight", "damage": 6 },
-    { "name": "Hoarfrost", "notation": "LargeStraight", "damage": 8 },
-    { "name": "Hail The King", "notation": "[6666]", "damage": 5 },
-    { "name": "Ice Storm!", "notation": "[66666]", "damage": 13 }
+    { "name": "Ice To Meet You", "notation": "[(45)(45)(45)(45)]", "damage": 3, "tokens": ["Ice Shard", "Dice Cube"] },
+    { "name": "Everybody Chill", "notation": "[(123)666]", "damage": 5, "tokens": ["Ice Shard"]  },
+    { "name": "Cold Treat", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7, "tokens": ["Ice Shard"]   },
+    { "name": "Thawsome", "notation": "SmallStraight", "damage": 6 , "tokens": ["Ice Shard", "Ice Shard", "Dice Cube"] },
+    { "name": "Hoarfrost", "notation": "LargeStraight", "damage": 8, "tokens": ["Ice Shard", "Ice Shard", "Ice Shard"] },
+    { "name": "Hail The King", "notation": "[6666]", "damage": 5, "tokens": ["Ice Shard","Ice Shard", "Ice Shard"] },
+    { "name": "Ice Storm!", "notation": "[66666]", "damage": 13, "tokens": ["Ice Shard","Ice Shard", "Ice Shard","Ice Shard", "Ice Shard", "Dice Cube", "Dice Cube"] }
 ]
 }

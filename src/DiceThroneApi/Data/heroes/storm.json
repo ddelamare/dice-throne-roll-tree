@@ -5,12 +5,12 @@
     { "name": "Lightning Field (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Lightning Field (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
     { "name": "Lightning Field (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
-    { "name": "Light It Up", "notation": "[(123)(45)(45)6]", "damage": 0 },
-    { "name": "Thunderstorm", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7 },
-    { "name": "Opposites Attract", "notation": "[(123)(123)(123)66]", "damage": 7 },
-    { "name": "Gust (Small)", "notation": "SmallStraight", "damage": 6 },
-    { "name": "Gust (Large)", "notation": "LargeStraight", "damage": 8 },
-    { "name": "Blizzard", "notation": "[6666]", "damage": 8 },
-    { "name": "Tempest!", "notation": "[66666]", "damage": 13 }
+    { "name": "Light It Up", "notation": "[(123)(45)(45)6]", "damage": 0, "tokens": ["Lightning", "Lightning", "Lightning"]  },
+    { "name": "Thunderstorm", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7, "tokens": ["Lightning", "Lightning"]  },
+    { "name": "Opposites Attract", "notation": "[(123)(123)(123)66]", "damage": 7, "tokens": ["Tornado", "Tornado", "Tornado"]  },
+    { "name": "Gust (Small)", "notation": "SmallStraight", "damage": 6, "tokens": ["Wind Shear"] },
+    { "name": "Gust (Large)", "notation": "LargeStraight", "damage": 8 , "tokens": ["Wind Shear"] },
+    { "name": "Blizzard", "notation": "[6666]", "damage": 8, "tokens": ["Tornado", "Tornado", "Tornado"] },
+    { "name": "Tempest!", "notation": "[66666]", "damage": 13, "tokens": ["Tornado", "Tornado", "Wind Shear"] }
 ]
 }

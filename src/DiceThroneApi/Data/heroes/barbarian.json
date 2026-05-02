@@ -9,7 +9,7 @@
     { "name": "Overpower", "notation": "[(123)(123)(123)66]", "damage": 9 },
     { "name": "Mighty Blow", "notation": "SmallStraight", "damage": 9 },
     { "name": "Reckless", "notation": "LargeStraight", "damage": 15 },
-    { "name": "Crit Bash", "notation": "[6666]", "damage": 5 },
-    { "name": "Rage!", "notation": "[66666]", "damage": 15 }
+    { "name": "Crit Bash", "notation": "[6666]", "damage": 5, "tokens": ["Stun"] },
+    { "name": "Rage!", "notation": "[66666]", "damage": 15, "tokens": ["Stun"] }
   ]
 }
