@@ -28,7 +28,7 @@ public class DiceRollAdvisor
         foreach (var (objective, index) in objectives.Select((o, i) => (o, i)))
         {
             // Always use optimal keep strategy from the analytic calculator
-            var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep, lockedDiceMask);
+            var optimalProb = _calculator.CalculateBestKeep(currentDice, rollsRemaining, objective, out var toKeep, lockedDiceMask, objectives);
             
             // Calculate baseline probability (if we reroll all dice)
             var baselineProb = CalculateBaselineProbability(currentDice, rollsRemaining, objective, lockedDiceMask);
@@ -88,6 +88,11 @@ public class DiceRollAdvisor
                     {
                         bestFallbackExpected = expected;
                         bestFallbackProb = fallbackProb;
+                        bestFallbackObj = other;
+                    }
+                    else if (fallbackProb == bestFallbackProb && expected > bestFallbackExpected)
+                    {
+                        bestFallbackExpected = expected;
                         bestFallbackObj = other;
                     }
                 }

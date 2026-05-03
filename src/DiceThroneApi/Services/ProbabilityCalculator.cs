@@ -154,7 +154,7 @@ public class ProbabilityCalculator
 
     public double CalculateBestKeep(List<int> currentDice, int rerollsLeft, RollObjective objective, out List<bool> bestKeep)
     {
-        return CalculateBestKeep(currentDice, rerollsLeft, objective, out bestKeep, null);
+        return CalculateBestKeep(currentDice, rerollsLeft, objective, out bestKeep, null, null);
     }
 
     public double CalculateBestKeep(
@@ -162,7 +162,8 @@ public class ProbabilityCalculator
         int rerollsLeft,
         RollObjective objective,
         out List<bool> bestKeep,
-        List<bool>? requiredKeep)
+        List<bool>? requiredKeep = null,
+        List<RollObjective>? fallbacks = null)
     {
         bestKeep = new List<bool>();
         var requiredKeepMask = NormalizeKeepMask(requiredKeep, currentDice.Count);
@@ -219,6 +220,19 @@ public class ProbabilityCalculator
             {
                 bestProb = prob;
                 bestKeepHistogram = keepHistogram;
+            }
+            else if (prob == bestProb && fallbacks != null)
+            {
+                // Tiebreaker: Check the dice against the fallback objective, and prefer the keep that yields a higher fallback probability.
+                var fallbackProb = 0.0;
+                foreach (var fallback in fallbacks)
+                {
+                    fallbackProb = CalculateWithForcedKeep(currentDice, rerollsLeft, fallback, HistogramKeepToMask(currentDice, keepHistogram));
+                    if (fallbackProb > bestProb)
+                    {
+                        bestKeepHistogram = keepHistogram;
+                    }
+                }
             }
         }
 

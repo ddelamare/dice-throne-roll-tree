@@ -1,3 +1,4 @@
+using DiceThroneApi.Models;
 using DiceThroneApi.Services;
 using Xunit;
 
@@ -104,6 +105,18 @@ public class ProbabilityCalculatorTests
         
         Assert.True(probability >= 0.9);
         Assert.Equal(5, bestKeep.Count);
+    }
+
+    [Fact]
+    public void CalculateBestKeep_FallsBackToSmallStraight()
+    {
+        var objective = _parser.Parse("Test", "LargeStraight");
+        var fallbacks = new List<RollObjective> { _parser.Parse("Small Test", "SmallStraight") };
+        var currentDice = new List<int> { 1,2,3,4,6 };
+        
+        var probability = _calculator.CalculateBestKeep(currentDice, 1, objective, out var bestKeep, null, fallbacks);
+        
+        Assert.True(bestKeep.SequenceEqual(new List<bool> { true, true, true, true, false }));
     }
 
     [Fact]
