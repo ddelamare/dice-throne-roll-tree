@@ -11,6 +11,6 @@
     { "name": "Gust (Small)", "notation": "SmallStraight", "damage": 6, "tokens": ["Wind Shear"] },
     { "name": "Gust (Large)", "notation": "LargeStraight", "damage": 8 , "tokens": ["Wind Shear"] },
     { "name": "Blizzard", "notation": "[6666]", "damage": 8, "tokens": ["Tornado", "Tornado", "Tornado"] },
-    { "name": "Tempest!", "notation": "[66666]", "damage": 13, "tokens": ["Tornado", "Tornado", "Wind Shear"] }
+    { "name": "Tempest!", "notation": "[66666]", "damage": 13, "bypassDefense": true, "tokens": ["Tornado", "Tornado", "Wind Shear"] }
 ]
 }

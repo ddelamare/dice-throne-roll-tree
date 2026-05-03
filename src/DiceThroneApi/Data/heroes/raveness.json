@@ -7,10 +7,10 @@
     { "name": "Peck (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
     { "name": "Fowl Friend", "notation": "[(45)(45)(45)(45)]", "damage": 2, "heal": 2, "cards": 1, "tokens": ["Feather","Feather","Feather","Feather"] },
     { "name": "Murder of Crows", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7, "tokens": ["Feather"] },
-    { "name": "Raven Sight", "notation": "[(123)(123)66]", "damage": 4, "heal": 1 },
+    { "name": "Raven Sight", "notation": "[(123)(123)66]", "damage": 4, "bypassDefense": true, "heal": 1 },
     { "name": "Craven", "notation": "SmallStraight", "damage": 8, "tokens": ["Feather"] },
     { "name": "Beguile", "notation": "LargeStraight", "damage": 10, "heal": 1, "tokens": ["Feather", "Feather"] },
-    { "name": "Chamber", "notation": "[6666]", "damage": 9, "heal": 2},
-    { "name": "Fantastic Terrors", "notation": "[66666]", "damage": 16, "heal": 3, "tokens": ["Hex"] }
+    { "name": "Chamber", "notation": "[6666]", "damage": 9, "bypassDefense": true, "heal": 2},
+    { "name": "Fantastic Terrors", "notation": "[66666]", "damage": 16, "bypassDefense": true, "heal": 3, "tokens": ["Hex"] }
   ]
 }

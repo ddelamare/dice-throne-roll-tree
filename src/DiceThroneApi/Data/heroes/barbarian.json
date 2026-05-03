@@ -5,11 +5,14 @@
     { "name": "Smack (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Smack (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
     { "name": "Smack (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 8 },
-    { "name": "Sturdy Blow", "notation": "[(123)(123)66]", "damage": 4 },
+    { "name": "Sturdy Blow", "notation": "[(123)(123)66]", "damage": 4, "bypassDefense": true },
+    { "name": "Fortitude (3)", "notation": "[(45)(45)(45)]", "heal": 4 },
+    { "name": "Fortitude (4)", "notation": "[(45)(45)(45)(45)]", "heal": 5 },
+    { "name": "Fortitude (5)", "notation": "[(45)(45)(45)(45)(45)]", "heal": 6 },
     { "name": "Overpower", "notation": "[(123)(123)(123)66]", "damage": 10 },
     { "name": "Mighty Blow", "notation": "SmallStraight", "damage": 9 },
     { "name": "Reckless", "notation": "LargeStraight", "damage": 15, "heal": -4 },
-    { "name": "Crit Bash", "notation": "[6666]", "damage": 5, "tokens": ["Stun"] },
-    { "name": "Rage!", "notation": "[66666]", "damage": 15, "tokens": ["Stun"] }
+    { "name": "Crit Bash", "notation": "[6666]", "damage": 5, "tokens": ["Stun"], "bypassDefense": true },
+    { "name": "Rage!", "notation": "[66666]", "damage": 15, "tokens": ["Stun"], "bypassDefense": true }
   ]
 }

@@ -8,7 +8,7 @@
     { "name": "Mystic Bolts (Small)", "notation": "SmallStraight", "damage": 6 },
     { "name": "Mystic Bolts (Large)", "notation": "LargeStraight", "damage": 9 },
     { "name": "Binding", "notation": "[(12)(12)55]", "damage": 9 , "tokens": ["Crimson Bands"] },
-    { "name": "Wands of Watoomb", "notation": "[6666]", "damage": 5 , "tokens": ["Crimson Bands"]},
-    { "name": "All-Seeing Eye!", "notation": "[66666]", "damage": 10 }
+    { "name": "Wands of Watoomb", "notation": "[6666]", "bypassDefense": true, "damage": 5 , "tokens": ["Crimson Bands"]},
+    { "name": "All-Seeing Eye!", "notation": "[66666]", "bypassDefense": true, "damage": 10 }
 ]
 }

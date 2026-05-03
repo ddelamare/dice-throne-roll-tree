@@ -5,12 +5,12 @@
     { "name": "Fireball (3)", "notation": "[(123)(123)(123)]", "damage": 3 },
     { "name": "Fireball (4)", "notation": "[(123)(123)(123)(123)]", "damage": 4 },
     { "name": "Fireball (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
-    { "name": "Burning Soul", "notation": "[(5)(5)]", "damage": 2, "tokens": ["Fire Mastery","Fire Mastery","Fire Mastery","Fire Mastery"] },
+    { "name": "Burning Soul", "notation": "[(5)(5)]", "damage": 2, "bypassDefense": true, "tokens": ["Fire Mastery","Fire Mastery","Fire Mastery","Fire Mastery"] },
     { "name": "Pyroblast", "notation": "[(123)(123)(123)6]", "damage": 9, "tokens": ["Fire Mastery"] },
-    { "name": "Combustion", "notation": "[(123)456]", "damage": 9 },
+    { "name": "Combustion", "notation": "[(123)456]", "damage": 9, "bypassDefense": true },
     { "name": "Hot Streak", "notation": "SmallStraight", "damage": 7, "tokens": ["Fire Mastery","Fire Mastery"] },
     { "name": "Ignite", "notation": "LargeStraight", "damage": 8, "tokens": ["Fire Mastery","Fire Mastery"] },
-    { "name": "Meteorite", "notation": "[6666]", "damage": 4, "tokens": ["Fire Mastery","Fire Mastery", "Stun"] },
-    { "name": "Scorch The Earth", "notation": "[66666]", "damage": 14, "tokens": ["Fire Mastery","Fire Mastery", "Fire Mastery", "Knockdown", "Burn"] }
+    { "name": "Meteorite", "notation": "[6666]", "damage": 4, "bypassDefense": true, "tokens": ["Fire Mastery","Fire Mastery", "Stun"] },
+    { "name": "Scorch The Earth", "notation": "[66666]", "damage": 14, "bypassDefense": true, "tokens": ["Fire Mastery","Fire Mastery", "Fire Mastery", "Knockdown", "Burn"] }
   ]
 }

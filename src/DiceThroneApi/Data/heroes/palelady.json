@@ -10,8 +10,8 @@
     { "name": "Conflicted (Small)", "notation": "SmallStraight", "damage": 6, "tokens" : ["Moon Shard"] },
     { "name": "Conflicted (Large)", "notation": "LargeStraight", "damage": 8, "tokens" : ["Moon Shard", "Moon Shard"] },
     { "name": "Full Moon", "notation": "[(45)(45)(45)(45)]", "damage": 7, "tokens" : ["Moon Shard"], "cp": 1 },
-    { "name": "Ensnare", "notation": "[6666]", "damage": 5, "tokens": ["Prey", "Prey"] },
-    { "name": "Unleash the Beast!", "notation": "[66666]", "damage": 13,"tokens": ["Prey", "Moon Shard","Moon Shard","Moon Shard","Bleed", "Bleed"] }
+    { "name": "Ensnare", "notation": "[6666]", "damage": 5, "bypassDefense": true, "tokens": ["Prey", "Prey"] },
+    { "name": "Unleash the Beast!", "notation": "[66666]", "damage": 13,"bypassDefense": true, "tokens": ["Prey", "Moon Shard","Moon Shard","Moon Shard","Bleed", "Bleed"] }
 
   ]
 }

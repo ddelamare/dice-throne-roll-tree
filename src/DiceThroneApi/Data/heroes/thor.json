@@ -5,12 +5,12 @@
     { "name": "Hammered (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Hammered (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Hammered (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
-    { "name": "Mighty Summon", "notation": "[(123)(45)(45)6]", "damage": 3, "heal": 2 , "tokens": ["Guard Break", "Guard Break", "Electrokinesis"] },
+    { "name": "Mighty Summon", "notation": "[(123)(45)(45)6]", "damage": 3, "bypassDefense": true, "heal": 2 , "tokens": ["Guard Break", "Guard Break", "Electrokinesis"] },
     { "name": "Odinforce", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7 , "tokens": ["Electrokinesis", "Electrokinesis"]},
     { "name": "Chain Lightning", "notation": "[(123)(123)(123)66]", "damage": 8 },
     { "name": "Lightning Rod", "notation": "SmallStraight", "damage": 8},
     { "name": "Thunderbolt", "notation": "LargeStraight", "damage": 10, "tokens": ["Electrokinesis", "Electrokinesis"] },
     { "name": "Bottled Lightning", "notation": "[6666]", "damage": 9 , "tokens": ["Guard Break", "Guard Break"]},
-    { "name": "For Asgard!", "notation": "[66666]", "damage": 16 , "tokens": ["Guard Break"]}
+    { "name": "For Asgard!", "notation": "[66666]", "damage": 16, "bypassDefense": true , "tokens": ["Guard Break"]}
 ]
 }

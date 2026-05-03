@@ -8,5 +8,6 @@ public class EvaluationConfig
     public double CardValue { get; set; } = 1.0;
     public double CpValue { get; set; } = 1.0;
     public double DefaultTokenValue { get; set; } = 2.0;
+    public double EnemyDefenseDelta { get; set; } = 2.5; // How much to subtract from damage when calculating expected value (to account for enemy defense)
     public Dictionary<string, double> TokenValues { get; set; } = new();
 }

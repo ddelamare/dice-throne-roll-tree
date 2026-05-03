@@ -72,6 +72,7 @@ public class HeroService
                 objective.Cards = objData.Cards;
                 objective.Cp = objData.Cp;
                 objective.Tokens = objData.Tokens ?? new List<string>();
+                objective.BypassDefense = objData.BypassDefense || objective.Notation == "[66666]"; // Auto-apply defense bypass for objectives with ult die notation
                 hero.Objectives.Add(objective);
             }
 
@@ -100,5 +101,6 @@ public class HeroService
         public int Cards { get; set; }
         public int Cp { get; set; }
         public List<string>? Tokens { get; set; }
+        public bool BypassDefense { get; set; }
     }
 }

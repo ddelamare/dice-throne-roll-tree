@@ -145,6 +145,7 @@ public class RollController : ControllerBase
                 delta += objective.Heal * evaluation.HealValue;
                 delta += objective.Cards * evaluation.CardValue;
                 delta += objective.Cp * evaluation.CpValue;
+                delta -= objective.TriggersDefense ? evaluation.EnemyDefenseDelta : 0; // Subtract defense delta if this objective triggers defense
                 foreach (var token in objective.Tokens ?? new List<string>())
                 {
                     if (evaluation.TokenValues != null && evaluation.TokenValues.TryGetValue(token, out var val))

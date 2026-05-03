@@ -10,7 +10,7 @@
     { "name": "Spider Reflexes", "notation": "[(123)(45)(45)6]", "damage": 7 },
     { "name": "Ensnare (Small)", "notation": "SmallStraight", "damage": 5, "tokens": ["Webbed"]  },
     { "name": "Ensnare (Large)", "notation": "LargeStraight","cards": 1, "damage": 8, "tokens": ["Webbed"]  },
-    { "name": "Venom Punch", "notation": "[6666]", "damage": 7, "tokens": ["Invisibility"]  },
-    { "name": "Venom Shockwave!", "notation": "[66666]", "damage": 13, "tokens": ["Invisibility", "Webbed"]  }
+    { "name": "Venom Punch", "notation": "[6666]", "damage": 7, "bypassDefense": true, "tokens": ["Invisibility"]  },
+    { "name": "Venom Shockwave!", "notation": "[66666]", "damage": 13, "bypassDefense": true, "tokens": ["Invisibility", "Webbed"]  }
 ]
 }

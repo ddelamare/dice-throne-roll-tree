@@ -578,6 +578,10 @@
                         <label for="evalDefaultToken">Default Token Value</label>
                         <input id="evalDefaultToken" type="number" min="0" step="0.5" value="2" />
                     </div>
+                    <div class="control-group">
+                        <label for="evalEnemyDefenseDelta">Enemy Defense Delta</label>
+                        <input id="evalEnemyDefenseDelta" type="number" min="0" step="0.5" value="2.5" />
+                    </div>
                 </div>
                 <div id="tokenValueSection" style="margin-top:14px; display:none;">
                     <strong style="font-size:13px;">Per-Token Overrides</strong>
@@ -621,6 +625,7 @@
             cardValue: 1,
             cpValue: 1,
             defaultTokenValue: 2,
+            enemyDefenseDelta: 2.5,
             tokenValues: {}
         };
 
@@ -630,6 +635,7 @@
                 cardValue: evalConfig.cardValue,
                 cpValue: evalConfig.cpValue,
                 defaultTokenValue: evalConfig.defaultTokenValue,
+                enemyDefenseDelta: evalConfig.enemyDefenseDelta,
                 tokenValues: Object.keys(evalConfig.tokenValues).length > 0 ? evalConfig.tokenValues : {}
             };
         }
@@ -641,6 +647,7 @@
             document.getElementById('evalCard').value = evalConfig.cardValue;
             document.getElementById('evalCp').value = evalConfig.cpValue;
             document.getElementById('evalDefaultToken').value = evalConfig.defaultTokenValue;
+            document.getElementById('evalEnemyDefenseDelta').value = evalConfig.enemyDefenseDelta;
             // Populate per-token table from current hero objectives
             const tokens = collectHeroTokens();
             const section = document.getElementById('tokenValueSection');
@@ -669,6 +676,7 @@
             evalConfig.cardValue = parseFloat(document.getElementById('evalCard').value) || 0;
             evalConfig.cpValue = parseFloat(document.getElementById('evalCp').value) || 0;
             evalConfig.defaultTokenValue = parseFloat(document.getElementById('evalDefaultToken').value) || 0;
+            evalConfig.enemyDefenseDelta = parseFloat(document.getElementById('evalEnemyDefenseDelta').value) || 0;
             evalConfig.tokenValues = {};
             document.querySelectorAll('#tokenValuesBody input[data-token]').forEach(input => {
                 const token = input.getAttribute('data-token');

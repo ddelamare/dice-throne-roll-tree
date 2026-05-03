@@ -165,6 +165,7 @@ public class DiceRollAdvisor
         delta += objective.Heal * eval.HealValue;
         delta += objective.Cards * eval.CardValue;
         delta += objective.Cp * eval.CpValue;
+        delta -= objective.TriggersDefense ? eval.EnemyDefenseDelta : 0; // Subtract defense delta if this objective triggers defense
 
         foreach (var token in objective.Tokens ?? new List<string>())
         {

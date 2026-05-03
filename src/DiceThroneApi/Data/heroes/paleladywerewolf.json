@@ -2,15 +2,15 @@
   "id": "paleladywerewolf",
   "name": "Pale Lady Werewolf",
   "objectives": [
-    { "name": "Shred (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
-    { "name": "Shred (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
-    { "name": "Shred (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
-    { "name": "Rip and Tear", "notation": "[(45)(45)(45)6]", "damage": 8 },
+    { "name": "Shred (3)", "notation": "[(123)(123)(123)]", "damage": 4, "bypassDefense": true },
+    { "name": "Shred (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5, "bypassDefense": true },
+    { "name": "Shred (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6, "bypassDefense": true },
+    { "name": "Rip and Tear", "notation": "[(45)(45)(45)6]", "damage": 8, "bypassDefense": true },
     { "name": "The Hunter", "notation": "[(123)(123)66]", "damage": 7, "tokens": ["Prey", "Prey"] },
     { "name": "Sunder (Small)", "notation": "SmallStraight", "damage": 10, "tokens" : ["Bleed"] },
     { "name": "Sunder (Large)", "notation": "LargeStraight", "damage": 12, "tokens" : ["Bleed", "Bleed"] },
-    { "name": "Full Moon Blitz", "notation": "[(45)(45)(45)(45)]", "damage": 6, "heal": 2 },
-    { "name": "Ensnare", "notation": "[6666]", "damage": 9, "tokens": ["Prey", "Moon Shard"] },
-    { "name": "Unleash the Beast!", "notation": "[66666]", "damage": 13,"tokens": ["Prey", "Moon Shard","Bleed", "Bleed"] }
+    { "name": "Full Moon Blitz", "notation": "[(45)(45)(45)(45)]", "damage": 6, "bypassDefense": true, "heal": 2 },
+    { "name": "Ensnare", "notation": "[6666]", "damage": 9, "bypassDefense": true, "tokens": ["Prey", "Moon Shard"] },
+    { "name": "Unleash the Beast!", "notation": "[66666]", "damage": 13,"bypassDefense": true, "tokens": ["Prey", "Moon Shard","Bleed", "Bleed"] }
   ]
 }

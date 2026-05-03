@@ -5,12 +5,12 @@
     { "name": "Brawl (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Brawl (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Brawl (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
-    { "name": "Sass", "notation": "[(45)(45)66]", "damage": 3, "cp": 1, "tokens": ["Influence"] },
-    { "name": "Leach", "notation": "[(123)(45)(45)(45)]", "damage": 3, "heal": 3 },
+    { "name": "Sass", "notation": "[(45)(45)66]", "damage": 3, "bypassDefense": true, "cp": 1, "tokens": ["Influence"] },
+    { "name": "Leach", "notation": "[(123)(45)(45)(45)]", "damage": 3, "bypassDefense": true, "heal": 3 },
     { "name": "Absorption (Small)", "notation": "SmallStraight", "damage": 7, "tokens": ["Influence"]  },
     { "name": "Absorption (Large)", "notation": "LargeStraight", "damage": 9, "tokens": ["Influence", "Influence"]  },
     { "name": "Skybound", "notation": "[(45)(45)66]", "damage": 7, "cp": 1, "tokens": ["Skyward"] },
-    { "name": "Influential", "notation": "[6666]", "damage": 6, "tokens": ["Skyward","Influence", "Influence"]  },
-    { "name": "High Altitude!", "notation": "[66666]", "damage": 11, "cp": 1, "tokens": ["Skyward","Influence", "Influence", "Influence"] }
+    { "name": "Influential", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Skyward","Influence", "Influence"]  },
+    { "name": "High Altitude!", "notation": "[66666]", "damage": 11, "bypassDefense": true, "cp": 1, "tokens": ["Skyward","Influence", "Influence", "Influence"] }
 ]
 }
