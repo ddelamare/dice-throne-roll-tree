@@ -12,7 +12,7 @@
     { "name": "Blight (Small)", "notation": "SmallStraight", "damage": 5, "tokens": ["Corpse"] },
     { "name": "Blight (Large)", "notation": "LargeStraight", "damage": 7, "tokens": ["Corpse", "Decrepify"] },
     { "name": "Deadman's Party", "notation": "[(45)(45)(45)66]", "damage": 6 },
-    { "name": "Black Shroud", "notation": "[6666]", "damage": 4, "bypassDefense": true, "tokens": ["Corpse", "Corpse"] },
+    { "name": "Black Shroud", "notation": "[6666]", "damage": 4, "bypassDefense": true, "tokens": ["Corpse", "Corpse", "Corpse"] },
     { "name": "Necro-Dancer!", "notation": "[66666]", "damage": 10, "bypassDefense": true, "tokens": ["Decrepify", "Resurrect"] }
   ]
 }
