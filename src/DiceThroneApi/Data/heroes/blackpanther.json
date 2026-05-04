@@ -6,7 +6,7 @@
     { "name": "Vibranium Claws (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Vibranium Claws (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
     { "name": "Stealth Strike", "notation": "[(123)(123)66]", "damage": 3, "bypassDefense": true },
-    { "name": "Heart-Shaped Herb", "notation": "[(45)(45)(45)]", "damage": 0, "tokens": ["Kinetic Energy", "Vibranium Suit"] },
+    { "name": "Heart-Shaped Herb", "notation": "[(45)(45)(45)]", "damage": 0, "tokens": ["Kinetic Energy","Kinetic Energy","Kinetic Energy", "Vibranium Suit"] },
     { "name": "Meteoric Punch", "notation": "SmallStraight", "damage": 6, "tokens": ["Kinetic Energy"] },
     { "name": "Meteoric Punch (Large)", "notation": "LargeStraight", "damage": 8, "tokens": ["Kinetic Energy", "Kinetic Energy"] },
     { "name": "Triple Threat", "notation": "[(123)(123)(45)(45)6]", "damage": 7, "tokens": ["Kinetic Energy"] },
