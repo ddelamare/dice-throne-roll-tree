@@ -105,4 +105,15 @@ public class MonteCarloSimulatorTests
         var probability = simulatorWithOptimal.Simulate(objective, 2, iterations: 100);
         Assert.InRange(probability, 0.0, 1.0);
     }
+
+    [Fact]
+    public void Simulation_Makes_Sensible_Probabilities_For_Complex_Objectives()
+    {
+        var objective = _parser.Parse("Test", "[6666]");
+        var probability = _simulator.Simulate(objective, 5, iterations: 10000);
+        
+        // This is a complex objective, but we expect some reasonable probability
+        Assert.InRange(probability, 0.0, 1.0);
+        Assert.True(probability > 0);
+    }
 }

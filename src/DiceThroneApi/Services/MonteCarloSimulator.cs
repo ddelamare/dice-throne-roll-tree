@@ -1,4 +1,5 @@
 using DiceThroneApi.Models;
+using System.Linq;
 
 namespace DiceThroneApi.Services;
 
@@ -30,9 +31,39 @@ public class MonteCarloSimulator
         return (double)successes / iterations;
     }
 
-    private bool SimulateOneGame(RollObjective objective, int totalDice, int rerollsLeft)
+    // Overload that accepts the current/initial dice to start the simulation from
+    public double Simulate(RollObjective objective, List<int> initialDice, int iterations = MonteCarloConst.StandardIterations, int rerolls = 2)
     {
-        var dice = RollDice(totalDice);
+        var totalDice = initialDice?.Count ?? 0;
+        var successes = 0;
+
+        for (int i = 0; i < iterations; i++)
+        {
+            if (SimulateOneGame(objective, totalDice, rerolls, initialDice))
+            {
+                successes++;
+            }
+        }
+
+        return (double)successes / iterations;
+    }
+
+    private bool SimulateOneGame(RollObjective objective, int totalDice, int rerollsLeft, List<int>? initialDice = null)
+    {
+        List<int> dice;
+        if (initialDice != null)
+        {
+            // Start from the provided initial dice; truncate or pad to match totalDice
+            dice = new List<int>(initialDice.Take(totalDice));
+            if (dice.Count < totalDice)
+            {
+                dice.AddRange(RollDice(totalDice - dice.Count));
+            }
+        }
+        else
+        {
+            dice = RollDice(totalDice);
+        }
 
         for (int roll = 0; roll <= rerollsLeft; roll++)
         {

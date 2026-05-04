@@ -37,7 +37,7 @@ public class DiceRollAdvisor
             // If the current dice already satisfy the objective (optimalProb == 1.0), skip the
             // simulation and return 100% immediately.
             var prob = method.Equals("montecarlo", StringComparison.OrdinalIgnoreCase)
-                ? (optimalProb >= 1.0 ? 1.0 : _simulator.Simulate(objective, currentDice.Count, MonteCarloConst.StandardIterations, rollsRemaining))
+                ? (optimalProb >= 1.0 ? 1.0 : _simulator.Simulate(objective, new List<int>(currentDice), MonteCarloConst.StandardIterations, rollsRemaining))
                 : optimalProb;
             
             var objectiveDelta = ComputeDelta(objective, eval);

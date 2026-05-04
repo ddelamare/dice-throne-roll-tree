@@ -42,6 +42,7 @@ public class DiceRollAdvisorTests
     {
         var objective = _parser.Parse("Test", "[6666]");
         objective.Damage = 5;
+        objective.BypassDefense = true;
 
         var dice = new List<int> { 1, 2, 3, 4, 5 };
         var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective });
@@ -71,6 +72,7 @@ public class DiceRollAdvisorTests
     {
         var objective = _parser.Parse("Test", "[6666]");
         objective.Damage = 4;
+        objective.BypassDefense = true;
 
         // All four sixes kept, one reroll remaining — probability is very high
         var dice = new List<int> { 6, 6, 6, 6, 1 };
@@ -101,6 +103,7 @@ public class DiceRollAdvisorTests
     {
         var objective = _parser.Parse("Test", "[6]");
         objective.Damage = 3;
+        objective.BypassDefense = true;
 
         var dice = new List<int> { 1, 2, 3, 4, 5 };
         var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { objective }, method: "montecarlo");
@@ -268,10 +271,12 @@ public class DiceRollAdvisorTests
         // High damage but hard objective
         var hardObj = _parser.Parse("Hard Attack", "[66666]");
         hardObj.Damage = 10;
+        hardObj.BypassDefense = true;
 
         // Lower damage but easier objective
         var easyObj = _parser.Parse("Easy Attack", "[66]");
         easyObj.Damage = 2;
+        easyObj.BypassDefense = true;
 
         var dice = new List<int> { 6, 6, 1, 2, 3 };
         var objectives = new List<RollObjective> { hardObj, easyObj };
@@ -341,6 +346,7 @@ public class DiceRollAdvisorTests
         var objective = _parser.Parse("Crit Bash", "[6666]");
         objective.Damage = 5;
         objective.Tokens = new List<string> { "Stun", "Stun" };
+        objective.BypassDefense = true;
 
         var dice = new List<int> { 6, 6, 6, 6, 1 };
         var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective });
@@ -372,6 +378,7 @@ public class DiceRollAdvisorTests
         var objective = _parser.Parse("Stun Attack", "[6666]");
         objective.Damage = 5;
         objective.Tokens = new List<string> { "Stun" };
+        objective.BypassDefense = true;
 
         var eval = new DiceThroneApi.Models.EvaluationConfig
         {
@@ -393,6 +400,7 @@ public class DiceRollAdvisorTests
         var objective = _parser.Parse("Stun Attack", "[6666]");
         objective.Damage = 5;
         objective.Tokens = new List<string> { "Stun" };
+        objective.BypassDefense = true;
 
         var eval = new DiceThroneApi.Models.EvaluationConfig
         {
@@ -424,6 +432,25 @@ public class DiceRollAdvisorTests
         Assert.Equal("Buff", best.ObjectiveName);
         // delta = 0 + 3 = 3 for the token
         Assert.Equal(best.Probability * 3, best.ExpectedDelta, precision: 10);
+    }
+
+    [Fact]
+    public void GetAdvice_DefenseDelta_IsAppliedWhenNotBypassed()
+    {
+        var objective = _parser.Parse("Test", "[6666]");
+        objective.Damage = 4;
+        // Do not set BypassDefense (default false) — defense should be applied
+
+        var dice = new List<int> { 6, 6, 6, 6, 1 };
+        var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective });
+
+        Assert.Single(advice);
+        var result = advice[0];
+
+        // Probability is 1.0 because dice already match; expected delta should equal (damage - enemyDefenseDelta)
+        var eval = new DiceThroneApi.Models.EvaluationConfig();
+        var expectedDelta = result.Probability * (objective.Damage - eval.EnemyDefenseDelta);
+        Assert.Equal(expectedDelta, result.ExpectedDelta, precision: 10);
     }
 
     public async Task AnalyticKeepOutperformsGreedyKeep_Top10Improvements()
