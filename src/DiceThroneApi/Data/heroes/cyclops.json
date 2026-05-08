@@ -5,7 +5,7 @@
     { "name": "Hand To Hand (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Hand To Hand (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Hand To Hand (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
-    { "name": "Target Acquired", "notation": "[(123)(123)(123)6]", "damage": 6, "tokens": "Focus Fire"},
+    { "name": "Target Acquired", "notation": "[(123)(123)(123)6]", "damage": 6, "tokens": ["Focus Fire"]},
     { "name": "Teamwork", "notation": "[(123)(45)(45)(45)]", "damage": 6, "tokens": ["Support", "Support"] },
     { "name": "Never Back Down", "notation": "[(123)(123)(123)66]", "damage": 8, "tokens": ["Battle Plan", "Support"] },
     { "name": "Regroup", "notation": "SmallStraight", "damage": 6, "tokens": ["Battle Plan", "Battle Plan"] },
