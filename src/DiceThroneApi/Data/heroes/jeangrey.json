@@ -1,0 +1,16 @@
+{
+  "id": "jeangrey",
+  "name": "Jean Grey",
+  "objectives": [
+    { "name": "Mind Attack (3)", "notation": "[(123)(123)(123)]", "damage": 4, "tokens": ["Acuity"] },
+    { "name": "Mind Attack (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 , "tokens": ["Acuity"] },
+    { "name": "Mind Attack (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6, "tokens": ["Acuity"] },
+    { "name": "Psychic Multiplier", "notation": "[(45)(45)(45)]", "damage": 2, "bypassDefense": true, "tokens": ["Acuity", "Acuity","Acuity", "Flame Blast", "Flame Blast", "Flame Blast"] },
+    { "name": "Occlusion", "notation": "[(123)(45)(45)6]", "damage": 5, "tokens": ["Force Field", "Flame Blast"] },
+    { "name": "Astral Combat (Small)", "notation": "SmallStraight", "damage": 5, "tokens": ["Acuity","Acuity"] },
+    { "name": "Astral Combat (Large)", "notation": "LargeStraight", "damage": 8, "tokens": ["Acuity", "Acuity"] },
+    { "name": "Telekinetic Blast", "notation": "[(123)(123)(123)66]", "damage": 7, "tokens": ["Acuity", "Acuity", "Flame Blast", "Flame Blast"] },
+    { "name": "Firebird", "notation": "[6666]", "damage": 5, "bypassDefense": true, "tokens": ["Force Field", "Flame Blast", "Flame Blast"]  },
+    { "name": "One True Phoenix!", "notation": "[66666]", "damage": 12, "bypassDefense": true, "tokens": ["Force Field", "Acuity"] }
+]
+}
