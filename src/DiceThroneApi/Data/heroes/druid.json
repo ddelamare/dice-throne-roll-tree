@@ -1,0 +1,16 @@
+{
+  "id": "druid",
+  "name": "Druid",
+  "objectives": [
+    { "name": "Ferocity (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Ferocity (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Ferocity (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Wild Realignment", "notation": "[(123)(123)(45)(45)6]", "cp": 1, "cards": 1, "tokens": ["Shape Shift", "Shape Shift"]   },
+    { "name": "Nature's Cure", "notation": "[(123)(123)66]", "damage": 6, "tokens": ["Regenerate"]  },
+    { "name": "Maul", "notation": "[(45)(45)(45)(45)]", "damage": 7},
+    { "name": "Forest's Call", "notation": "SmallStraight", "damage": 6 , "tokens": ["Shape Shift"] },
+    { "name": "Forest's Answer", "notation": "LargeStraight", "damage": 8, "tokens": ["Shape Shift", "Shape Shift"] },
+    { "name": "Protect The Forest", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Shape Shift","Regenerate"] },
+    { "name": "Wrath of Nature!", "notation": "[66666]", "damage": 12, "bypassDefense": true, "tokens": ["Shape Shift","Shape Shift", "Regenerate"] }
+]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "sunelf",
+  "name": "Sun Elf",
+  "objectives": [
+    { "name": "Light Staff (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Light Staff (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Light Staff (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Ray Absorption", "notation": "[(45)(45)(45)(45)]", "hp": 2, "tokens": ["Sun Dial","Sun Dial", "Sun Dial", "Charged Gem"] },
+    { "name": "Scorching Staff", "notation": "[(123)(123)(45)(45)(45)]", "damage": 6 , "tokens": ["Sun Dial"] },
+    { "name": "Radiant Energy", "notation": "[(123)(123)(123)66]", "damage": 6, "tokens": ["Sun Marked"] },
+    { "name": "Ray of Light", "notation": "SmallStraight", "damage": 7 , "tokens": ["Sun Dial"] },
+    { "name": "Sun Beam", "notation": "LargeStraight", "damage": 9, "tokens": ["Sun Dial", "Sun Dial"] },
+    { "name": "Solar Burst", "notation": "[6666]", "damage": 8, "bypassDefense": false, "tokens": ["Sun Dial","Sun Dial", "Sun Marked"] },
+    { "name": "Solar Flare!", "notation": "[66666]", "damage": 10, "bypassDefense": true, "tokens": ["Sun Dial","Sun Dial","Sun Dial", "Charged Gem", "Sun Marked"] }
+]
+}

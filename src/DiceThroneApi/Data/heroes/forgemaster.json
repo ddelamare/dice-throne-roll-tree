@@ -1,0 +1,15 @@
+{
+  "id": "forgemaster",
+  "name": "Forgemaster",
+  "objectives": [
+    { "name": "Pick Axe (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Pick Axe (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Pick Axe (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Furnace", "notation": "[(45)(45)(45)(45)]", "damage": 8, "bypassDefense": false },
+    { "name": "Armored Up (Small)", "notation": "SmallStraight", "damage": 8},
+    { "name": "Armored Up (Large)", "notation": "LargeStraight", "damage": 11},
+    { "name": "A Good Haul", "notation": "[(123)(45)66]", "damage": 8, "tokens": ["Mine"]  },
+    { "name": "Smelting Time", "notation": "[6666]", "damage": 9, "bypassDefense": true, "cards": 1 },
+    { "name": "Final Touches!", "notation": "[66666]", "damage": 14, "bypassDefense": true, "tokens": ["Ore"] }
+]
+}
