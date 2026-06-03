@@ -209,7 +209,7 @@ public class RollController : ControllerBase
 
     private string? GetVisitorId()
     {
-        return Request.Headers.TryGetValue("X-Visitor-Id", out var visitorIds)
+        return HttpContext?.Request?.Headers.TryGetValue("X-Visitor-Id", out var visitorIds) == true
             ? visitorIds.ToString()
             : null;
     }

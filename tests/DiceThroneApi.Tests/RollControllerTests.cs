@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using DiceThroneApi.Controllers;
 using DiceThroneApi.Services;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
@@ -12,7 +13,19 @@ public class RollControllerTests
 {
     private IWebHostEnvironment CreateTestEnvironment()
     {
-        var contentRootPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "src", "DiceThroneApi"));
+        var sourceRootPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "src", "DiceThroneApi"));
+        var contentRootPath = Path.Combine(Path.GetTempPath(), "dice-throne-roll-controller-tests", Path.GetRandomFileName());
+        Directory.CreateDirectory(contentRootPath);
+
+        var sourceHeroesPath = Path.Combine(sourceRootPath, "Data", "heroes");
+        var targetHeroesPath = Path.Combine(contentRootPath, "Data", "heroes");
+        Directory.CreateDirectory(targetHeroesPath);
+
+        foreach (var heroFile in Directory.GetFiles(sourceHeroesPath, "*.json"))
+        {
+            File.Copy(heroFile, Path.Combine(targetHeroesPath, Path.GetFileName(heroFile)), overwrite: true);
+        }
+
         return new FakeWebHostEnvironment
         {
             ContentRootPath = contentRootPath,
@@ -79,6 +92,42 @@ public class RollControllerTests
 
         var document = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(okResult.Value));
         Assert.Equal(1, document.RootElement.GetProperty("rollsRemaining").GetInt32());
+    }
+
+    [Fact]
+    public async Task Simulate_RecordsTelemetryForOperationAndHero()
+    {
+        var parser = new DiceNotationParser();
+        var matcher = new ObjectiveMatcher();
+        var calculator = new ProbabilityCalculator(matcher);
+        var simulator = new MonteCarloSimulator(matcher);
+        var advisor = new DiceRollAdvisor(calculator, simulator);
+        var env = CreateTestEnvironment();
+        var heroService = new HeroService(env, parser);
+        var telemetry = new TelemetryService(env);
+        var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry)
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            }
+        };
+        controller.HttpContext.Request.Headers["X-Visitor-Id"] = "test-visitor";
+
+        var result = await controller.Simulate(new SimulateRequest
+        {
+            HeroId = "barbarian",
+            DiceCount = 5,
+            Method = "analytic"
+        });
+
+        Assert.IsType<OkObjectResult>(result);
+
+        var summary = await telemetry.GetSummaryAsync();
+        Assert.Equal(1, summary.TotalOperations);
+        Assert.Equal(1, summary.UniqueVisitors);
+        Assert.Equal(1, summary.OperationCounts["simulate"]);
+        Assert.Equal(1, summary.HeroUsage["barbarian"]);
     }
 
     private class FakeWebHostEnvironment : IWebHostEnvironment
