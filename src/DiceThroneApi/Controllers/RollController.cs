@@ -13,19 +13,22 @@ public class RollController : ControllerBase
     private readonly ProbabilityCalculator _calculator;
     private readonly MonteCarloSimulator _simulator;
     private readonly DiceNotationParser _parser;
+    private readonly TelemetryService _telemetryService;
 
     public RollController(
         HeroService heroService,
         DiceRollAdvisor advisor,
         ProbabilityCalculator calculator,
         MonteCarloSimulator simulator,
-        DiceNotationParser parser)
+        DiceNotationParser parser,
+        TelemetryService telemetryService)
     {
         _heroService = heroService;
         _advisor = advisor;
         _calculator = calculator;
         _simulator = simulator;
         _parser = parser;
+        _telemetryService = telemetryService;
     }
 
     [HttpPost("simulate")]
@@ -45,6 +48,7 @@ public class RollController : ControllerBase
 
         var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
         var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
+        await TrackOperationAsync("simulate", request.HeroId);
 
         return Ok(new
         {
@@ -77,6 +81,7 @@ public class RollController : ControllerBase
 
         var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
         var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
+        await TrackOperationAsync("setdice", request.HeroId);
 
         return Ok(new
         {
@@ -89,7 +94,7 @@ public class RollController : ControllerBase
     }
 
     [HttpPost("probability")]
-    public IActionResult CalculateProbability([FromBody] ProbabilityRequest request)
+    public async Task<IActionResult> CalculateProbability([FromBody] ProbabilityRequest request)
     {
         try
         {
@@ -104,6 +109,8 @@ public class RollController : ControllerBase
             {
                 probability = _calculator.Calculate(objective, request.DiceCount);
             }
+
+            await TrackOperationAsync("probability");
 
             return Ok(new
             {
@@ -172,6 +179,7 @@ public class RollController : ControllerBase
 .OrderByDescending(a => a.ExpectedDelta)
             .ThenByDescending(a => a.Probability)
             .ToList();
+        await TrackOperationAsync("preroll", request.HeroId);
 
         return Ok(advice);
     }
@@ -189,8 +197,21 @@ public class RollController : ControllerBase
         var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
 
         var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
+        await TrackOperationAsync("advice", request.HeroId);
 
         return Ok(advice);
+    }
+
+    private Task TrackOperationAsync(string operation, string? heroId = null)
+    {
+        return _telemetryService.RecordOperationAsync(GetVisitorId(), operation, heroId);
+    }
+
+    private string? GetVisitorId()
+    {
+        return Request.Headers.TryGetValue("X-Visitor-Id", out var visitorIds)
+            ? visitorIds.ToString()
+            : null;
     }
 
     private static bool HasManifestDie(string heroId)

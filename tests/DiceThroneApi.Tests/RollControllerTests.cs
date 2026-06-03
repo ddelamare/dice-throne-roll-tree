@@ -32,7 +32,8 @@ public class RollControllerTests
         var advisor = new DiceRollAdvisor(calculator, simulator);
         var env = CreateTestEnvironment();
         var heroService = new HeroService(env, parser);
-        var controller = new RollController(heroService, advisor, calculator, simulator, parser);
+        var telemetry = new TelemetryService(env);
+        var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry);
 
         var request = new SetDiceRequest
         {
@@ -62,7 +63,8 @@ public class RollControllerTests
         var advisor = new DiceRollAdvisor(calculator, simulator);
         var env = CreateTestEnvironment();
         var heroService = new HeroService(env, parser);
-        var controller = new RollController(heroService, advisor, calculator, simulator, parser);
+        var telemetry = new TelemetryService(env);
+        var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry);
 
         var request = new SetDiceRequest
         {

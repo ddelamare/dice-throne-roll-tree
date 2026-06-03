@@ -535,6 +535,7 @@
                     <button class="btn-primary" id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
                     <button class="btn-primary" id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
                     <button class="btn-primary" id="dropdownEvalBtn" onclick="evalModalOpen()">⚖️ Evaluation Weights</button>
+                    <button class="btn-primary" id="dropdownTelemetryBtn" onclick="openTelemetryPage()">📈 View Telemetry</button>
                 </div>
             </div>
         </div>
@@ -618,6 +619,43 @@
         let currentSuggestions = []; // Store current suggestions for re-sorting
         const defaultStatusText = 'Click "Roll Dice" to start a new turn!';
         const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
+        const visitorStorageKey = 'dice-throne-visitor-id';
+
+        function getVisitorId() {
+            let visitorId = localStorage.getItem(visitorStorageKey);
+            if (!visitorId) {
+                visitorId = window.crypto?.randomUUID?.() || `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+                localStorage.setItem(visitorStorageKey, visitorId);
+            }
+
+            return visitorId;
+        }
+
+        async function apiFetch(url, options = {}) {
+            const headers = new Headers(options.headers || {});
+            headers.set('X-Visitor-Id', getVisitorId());
+            return fetch(url, { ...options, headers });
+        }
+
+        async function trackVisit(page) {
+            try {
+                await apiFetch('/api/telemetry/visit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        visitorId: getVisitorId(),
+                        page
+                    })
+                });
+            } catch (error) {
+                console.error('Error recording visit:', error);
+            }
+        }
+
+        function openTelemetryPage() {
+            document.getElementById('menuContainer').classList.remove('show');
+            window.location.href = '/telemetry.html';
+        }
 
         // Evaluation config (mirrors EvaluationConfig model)
         let evalConfig = {
@@ -687,7 +725,7 @@
             // Re-fetch advice with new weights if we have current dice
             if (currentDice.length > 0) {
                 const method = document.getElementById('methodSelect').value;
-                fetch('/api/roll/advice', {
+                apiFetch('/api/roll/advice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -757,7 +795,7 @@
         
         async function loadHeroes() {
             try {
-                const response = await fetch('/api/heroes');
+                const response = await apiFetch('/api/heroes');
                 const heroes = await response.json();
                 
                 const select = document.getElementById('heroSelect');
@@ -776,7 +814,7 @@
         
         async function loadHero(heroId) {
             try {
-                const response = await fetch(`/api/heroes/${heroId}`);
+                const response = await apiFetch(`/api/heroes/${heroId}`);
                 currentHero = await response.json();
                 hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
                 manifestDieIndex = hasManifestDie ? 0 : -1;
@@ -905,7 +943,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
             
             try {
-                const response = await fetch('/api/roll/simulate', {
+                const response = await apiFetch('/api/roll/simulate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -951,7 +989,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating objective odds...</div>';
 
             try {
-                const response = await fetch('/api/roll/preroll', {
+                const response = await apiFetch('/api/roll/preroll', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1011,7 +1049,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
             
             try {
-                const response = await fetch('/api/roll/advice', {
+                const response = await apiFetch('/api/roll/advice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1085,7 +1123,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
 
             try {
-                const response = await fetch('/api/roll/setdice', {
+                const response = await apiFetch('/api/roll/setdice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1172,6 +1210,7 @@
         }
         
         updateActionButtons();
+        trackVisit('index');
         loadHeroes();
     </script>
 </body>

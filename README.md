@@ -10,6 +10,7 @@ A comprehensive .NET 8 ASP.NET Core Web API application for calculating Dice Thr
 - **Hero Management**: JSON-based hero data storage with multiple pre-configured heroes
 - **Roll Advisor**: Intelligent dice-keeping suggestions for optimal play
 - **Web Frontend**: Clean, responsive HTML/CSS/JavaScript interface
+- **Telemetry Dashboard**: Tracks visits, unique visitors, operations, and hero usage
 - **REST API**: Full-featured API with Swagger documentation
 
 ## Project Structure
@@ -79,6 +80,8 @@ Open your browser to the displayed URL to access the interactive web interface.
 - `POST /api/roll/probability` - Calculate probability for objective
 - `POST /api/roll/advice` - Get advice for current dice state
 - `POST /api/roll/setdice` - Set custom dice values and recalculate advice
+- `GET /api/telemetry` - View aggregated telemetry totals
+- `POST /api/telemetry/visit` - Record a page visit
 
 ## Heroes
 
