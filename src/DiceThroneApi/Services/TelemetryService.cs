@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace DiceThroneApi.Services;
 
-public class TelemetryService
+public class TelemetryService : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -166,5 +166,10 @@ public class TelemetryService
                 LastUpdatedUtc = LastUpdatedUtc
             };
         }
+    }
+
+    public void Dispose()
+    {
+        _mutex.Dispose();
     }
 }

@@ -120,36 +120,10 @@
         <div class="status" id="status">Loading telemetry…</div>
     </div>
 
+    <script src="/js/telemetry-client.js"></script>
     <script>
-        const visitorStorageKey = 'dice-throne-visitor-id';
-
-        function getVisitorId() {
-            let visitorId = localStorage.getItem(visitorStorageKey);
-            if (!visitorId) {
-                visitorId = window.crypto?.randomUUID?.() || `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-                localStorage.setItem(visitorStorageKey, visitorId);
-            }
-
-            return visitorId;
-        }
-
-        async function apiFetch(url, options = {}) {
-            const headers = new Headers(options.headers || {});
-            headers.set('X-Visitor-Id', getVisitorId());
-            return fetch(url, { ...options, headers });
-        }
-
-        async function trackVisit(page) {
-            try {
-                await apiFetch('/api/telemetry/visit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ visitorId: getVisitorId(), page })
-                });
-            } catch (error) {
-                console.error('Error recording visit:', error);
-            }
-        }
+        const apiFetch = window.telemetryClient.apiFetch;
+        const trackVisit = window.telemetryClient.trackVisit;
 
         function renderTable(containerId, rows, keyLabel) {
             const container = document.getElementById(containerId);

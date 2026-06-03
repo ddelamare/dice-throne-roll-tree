@@ -11,7 +11,7 @@ namespace DiceThroneApi.Tests;
 
 public class RollControllerTests
 {
-    private IWebHostEnvironment CreateTestEnvironment()
+    private FakeWebHostEnvironment CreateTestEnvironment()
     {
         var sourceRootPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..", "..", "..", "src", "DiceThroneApi"));
         var contentRootPath = Path.Combine(Path.GetTempPath(), "dice-throne-roll-controller-tests", Path.GetRandomFileName());
@@ -38,12 +38,12 @@ public class RollControllerTests
     [Fact]
     public async Task SetDice_ReturnsOkAndAdviceForCustomDice()
     {
+        using var env = CreateTestEnvironment();
         var parser = new DiceNotationParser();
         var matcher = new ObjectiveMatcher();
         var calculator = new ProbabilityCalculator(matcher);
         var simulator = new MonteCarloSimulator(matcher);
         var advisor = new DiceRollAdvisor(calculator, simulator);
-        var env = CreateTestEnvironment();
         var heroService = new HeroService(env, parser);
         var telemetry = new TelemetryService(env);
         var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry);
@@ -69,12 +69,12 @@ public class RollControllerTests
     [Fact]
     public async Task SetDice_HonorsRollsRemainingFromRequest()
     {
+        using var env = CreateTestEnvironment();
         var parser = new DiceNotationParser();
         var matcher = new ObjectiveMatcher();
         var calculator = new ProbabilityCalculator(matcher);
         var simulator = new MonteCarloSimulator(matcher);
         var advisor = new DiceRollAdvisor(calculator, simulator);
-        var env = CreateTestEnvironment();
         var heroService = new HeroService(env, parser);
         var telemetry = new TelemetryService(env);
         var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry);
@@ -97,12 +97,12 @@ public class RollControllerTests
     [Fact]
     public async Task Simulate_RecordsTelemetryForOperationAndHero()
     {
+        using var env = CreateTestEnvironment();
         var parser = new DiceNotationParser();
         var matcher = new ObjectiveMatcher();
         var calculator = new ProbabilityCalculator(matcher);
         var simulator = new MonteCarloSimulator(matcher);
         var advisor = new DiceRollAdvisor(calculator, simulator);
-        var env = CreateTestEnvironment();
         var heroService = new HeroService(env, parser);
         var telemetry = new TelemetryService(env);
         var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry)
@@ -130,7 +130,7 @@ public class RollControllerTests
         Assert.Equal(1, summary.HeroUsage["barbarian"]);
     }
 
-    private class FakeWebHostEnvironment : IWebHostEnvironment
+    private sealed class FakeWebHostEnvironment : IWebHostEnvironment, IDisposable
     {
         public string EnvironmentName { get; set; } = string.Empty;
         public string ApplicationName { get; set; } = string.Empty;
@@ -138,5 +138,13 @@ public class RollControllerTests
         public string ContentRootPath { get; set; } = string.Empty;
         public Microsoft.Extensions.FileProviders.IFileProvider? WebRootFileProvider { get; set; }
         public Microsoft.Extensions.FileProviders.IFileProvider? ContentRootFileProvider { get; set; }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(ContentRootPath))
+            {
+                Directory.Delete(ContentRootPath, recursive: true);
+            }
+        }
     }
 }
