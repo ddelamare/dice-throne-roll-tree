@@ -130,6 +130,41 @@ public class RollControllerTests
         Assert.Equal(1, summary.HeroUsage["barbarian"]);
     }
 
+    [Fact]
+    public async Task CalculateProbability_RecordsTelemetryForOperation()
+    {
+        using var env = CreateTestEnvironment();
+        var parser = new DiceNotationParser();
+        var matcher = new ObjectiveMatcher();
+        var calculator = new ProbabilityCalculator(matcher);
+        var simulator = new MonteCarloSimulator(matcher);
+        var advisor = new DiceRollAdvisor(calculator, simulator);
+        var telemetry = new TelemetryService(env);
+        var controller = new RollController(new HeroService(env, parser), advisor, calculator, simulator, parser, telemetry)
+        {
+            ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            }
+        };
+        controller.HttpContext.Request.Headers["X-Visitor-Id"] = "probability-visitor";
+
+        var result = await controller.CalculateProbability(new ProbabilityRequest
+        {
+            Notation = "[6]",
+            DiceCount = 5,
+            Method = "analytic"
+        });
+
+        Assert.IsType<OkObjectResult>(result);
+
+        var summary = await telemetry.GetSummaryAsync();
+        Assert.Equal(1, summary.TotalOperations);
+        Assert.Equal(1, summary.UniqueVisitors);
+        Assert.Equal(1, summary.OperationCounts["probability"]);
+        Assert.Empty(summary.HeroUsage);
+    }
+
     private sealed class FakeWebHostEnvironment : IWebHostEnvironment, IDisposable
     {
         public string EnvironmentName { get; set; } = string.Empty;
