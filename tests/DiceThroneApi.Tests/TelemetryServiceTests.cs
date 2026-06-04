@@ -80,24 +80,34 @@ public class TelemetryServiceTests
     {
         using var env = CreateTestEnvironment();
         var appDataPath = Path.Combine(env.ContentRootPath, "App_Data");
-        await File.WriteAllTextAsync(appDataPath, "not-a-directory");
+        try
+        {
+            await File.WriteAllTextAsync(appDataPath, "not-a-directory");
 
-        var telemetry = new TelemetryService(env);
-        await telemetry.RecordVisitAsync("visitor-a", "index");
-        await telemetry.RecordOperationAsync("visitor-a", "simulate", "barbarian");
+            var telemetry = new TelemetryService(env);
+            await telemetry.RecordVisitAsync("visitor-a", "index");
+            await telemetry.RecordOperationAsync("visitor-a", "simulate", "barbarian");
 
-        var summary = await telemetry.GetSummaryAsync();
+            var summary = await telemetry.GetSummaryAsync();
 
-        Assert.Equal(1, summary.TotalVisits);
-        Assert.Equal(1, summary.TotalOperations);
-        Assert.Equal(1, summary.PageVisits["index"]);
-        Assert.Equal(1, summary.OperationCounts["simulate"]);
-        Assert.Equal(1, summary.HeroUsage["barbarian"]);
-        Assert.Equal(1, summary.UniqueVisitors);
-        Assert.NotNull(summary.LastUpdatedUtc);
+            Assert.Equal(1, summary.TotalVisits);
+            Assert.Equal(1, summary.TotalOperations);
+            Assert.Equal(1, summary.PageVisits["index"]);
+            Assert.Equal(1, summary.OperationCounts["simulate"]);
+            Assert.Equal(1, summary.HeroUsage["barbarian"]);
+            Assert.Equal(1, summary.UniqueVisitors);
+            Assert.NotNull(summary.LastUpdatedUtc);
 
-        var telemetryFilePath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
-        Assert.False(File.Exists(telemetryFilePath));
+            var telemetryFilePath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
+            Assert.False(File.Exists(telemetryFilePath));
+        }
+        finally
+        {
+            if (File.Exists(appDataPath))
+            {
+                File.Delete(appDataPath);
+            }
+        }
     }
 
     private static FakeWebHostEnvironment CreateTestEnvironment(string environmentName = "Development")

@@ -108,7 +108,7 @@ public class TelemetryService : IDisposable
             var state = await JsonSerializer.DeserializeAsync<TelemetryState>(stream, JsonOptions);
             return state ?? new TelemetryState();
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        catch (Exception exception) when (IsLoadFallbackException(exception))
         {
             SwitchToInMemoryFallback();
             return _inMemoryState.Clone();
@@ -134,7 +134,7 @@ public class TelemetryService : IDisposable
             await using var stream = File.Create(_telemetryPath);
             await JsonSerializer.SerializeAsync(stream, state, JsonOptions);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
+        catch (Exception exception) when (IsSaveFallbackException(exception))
         {
             SwitchToInMemoryFallback(state);
         }
@@ -201,10 +201,10 @@ public class TelemetryService : IDisposable
             {
                 TotalVisits = TotalVisits,
                 TotalOperations = TotalOperations,
-                UniqueVisitorIds = new HashSet<string>(UniqueVisitorIds),
-                OperationCounts = new Dictionary<string, int>(OperationCounts, StringComparer.OrdinalIgnoreCase),
-                HeroUsage = new Dictionary<string, int>(HeroUsage, StringComparer.OrdinalIgnoreCase),
-                PageVisits = new Dictionary<string, int>(PageVisits, StringComparer.OrdinalIgnoreCase),
+                UniqueVisitorIds = new HashSet<string>(UniqueVisitorIds ?? []),
+                OperationCounts = new Dictionary<string, int>(OperationCounts ?? [], StringComparer.OrdinalIgnoreCase),
+                HeroUsage = new Dictionary<string, int>(HeroUsage ?? [], StringComparer.OrdinalIgnoreCase),
+                PageVisits = new Dictionary<string, int>(PageVisits ?? [], StringComparer.OrdinalIgnoreCase),
                 LastUpdatedUtc = LastUpdatedUtc
             };
         }
@@ -217,6 +217,16 @@ public class TelemetryService : IDisposable
         {
             _inMemoryState = state.Clone();
         }
+    }
+
+    private static bool IsLoadFallbackException(Exception exception)
+    {
+        return exception is IOException or UnauthorizedAccessException or JsonException;
+    }
+
+    private static bool IsSaveFallbackException(Exception exception)
+    {
+        return exception is IOException or UnauthorizedAccessException or NotSupportedException;
     }
 
     public void Dispose()
