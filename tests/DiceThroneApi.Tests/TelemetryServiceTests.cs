@@ -51,7 +51,7 @@ public class TelemetryServiceTests
     }
 
     [Fact]
-    public async Task ProductionTelemetry_IsDisabled()
+    public async Task ProductionTelemetry_IsEnabledAndPersists()
     {
         using var env = CreateTestEnvironment("Production");
         var telemetry = new TelemetryService(env);
@@ -61,14 +61,43 @@ public class TelemetryServiceTests
 
         var summary = await telemetry.GetSummaryAsync();
 
-        Assert.Equal(0, summary.TotalVisits);
-        Assert.Equal(0, summary.UniqueVisitors);
-        Assert.Equal(0, summary.TotalOperations);
-        Assert.Empty(summary.PageVisits);
-        Assert.Empty(summary.OperationCounts);
-        Assert.Empty(summary.HeroUsage);
-        Assert.Null(summary.LastUpdatedUtc);
-        Assert.False(Directory.Exists(Path.Combine(env.ContentRootPath, "App_Data")));
+        Assert.Equal(1, summary.TotalVisits);
+        Assert.Equal(1, summary.UniqueVisitors);
+        Assert.Equal(1, summary.TotalOperations);
+        Assert.Equal(1, summary.PageVisits["index"]);
+        Assert.Equal(1, summary.OperationCounts["simulate"]);
+        Assert.Equal(1, summary.HeroUsage["barbarian"]);
+        Assert.NotNull(summary.LastUpdatedUtc);
+
+        var reloaded = new TelemetryService(env);
+        var reloadedSummary = await reloaded.GetSummaryAsync();
+        Assert.Equal(1, reloadedSummary.TotalVisits);
+        Assert.Equal(1, reloadedSummary.TotalOperations);
+    }
+
+    [Fact]
+    public async Task RecordVisitAsync_FallsBackToInMemoryWhenFlatFileUnavailable()
+    {
+        using var env = CreateTestEnvironment();
+        var appDataPath = Path.Combine(env.ContentRootPath, "App_Data");
+        await File.WriteAllTextAsync(appDataPath, "not-a-directory");
+
+        var telemetry = new TelemetryService(env);
+        await telemetry.RecordVisitAsync("visitor-a", "index");
+        await telemetry.RecordOperationAsync("visitor-a", "simulate", "barbarian");
+
+        var summary = await telemetry.GetSummaryAsync();
+
+        Assert.Equal(1, summary.TotalVisits);
+        Assert.Equal(1, summary.TotalOperations);
+        Assert.Equal(1, summary.PageVisits["index"]);
+        Assert.Equal(1, summary.OperationCounts["simulate"]);
+        Assert.Equal(1, summary.HeroUsage["barbarian"]);
+        Assert.Equal(1, summary.UniqueVisitors);
+        Assert.NotNull(summary.LastUpdatedUtc);
+
+        var telemetryFilePath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
+        Assert.False(File.Exists(telemetryFilePath));
     }
 
     private static FakeWebHostEnvironment CreateTestEnvironment(string environmentName = "Development")

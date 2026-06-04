@@ -13,22 +13,17 @@ public class TelemetryService : IDisposable
     };
 
     private readonly string _telemetryPath;
-    private readonly bool _isEnabled;
     private readonly SemaphoreSlim _mutex = new(1, 1);
+    private TelemetryState _inMemoryState = new();
+    private bool _useInMemoryFallback;
 
     public TelemetryService(IWebHostEnvironment env)
     {
-        _isEnabled = !env.IsProduction();
         _telemetryPath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
     }
 
     public async Task RecordVisitAsync(string? visitorId, string? page)
     {
-        if (!_isEnabled)
-        {
-            return;
-        }
-
         await _mutex.WaitAsync();
         try
         {
@@ -53,11 +48,6 @@ public class TelemetryService : IDisposable
 
     public async Task RecordOperationAsync(string? visitorId, string operation, string? heroId = null)
     {
-        if (!_isEnabled)
-        {
-            return;
-        }
-
         await _mutex.WaitAsync();
         try
         {
@@ -88,11 +78,6 @@ public class TelemetryService : IDisposable
 
     public async Task<TelemetrySummary> GetSummaryAsync()
     {
-        if (!_isEnabled)
-        {
-            return new TelemetrySummary();
-        }
-
         await _mutex.WaitAsync();
         try
         {
@@ -107,26 +92,52 @@ public class TelemetryService : IDisposable
 
     private async Task<TelemetryState> LoadStateAsync()
     {
+        if (_useInMemoryFallback)
+        {
+            return _inMemoryState.Clone();
+        }
+
         if (!File.Exists(_telemetryPath))
         {
             return new TelemetryState();
         }
 
-        await using var stream = File.OpenRead(_telemetryPath);
-        var state = await JsonSerializer.DeserializeAsync<TelemetryState>(stream, JsonOptions);
-        return state ?? new TelemetryState();
+        try
+        {
+            await using var stream = File.OpenRead(_telemetryPath);
+            var state = await JsonSerializer.DeserializeAsync<TelemetryState>(stream, JsonOptions);
+            return state ?? new TelemetryState();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            SwitchToInMemoryFallback();
+            return _inMemoryState.Clone();
+        }
     }
 
     private async Task SaveStateAsync(TelemetryState state)
     {
-        var directory = Path.GetDirectoryName(_telemetryPath);
-        if (!string.IsNullOrWhiteSpace(directory))
+        if (_useInMemoryFallback)
         {
-            Directory.CreateDirectory(directory);
+            _inMemoryState = state.Clone();
+            return;
         }
 
-        await using var stream = File.Create(_telemetryPath);
-        await JsonSerializer.SerializeAsync(stream, state, JsonOptions);
+        var directory = Path.GetDirectoryName(_telemetryPath);
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            await using var stream = File.Create(_telemetryPath);
+            await JsonSerializer.SerializeAsync(stream, state, JsonOptions);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            SwitchToInMemoryFallback(state);
+        }
     }
 
     private static void TrackVisitor(TelemetryState state, string? visitorId)
@@ -182,6 +193,29 @@ public class TelemetryService : IDisposable
                 PageVisits = new Dictionary<string, int>(PageVisits, StringComparer.OrdinalIgnoreCase),
                 LastUpdatedUtc = LastUpdatedUtc
             };
+        }
+
+        public TelemetryState Clone()
+        {
+            return new TelemetryState
+            {
+                TotalVisits = TotalVisits,
+                TotalOperations = TotalOperations,
+                UniqueVisitorIds = new HashSet<string>(UniqueVisitorIds),
+                OperationCounts = new Dictionary<string, int>(OperationCounts, StringComparer.OrdinalIgnoreCase),
+                HeroUsage = new Dictionary<string, int>(HeroUsage, StringComparer.OrdinalIgnoreCase),
+                PageVisits = new Dictionary<string, int>(PageVisits, StringComparer.OrdinalIgnoreCase),
+                LastUpdatedUtc = LastUpdatedUtc
+            };
+        }
+    }
+
+    private void SwitchToInMemoryFallback(TelemetryState? state = null)
+    {
+        _useInMemoryFallback = true;
+        if (state is not null)
+        {
+            _inMemoryState = state.Clone();
         }
     }
 
