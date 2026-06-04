@@ -13,15 +13,22 @@ public class TelemetryService : IDisposable
     };
 
     private readonly string _telemetryPath;
+    private readonly bool _isEnabled;
     private readonly SemaphoreSlim _mutex = new(1, 1);
 
     public TelemetryService(IWebHostEnvironment env)
     {
+        _isEnabled = !env.IsProduction();
         _telemetryPath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
     }
 
     public async Task RecordVisitAsync(string? visitorId, string? page)
     {
+        if (!_isEnabled)
+        {
+            return;
+        }
+
         await _mutex.WaitAsync();
         try
         {
@@ -46,6 +53,11 @@ public class TelemetryService : IDisposable
 
     public async Task RecordOperationAsync(string? visitorId, string operation, string? heroId = null)
     {
+        if (!_isEnabled)
+        {
+            return;
+        }
+
         await _mutex.WaitAsync();
         try
         {
@@ -76,6 +88,11 @@ public class TelemetryService : IDisposable
 
     public async Task<TelemetrySummary> GetSummaryAsync()
     {
+        if (!_isEnabled)
+        {
+            return new TelemetrySummary();
+        }
+
         await _mutex.WaitAsync();
         try
         {
@@ -151,7 +168,7 @@ public class TelemetryService : IDisposable
         public Dictionary<string, int> OperationCounts { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, int> HeroUsage { get; set; } = new(StringComparer.OrdinalIgnoreCase);
         public Dictionary<string, int> PageVisits { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-        public DateTimeOffset LastUpdatedUtc { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset? LastUpdatedUtc { get; set; }
 
         public TelemetrySummary ToSummary()
         {
