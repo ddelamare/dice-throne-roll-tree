@@ -80,8 +80,8 @@ Open your browser to the displayed URL to access the interactive web interface.
 - `POST /api/roll/probability` - Calculate probability for objective
 - `POST /api/roll/advice` - Get advice for current dice state
 - `POST /api/roll/setdice` - Set custom dice values and recalculate advice
-- `GET /api/telemetry` - View aggregated telemetry totals (development only; disabled in production)
-- `POST /api/telemetry/visit` - Record a page visit (development only; disabled in production)
+- `GET /api/telemetry` - View aggregated telemetry totals (all environments; uses in-memory fallback if flat-file storage is unavailable)
+- `POST /api/telemetry/visit` - Record a page visit (all environments; uses in-memory fallback if flat-file storage is unavailable)
 
 ## Heroes
 

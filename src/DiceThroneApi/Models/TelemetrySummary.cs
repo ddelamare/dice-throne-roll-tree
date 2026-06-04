@@ -9,4 +9,7 @@ public class TelemetrySummary
     public Dictionary<string, int> HeroUsage { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, int> PageVisits { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public DateTimeOffset? LastUpdatedUtc { get; set; }
+    public List<TelemetryFileError> FileErrors { get; set; } = [];
 }
+
+public record TelemetryFileError(DateTimeOffset OccurredAtUtc, string Operation, string Message);

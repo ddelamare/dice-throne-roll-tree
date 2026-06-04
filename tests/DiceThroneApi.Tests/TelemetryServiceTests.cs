@@ -51,7 +51,7 @@ public class TelemetryServiceTests
     }
 
     [Fact]
-    public async Task ProductionTelemetry_IsDisabled()
+    public async Task ProductionTelemetry_IsEnabledAndPersists()
     {
         using var env = CreateTestEnvironment("Production");
         var telemetry = new TelemetryService(env);
@@ -61,14 +61,96 @@ public class TelemetryServiceTests
 
         var summary = await telemetry.GetSummaryAsync();
 
-        Assert.Equal(0, summary.TotalVisits);
-        Assert.Equal(0, summary.UniqueVisitors);
-        Assert.Equal(0, summary.TotalOperations);
-        Assert.Empty(summary.PageVisits);
-        Assert.Empty(summary.OperationCounts);
-        Assert.Empty(summary.HeroUsage);
-        Assert.Null(summary.LastUpdatedUtc);
-        Assert.False(Directory.Exists(Path.Combine(env.ContentRootPath, "App_Data")));
+        Assert.Equal(1, summary.TotalVisits);
+        Assert.Equal(1, summary.UniqueVisitors);
+        Assert.Equal(1, summary.TotalOperations);
+        Assert.Equal(1, summary.PageVisits["index"]);
+        Assert.Equal(1, summary.OperationCounts["simulate"]);
+        Assert.Equal(1, summary.HeroUsage["barbarian"]);
+        Assert.NotNull(summary.LastUpdatedUtc);
+
+        var reloaded = new TelemetryService(env);
+        var reloadedSummary = await reloaded.GetSummaryAsync();
+        Assert.Equal(1, reloadedSummary.TotalVisits);
+        Assert.Equal(1, reloadedSummary.TotalOperations);
+    }
+
+    [Fact]
+    public async Task RecordVisitAsync_FallsBackToInMemoryWhenFlatFileUnavailable()
+    {
+        using var env = CreateTestEnvironment();
+        var appDataPath = Path.Combine(env.ContentRootPath, "App_Data");
+        try
+        {
+            await File.WriteAllTextAsync(appDataPath, "not-a-directory");
+
+            var telemetry = new TelemetryService(env);
+            await telemetry.RecordVisitAsync("visitor-a", "index");
+            await telemetry.RecordOperationAsync("visitor-a", "simulate", "barbarian");
+
+            var summary = await telemetry.GetSummaryAsync();
+
+            // Telemetry events are not accumulated during fallback — they are dropped
+            Assert.Equal(0, summary.TotalVisits);
+            Assert.Equal(0, summary.TotalOperations);
+            Assert.Empty(summary.PageVisits);
+            Assert.Empty(summary.OperationCounts);
+            Assert.Empty(summary.HeroUsage);
+            Assert.Equal(0, summary.UniqueVisitors);
+            Assert.Null(summary.LastUpdatedUtc);
+
+            // File errors are recorded in the in-memory error log
+            Assert.NotEmpty(summary.FileErrors);
+            Assert.All(summary.FileErrors, e => Assert.False(string.IsNullOrWhiteSpace(e.Message)));
+
+            var telemetryFilePath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
+            Assert.False(File.Exists(telemetryFilePath));
+        }
+        finally
+        {
+            if (File.Exists(appDataPath))
+            {
+                File.Delete(appDataPath);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task InMemoryFallback_ResetsAfterDurationAndRetriesToFile()
+    {
+        using var env = CreateTestEnvironment();
+        var appDataPath = Path.Combine(env.ContentRootPath, "App_Data");
+        try
+        {
+            await File.WriteAllTextAsync(appDataPath, "not-a-directory");
+
+            var telemetry = new TelemetryService(env, fallbackDuration: TimeSpan.FromMilliseconds(1));
+            await telemetry.RecordVisitAsync("visitor-a", "index"); // triggers fallback, visit dropped
+
+            var duringFallback = await telemetry.GetSummaryAsync();
+            Assert.Equal(0, duringFallback.TotalVisits);
+            Assert.NotEmpty(duringFallback.FileErrors);
+
+            // Remove the blocking file so directory creation succeeds
+            File.Delete(appDataPath);
+
+            // Wait for the fallback window to expire
+            await Task.Delay(10);
+
+            // After expiry, file I/O is retried; this visit should be persisted
+            await telemetry.RecordVisitAsync("visitor-b", "index");
+
+            var afterReset = await telemetry.GetSummaryAsync();
+            Assert.Equal(1, afterReset.TotalVisits); // only the post-reset visit
+            Assert.NotEmpty(afterReset.FileErrors);  // error log persists for the service lifetime
+        }
+        finally
+        {
+            if (File.Exists(appDataPath))
+            {
+                File.Delete(appDataPath);
+            }
+        }
     }
 
     private static FakeWebHostEnvironment CreateTestEnvironment(string environmentName = "Development")

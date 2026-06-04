@@ -12,23 +12,23 @@ public class TelemetryService : IDisposable
         WriteIndented = true
     };
 
-    private readonly string _telemetryPath;
-    private readonly bool _isEnabled;
-    private readonly SemaphoreSlim _mutex = new(1, 1);
+    private static readonly TimeSpan DefaultFallbackDuration = TimeSpan.FromHours(1);
 
-    public TelemetryService(IWebHostEnvironment env)
+    private readonly string _telemetryPath;
+    private readonly TimeSpan _fallbackDuration;
+    private readonly SemaphoreSlim _mutex = new(1, 1);
+    private readonly List<TelemetryFileError> _fileErrors = [];
+    private bool _useInMemoryFallback;
+    private DateTimeOffset? _fallbackStartedAt;
+
+    public TelemetryService(IWebHostEnvironment env, TimeSpan? fallbackDuration = null)
     {
-        _isEnabled = !env.IsProduction();
         _telemetryPath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
+        _fallbackDuration = fallbackDuration ?? DefaultFallbackDuration;
     }
 
     public async Task RecordVisitAsync(string? visitorId, string? page)
     {
-        if (!_isEnabled)
-        {
-            return;
-        }
-
         await _mutex.WaitAsync();
         try
         {
@@ -53,11 +53,6 @@ public class TelemetryService : IDisposable
 
     public async Task RecordOperationAsync(string? visitorId, string operation, string? heroId = null)
     {
-        if (!_isEnabled)
-        {
-            return;
-        }
-
         await _mutex.WaitAsync();
         try
         {
@@ -88,16 +83,13 @@ public class TelemetryService : IDisposable
 
     public async Task<TelemetrySummary> GetSummaryAsync()
     {
-        if (!_isEnabled)
-        {
-            return new TelemetrySummary();
-        }
-
         await _mutex.WaitAsync();
         try
         {
             var state = await LoadStateAsync();
-            return state.ToSummary();
+            var summary = state.ToSummary();
+            summary.FileErrors = new List<TelemetryFileError>(_fileErrors);
+            return summary;
         }
         finally
         {
@@ -107,26 +99,79 @@ public class TelemetryService : IDisposable
 
     private async Task<TelemetryState> LoadStateAsync()
     {
+        ClearFallbackIfExpired();
+
+        if (_useInMemoryFallback)
+        {
+            return new TelemetryState();
+        }
+
         if (!File.Exists(_telemetryPath))
         {
             return new TelemetryState();
         }
 
-        await using var stream = File.OpenRead(_telemetryPath);
-        var state = await JsonSerializer.DeserializeAsync<TelemetryState>(stream, JsonOptions);
-        return state ?? new TelemetryState();
+        try
+        {
+            await using var stream = File.OpenRead(_telemetryPath);
+            var state = await JsonSerializer.DeserializeAsync<TelemetryState>(stream, JsonOptions);
+            return state ?? new TelemetryState();
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
+        {
+            RecordFileError("load", exception);
+            return new TelemetryState();
+        }
     }
 
     private async Task SaveStateAsync(TelemetryState state)
     {
-        var directory = Path.GetDirectoryName(_telemetryPath);
-        if (!string.IsNullOrWhiteSpace(directory))
+        ClearFallbackIfExpired();
+
+        if (_useInMemoryFallback)
         {
-            Directory.CreateDirectory(directory);
+            return;
         }
 
-        await using var stream = File.Create(_telemetryPath);
-        await JsonSerializer.SerializeAsync(stream, state, JsonOptions);
+        var directory = Path.GetDirectoryName(_telemetryPath);
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            await using var stream = File.Create(_telemetryPath);
+            await JsonSerializer.SerializeAsync(stream, state, JsonOptions);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            RecordFileError("save", exception);
+        }
+    }
+
+    // Must be called while holding _mutex.
+    private void ClearFallbackIfExpired()
+    {
+        if (_useInMemoryFallback &&
+            _fallbackStartedAt.HasValue &&
+            DateTimeOffset.UtcNow - _fallbackStartedAt.Value >= _fallbackDuration)
+        {
+            _useInMemoryFallback = false;
+            _fallbackStartedAt = null;
+        }
+    }
+
+    // Must be called while holding _mutex.
+    private void RecordFileError(string operation, Exception exception)
+    {
+        if (!_useInMemoryFallback)
+        {
+            _useInMemoryFallback = true;
+            _fallbackStartedAt = DateTimeOffset.UtcNow;
+        }
+
+        _fileErrors.Add(new TelemetryFileError(DateTimeOffset.UtcNow, operation, exception.Message));
     }
 
     private static void TrackVisitor(TelemetryState state, string? visitorId)
