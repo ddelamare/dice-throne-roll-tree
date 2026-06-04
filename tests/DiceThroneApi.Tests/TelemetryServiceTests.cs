@@ -50,7 +50,28 @@ public class TelemetryServiceTests
         Assert.Equal(2, secondSummary.HeroUsage["barbarian"]);
     }
 
-    private static FakeWebHostEnvironment CreateTestEnvironment()
+    [Fact]
+    public async Task ProductionTelemetry_IsDisabled()
+    {
+        using var env = CreateTestEnvironment("Production");
+        var telemetry = new TelemetryService(env);
+
+        await telemetry.RecordVisitAsync("visitor-a", "index");
+        await telemetry.RecordOperationAsync("visitor-a", "simulate", "barbarian");
+
+        var summary = await telemetry.GetSummaryAsync();
+
+        Assert.Equal(0, summary.TotalVisits);
+        Assert.Equal(0, summary.UniqueVisitors);
+        Assert.Equal(0, summary.TotalOperations);
+        Assert.Empty(summary.PageVisits);
+        Assert.Empty(summary.OperationCounts);
+        Assert.Empty(summary.HeroUsage);
+        Assert.Null(summary.LastUpdatedUtc);
+        Assert.False(Directory.Exists(Path.Combine(env.ContentRootPath, "App_Data")));
+    }
+
+    private static FakeWebHostEnvironment CreateTestEnvironment(string environmentName = "Development")
     {
         var contentRootPath = Path.Combine(Path.GetTempPath(), "dice-throne-telemetry-tests", Path.GetRandomFileName());
         Directory.CreateDirectory(contentRootPath);
@@ -58,7 +79,7 @@ public class TelemetryServiceTests
         return new FakeWebHostEnvironment
         {
             ContentRootPath = contentRootPath,
-            EnvironmentName = "Development",
+            EnvironmentName = environmentName,
             ApplicationName = "DiceThroneApi.Tests",
             WebRootPath = Path.Combine(contentRootPath, "wwwroot")
         };

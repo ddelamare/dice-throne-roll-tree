@@ -8,5 +8,5 @@ public class TelemetrySummary
     public Dictionary<string, int> OperationCounts { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, int> HeroUsage { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, int> PageVisits { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-    public DateTimeOffset LastUpdatedUtc { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? LastUpdatedUtc { get; set; }
 }
