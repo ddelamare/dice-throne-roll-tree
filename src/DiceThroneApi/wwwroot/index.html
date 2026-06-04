@@ -535,6 +535,7 @@
                     <button class="btn-primary" id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
                     <button class="btn-primary" id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
                     <button class="btn-primary" id="dropdownEvalBtn" onclick="evalModalOpen()">⚖️ Evaluation Weights</button>
+                    <button class="btn-primary" id="dropdownTelemetryBtn" onclick="openTelemetryPage()">📈 View Telemetry</button>
                 </div>
             </div>
         </div>
@@ -607,6 +608,7 @@
         <div id="objectives" class="objectives"></div>
     </div>
 
+    <script src="/js/telemetry-client.js"></script>
     <script>
         let currentHero = null;
         let currentDice = [];
@@ -618,6 +620,13 @@
         let currentSuggestions = []; // Store current suggestions for re-sorting
         const defaultStatusText = 'Click "Roll Dice" to start a new turn!';
         const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
+        const apiFetch = window.telemetryClient.apiFetch;
+        const trackVisit = window.telemetryClient.trackVisit;
+
+        function openTelemetryPage() {
+            document.getElementById('menuContainer').classList.remove('show');
+            window.location.href = '/telemetry.html';
+        }
 
         // Evaluation config (mirrors EvaluationConfig model)
         let evalConfig = {
@@ -687,7 +696,7 @@
             // Re-fetch advice with new weights if we have current dice
             if (currentDice.length > 0) {
                 const method = document.getElementById('methodSelect').value;
-                fetch('/api/roll/advice', {
+                apiFetch('/api/roll/advice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -757,7 +766,7 @@
         
         async function loadHeroes() {
             try {
-                const response = await fetch('/api/heroes');
+                const response = await apiFetch('/api/heroes');
                 const heroes = await response.json();
                 
                 const select = document.getElementById('heroSelect');
@@ -776,7 +785,7 @@
         
         async function loadHero(heroId) {
             try {
-                const response = await fetch(`/api/heroes/${heroId}`);
+                const response = await apiFetch(`/api/heroes/${heroId}`);
                 currentHero = await response.json();
                 hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
                 manifestDieIndex = hasManifestDie ? 0 : -1;
@@ -905,7 +914,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
             
             try {
-                const response = await fetch('/api/roll/simulate', {
+                const response = await apiFetch('/api/roll/simulate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -951,7 +960,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating objective odds...</div>';
 
             try {
-                const response = await fetch('/api/roll/preroll', {
+                const response = await apiFetch('/api/roll/preroll', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1011,7 +1020,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
             
             try {
-                const response = await fetch('/api/roll/advice', {
+                const response = await apiFetch('/api/roll/advice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1085,7 +1094,7 @@
             document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
 
             try {
-                const response = await fetch('/api/roll/setdice', {
+                const response = await apiFetch('/api/roll/setdice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1172,6 +1181,7 @@
         }
         
         updateActionButtons();
+        trackVisit('index');
         loadHeroes();
     </script>
 </body>

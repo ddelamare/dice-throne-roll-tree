@@ -22,6 +22,7 @@ builder.Services.AddSingleton<ProbabilityCalculator>();
 builder.Services.AddSingleton<MonteCarloSimulator>();
 builder.Services.AddSingleton<DiceRollAdvisor>();
 builder.Services.AddSingleton<HeroService>();
+builder.Services.AddSingleton<TelemetryService>();
 
 var app = builder.Build();
 
