@@ -12,14 +12,19 @@ public class TelemetryService : IDisposable
         WriteIndented = true
     };
 
-    private readonly string _telemetryPath;
-    private readonly SemaphoreSlim _mutex = new(1, 1);
-    private TelemetryState _inMemoryState = new();
-    private bool _useInMemoryFallback;
+    private static readonly TimeSpan DefaultFallbackDuration = TimeSpan.FromHours(1);
 
-    public TelemetryService(IWebHostEnvironment env)
+    private readonly string _telemetryPath;
+    private readonly TimeSpan _fallbackDuration;
+    private readonly SemaphoreSlim _mutex = new(1, 1);
+    private readonly List<TelemetryFileError> _fileErrors = [];
+    private bool _useInMemoryFallback;
+    private DateTimeOffset? _fallbackStartedAt;
+
+    public TelemetryService(IWebHostEnvironment env, TimeSpan? fallbackDuration = null)
     {
         _telemetryPath = Path.Combine(env.ContentRootPath, "App_Data", "telemetry.json");
+        _fallbackDuration = fallbackDuration ?? DefaultFallbackDuration;
     }
 
     public async Task RecordVisitAsync(string? visitorId, string? page)
@@ -82,7 +87,9 @@ public class TelemetryService : IDisposable
         try
         {
             var state = await LoadStateAsync();
-            return state.ToSummary();
+            var summary = state.ToSummary();
+            summary.FileErrors = new List<TelemetryFileError>(_fileErrors);
+            return summary;
         }
         finally
         {
@@ -92,9 +99,11 @@ public class TelemetryService : IDisposable
 
     private async Task<TelemetryState> LoadStateAsync()
     {
+        ClearFallbackIfExpired();
+
         if (_useInMemoryFallback)
         {
-            return _inMemoryState.Clone();
+            return new TelemetryState();
         }
 
         if (!File.Exists(_telemetryPath))
@@ -108,18 +117,19 @@ public class TelemetryService : IDisposable
             var state = await JsonSerializer.DeserializeAsync<TelemetryState>(stream, JsonOptions);
             return state ?? new TelemetryState();
         }
-        catch (Exception exception) when (IsLoadFallbackException(exception))
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or JsonException)
         {
-            SwitchToInMemoryFallback();
-            return _inMemoryState.Clone();
+            RecordFileError("load", exception);
+            return new TelemetryState();
         }
     }
 
     private async Task SaveStateAsync(TelemetryState state)
     {
+        ClearFallbackIfExpired();
+
         if (_useInMemoryFallback)
         {
-            _inMemoryState = state.Clone();
             return;
         }
 
@@ -134,10 +144,34 @@ public class TelemetryService : IDisposable
             await using var stream = File.Create(_telemetryPath);
             await JsonSerializer.SerializeAsync(stream, state, JsonOptions);
         }
-        catch (Exception exception) when (IsSaveFallbackException(exception))
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or NotSupportedException)
         {
-            SwitchToInMemoryFallback(state);
+            RecordFileError("save", exception);
         }
+    }
+
+    // Must be called while holding _mutex.
+    private void ClearFallbackIfExpired()
+    {
+        if (_useInMemoryFallback &&
+            _fallbackStartedAt.HasValue &&
+            DateTimeOffset.UtcNow - _fallbackStartedAt.Value >= _fallbackDuration)
+        {
+            _useInMemoryFallback = false;
+            _fallbackStartedAt = null;
+        }
+    }
+
+    // Must be called while holding _mutex.
+    private void RecordFileError(string operation, Exception exception)
+    {
+        if (!_useInMemoryFallback)
+        {
+            _useInMemoryFallback = true;
+            _fallbackStartedAt = DateTimeOffset.UtcNow;
+        }
+
+        _fileErrors.Add(new TelemetryFileError(DateTimeOffset.UtcNow, operation, exception.Message));
     }
 
     private static void TrackVisitor(TelemetryState state, string? visitorId)
@@ -194,39 +228,6 @@ public class TelemetryService : IDisposable
                 LastUpdatedUtc = LastUpdatedUtc
             };
         }
-
-        public TelemetryState Clone()
-        {
-            return new TelemetryState
-            {
-                TotalVisits = TotalVisits,
-                TotalOperations = TotalOperations,
-                UniqueVisitorIds = new HashSet<string>(UniqueVisitorIds ?? []),
-                OperationCounts = new Dictionary<string, int>(OperationCounts ?? [], StringComparer.OrdinalIgnoreCase),
-                HeroUsage = new Dictionary<string, int>(HeroUsage ?? [], StringComparer.OrdinalIgnoreCase),
-                PageVisits = new Dictionary<string, int>(PageVisits ?? [], StringComparer.OrdinalIgnoreCase),
-                LastUpdatedUtc = LastUpdatedUtc
-            };
-        }
-    }
-
-    private void SwitchToInMemoryFallback(TelemetryState? state = null)
-    {
-        _useInMemoryFallback = true;
-        if (state is not null)
-        {
-            _inMemoryState = state.Clone();
-        }
-    }
-
-    private static bool IsLoadFallbackException(Exception exception)
-    {
-        return exception is IOException or UnauthorizedAccessException or JsonException;
-    }
-
-    private static bool IsSaveFallbackException(Exception exception)
-    {
-        return exception is IOException or UnauthorizedAccessException or NotSupportedException;
     }
 
     public void Dispose()
