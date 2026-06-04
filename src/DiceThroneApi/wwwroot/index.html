@@ -535,7 +535,6 @@
                     <button class="btn-primary" id="dropdownPreRollBtn" onclick="calculateObjectiveOdds()">📊 Show Objective Odds</button>
                     <button class="btn-primary" id="dropdownSetDiceBtn" onclick="setDiceModalOpen()">🛠️ Set Dice Values</button>
                     <button class="btn-primary" id="dropdownEvalBtn" onclick="evalModalOpen()">⚖️ Evaluation Weights</button>
-                    <button class="btn-primary" id="dropdownTelemetryBtn" onclick="openTelemetryPage()">📈 View Telemetry</button>
                 </div>
             </div>
         </div>
@@ -622,11 +621,6 @@
         const preRollStatusText = 'Pre-roll objective odds — click "Roll Dice" to start a new turn.';
         const apiFetch = window.telemetryClient.apiFetch;
         const trackVisit = window.telemetryClient.trackVisit;
-
-        function openTelemetryPage() {
-            document.getElementById('menuContainer').classList.remove('show');
-            window.location.href = '/telemetry.html';
-        }
 
         // Evaluation config (mirrors EvaluationConfig model)
         let evalConfig = {
