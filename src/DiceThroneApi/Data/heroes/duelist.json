@@ -6,7 +6,7 @@
     { "name": "Blade Flurry (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
     { "name": "Blade Flurry (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 6 },
     { "name": "Feint Attack", "notation": "[(123)(123)66]", "damage": 2, "bypassDefense": true, "tokens": ["Guard Break", "Step"] },
-    { "name": "Balestra", "notation": "[(123)(45)66]", "damage": 6, "tokens": ["Step", "Step"]  },
+    { "name": "Balestra", "notation": "[(123)(123)(45)(45)(45)]", "damage": 6, "tokens": ["Step", "Step"]  },
     { "name": "Strike (Small)", "notation": "SmallStraight", "damage": 7},
     { "name": "Strike (Large)", "notation": "LargeStraight", "damage": 10, "tokens": ["Step"] },
     { "name": "En Garde", "notation": "[(45)(45)(45)6]", "damage": 8, "tokens": ["Disarm"]  },
