@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/DiceThroneApi/DiceThroneApi.csproj" />
+    <Project Path="src/DiceThroneCli/DiceThroneCli.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/DiceThroneApi.Tests/DiceThroneApi.Tests.csproj" />

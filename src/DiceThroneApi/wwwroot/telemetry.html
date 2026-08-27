@@ -123,7 +123,6 @@
     <script src="/js/telemetry-client.js"></script>
     <script>
         const apiFetch = window.telemetryClient.apiFetch;
-        const trackVisit = window.telemetryClient.trackVisit;
 
         function renderTable(containerId, rows, keyLabel) {
             const container = document.getElementById(containerId);
@@ -170,7 +169,7 @@
             }
         }
 
-        trackVisit('telemetry').finally(loadTelemetry);
+        loadTelemetry();
     </script>
 </body>
 </html>

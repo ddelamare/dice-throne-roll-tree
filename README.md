@@ -22,6 +22,7 @@ A comprehensive .NET 8 ASP.NET Core Web API application for calculating Dice Thr
   /Services/                 - Business logic services
   /Data/heroes/              - JSON hero data files
   /wwwroot/                  - Static web frontend
+/src/DiceThroneCli/          - Agent-facing command-line interface
 /tests/DiceThroneApi.Tests/  - xUnit test project
 ```
 
@@ -82,6 +83,20 @@ Open your browser to the displayed URL to access the interactive web interface.
 - `POST /api/roll/setdice` - Set custom dice values and recalculate advice
 - `GET /api/telemetry` - View aggregated telemetry totals (all environments; uses in-memory fallback if flat-file storage is unavailable)
 - `POST /api/telemetry/visit` - Record a page visit (all environments; uses in-memory fallback if flat-file storage is unavailable)
+
+### Agent CLI
+
+The `DiceThroneCli` project exposes the same calculation services without requiring a running web server. Successful commands emit JSON on stdout; failures emit a JSON error on stderr and exit with code 2.
+
+```bash
+dotnet run --project src/DiceThroneCli -- probability --notation [6666] --dice-count 5 --rerolls 2
+dotnet run --project src/DiceThroneCli -- advice --dice 6,6,1,2,3 --rerolls 2 --hero barbarian
+dotnet run --project src/DiceThroneCli -- compare --dice 6,6,1,2,3 --rerolls 2 \
+  --objective "Attack|[6666]|4" --objective "Big Attack|[66666]|10"
+dotnet run --project src/DiceThroneCli -- heroes
+```
+
+Use `--method montecarlo --iterations 10000` for an estimated probability. Custom objectives use `name|notation|damage`; omit damage for non-damage objectives. `compare` returns every strategy, baseline probability, optimal keep mask, expected delta, fallback line, and the selected overall strategy.
 
 ## Heroes
 
