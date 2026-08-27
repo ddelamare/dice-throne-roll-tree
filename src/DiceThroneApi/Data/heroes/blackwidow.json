@@ -1,0 +1,16 @@
+{
+  "id": "blackwidow",
+  "name": "Black Widow",
+  "objectives": [
+    { "name": "Baton Strike (3)", "notation": "[(345)(345)(345)]", "damage": 5 },
+    { "name": "Baton Strike (4)", "notation": "[(345)(345)(345)(345)]", "damage": 6 },
+    { "name": "Baton Strike (5)", "notation": "[(345)(345)(345)(345)(345)]", "damage": 7 },
+    { "name": "Infiltrate", "notation": "[(12)(12)(345)6]", "damage": 0, "tokens": ["Agility", "Time Bomb"] },
+    { "name": "Widow's Gauntlets", "notation": "[(12)(12)(12)(345)(345)]", "damage": 6, "cp": 1 },
+    { "name": "Hacked", "notation": "SmallStraight", "damage": 5, "tokens": ["Time Bomb"] },
+    { "name": "Vengeance", "notation": "LargeStraight", "damage": 7, "tokens": ["Agility"] },
+    { "name": "Sabotage", "notation": "[(12)(12)(12)]", "damage": 0, "tokens": ["Time Bomb"] },
+    { "name": "Grapple", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Agility"] },
+    { "name": "Widow's Bite!", "notation": "[66666]", "damage": 10, "bypassDefense": true, "tokens": ["Time Bomb"] }
+  ]
+}
