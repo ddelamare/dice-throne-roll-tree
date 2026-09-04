@@ -34,6 +34,27 @@
             font-size: 2.5em;
         }
         
+        .page-nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 24px;
+        }
+
+        .page-nav a {
+            padding: 9px 13px;
+            border: 1px solid #c9d7ff;
+            border-radius: 999px;
+            color: #334b8f;
+            background: #eef3ff;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .page-nav a:hover {
+            background: #e2eaff;
+        }
+
         .controls {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -476,6 +497,10 @@
     <div class="container">
         <h1>🎲 Dice Throne Roll Calculator</h1>
         
+        <nav class="page-nav" aria-label="Page navigation">
+            <a href="/battle-tracker.html">⚔️ Open Battle Tracker</a>
+        </nav>
+
         <div class="controls">
             <div class="control-group">
                 <label for="heroSelect">Select Hero:</label>
