@@ -20,7 +20,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 30px;
             border-radius: 15px;
@@ -28,19 +28,33 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
         h1 {
-            margin-bottom: 8px;
             color: #20284a;
             font-size: 2.2rem;
         }
 
-        .page-nav {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 24px;
+        .page-header p {
+            margin-top: 5px;
+            color: #69718d;
+            font-size: 14px;
         }
 
-        .page-nav a {
+        .page-nav {
+            display: flex;
+            gap: 8px;
+            flex: 0 0 auto;
+        }
+
+        .page-nav a,
+        .tracker-export {
             padding: 9px 13px;
             border: 1px solid #c9d7ff;
             border-radius: 999px;
@@ -51,8 +65,75 @@
             text-decoration: none;
         }
 
-        .page-nav a:hover {
+        .page-nav a:hover,
+        .tracker-export:hover {
             background: #e2eaff;
+        }
+
+        .tracker-workspace {
+            padding: 24px;
+            border: 1px solid #dfe5f4;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #fbfcff 0%, #f4f6ff 100%);
+            box-shadow: 0 8px 24px rgba(54, 66, 120, 0.08);
+        }
+
+        .tracker-toolbar {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .tracker-toolbar h2 {
+            margin-bottom: 4px;
+            color: #20284a;
+            font-size: 1.45rem;
+        }
+
+        .tracker-toolbar p {
+            color: #69718d;
+            font-size: 13px;
+        }
+
+        .tracker-badge {
+            display: inline-block;
+            margin-top: 9px;
+            padding: 6px 10px;
+            border: 1px solid #c9d7ff;
+            border-radius: 999px;
+            color: #334b8f;
+            background: #eef3ff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .tracker-toolbar-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .tracker-export {
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tracker-reset {
+            padding: 9px 13px;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            background: #26335f;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .tracker-reset:hover {
+            background: #354477;
         }
 
         .control-group {
@@ -63,15 +144,18 @@
         label {
             margin-bottom: 5px;
             color: #555;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
         }
 
         select,
         input {
+            width: 100%;
             padding: 10px;
             border: 2px solid #ddd;
             border-radius: 5px;
-            font-size: 16px;
+            background: white;
+            font-size: 15px;
             transition: border-color 0.3s;
         }
 
@@ -79,17 +163,6 @@
         input:focus {
             outline: none;
             border-color: #667eea;
-        }
-
-        button {
-            padding: 12px 15px;
-            border: none;
-            border-radius: 8px;
-            color: white;
-            background: #26335f;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
         }
 
         button:focus-visible,
@@ -100,121 +173,96 @@
             outline-offset: 2px;
         }
 
-        .battle-tracker {
-            margin-bottom: 34px;
-            padding: 24px;
-            border: 1px solid #dfe5f4;
-            border-radius: 16px;
-            background: linear-gradient(145deg, #fbfcff 0%, #f4f6ff 100%);
-            box-shadow: 0 8px 24px rgba(54, 66, 120, 0.08);
-        }
-
-        .tracker-heading,
-        .tracker-ledger-heading {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .tracker-heading {
-            margin-bottom: 18px;
-        }
-
-        .tracker-heading h2 {
-            color: #20284a;
-            font-size: 1.45rem;
-            margin-bottom: 4px;
-        }
-
-        .tracker-heading p,
-        .tracker-ledger-heading p {
-            color: #69718d;
-            font-size: 13px;
-        }
-
-        .tracker-badge {
-            flex: 0 0 auto;
-            border: 1px solid #c9d7ff;
-            border-radius: 999px;
-            padding: 6px 10px;
-            color: #334b8f;
-            background: #eef3ff;
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .tracker-setup {
+        .hero-ledgers {
             display: grid;
-            grid-template-columns: minmax(170px, 1fr) minmax(170px, 1fr) minmax(130px, 0.7fr) auto;
-            gap: 12px;
-            align-items: end;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
         }
 
-        .tracker-setup .control-group input,
-        .tracker-setup .control-group select {
+        .hero-ledger {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid #dfe5f4;
+            border-radius: 14px;
             background: white;
         }
 
-        .tracker-reset {
-            min-height: 44px;
-            flex: 0 0 auto;
-            background: #26335f;
-        }
-
-        .tracker-health-overview {
-            display: grid;
-            grid-template-columns: minmax(155px, 0.8fr) minmax(180px, 1.5fr) minmax(120px, 0.7fr);
-            gap: 16px;
+        .hero-ledger-header {
+            display: flex;
             align-items: center;
-            margin: 20px 0;
-            padding: 18px;
-            border-radius: 12px;
-            background: #20284a;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px 18px 14px;
             color: white;
+            background: #20284a;
         }
 
-        .health-card,
-        .tracker-stat {
+        .hero-ledger-header h3 {
+            font-size: 1.15rem;
+        }
+
+        .hero-ledger-header span {
+            color: #b9c3e6;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .hero-ledger-content {
+            padding: 18px;
+        }
+
+        .hero-setup {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(110px, 0.65fr);
+            gap: 10px;
+        }
+
+        .health-overview {
+            display: grid;
+            grid-template-columns: minmax(120px, 0.8fr) minmax(120px, 1.2fr) minmax(105px, 0.7fr);
+            gap: 12px;
+            align-items: center;
+            margin: 16px 0;
+            padding: 14px;
+            border-radius: 10px;
+            color: white;
+            background: #20284a;
+        }
+
+        .health-stat {
             display: flex;
             flex-direction: column;
             gap: 3px;
         }
 
-        .health-card span,
-        .tracker-stat span {
+        .health-stat span {
             color: #b9c3e6;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 700;
             letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
 
-        .health-card strong {
-            font-size: 2.2rem;
+        .health-stat strong {
+            font-size: 1.65rem;
             line-height: 1;
         }
 
-        .health-card small {
+        .health-stat small {
             color: #dfe5ff;
-            font-size: 12px;
-        }
-
-        .tracker-stat strong {
-            font-size: 1.35rem;
+            font-size: 11px;
         }
 
         .health-bar-shell {
-            height: 13px;
+            height: 11px;
             overflow: hidden;
             border-radius: 999px;
             background: #4a5276;
         }
 
         .health-bar {
-            height: 100%;
             width: 100%;
+            height: 100%;
             border-radius: inherit;
             background: linear-gradient(90deg, #6ee7b7, #34d399);
             transition: width 0.25s ease, background 0.25s ease;
@@ -228,26 +276,20 @@
             background: #f87171;
         }
 
-        .tracker-entry {
-            padding: 18px;
+        .entry-composer {
+            padding: 15px;
             border: 1px solid #e1e6f3;
-            border-radius: 12px;
-            background: white;
+            border-radius: 10px;
+            background: #fbfcff;
         }
 
-        .tracker-entry-grid {
+        .entry-grid {
             display: grid;
-            grid-template-columns: minmax(190px, 1.1fr) minmax(120px, 0.55fr) minmax(190px, 1.3fr);
-            gap: 12px;
-            align-items: end;
+            grid-template-columns: minmax(0, 1.1fr) minmax(90px, 0.55fr) minmax(110px, 0.7fr);
+            gap: 10px;
         }
 
-        .tracker-entry-grid input,
-        .tracker-entry-grid select {
-            width: 100%;
-        }
-
-        .tracker-custom-ability {
+        .entry-effects {
             margin-top: 10px;
         }
 
@@ -255,271 +297,376 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            gap: 8px;
-            min-height: 30px;
-            margin-top: 14px;
+            gap: 7px;
+            min-height: 29px;
+            margin-top: 12px;
         }
 
         .tracker-suggestions-label {
             color: #69718d;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
         }
 
         .tracker-chip {
-            flex: 0 0 auto;
-            padding: 8px 11px;
+            padding: 7px 9px;
             border: 1px solid #c9d7ff;
             border-radius: 999px;
             color: #334b8f;
             background: #eef3ff;
-            font-size: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
         }
 
         .tracker-chip:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.18);
+            background: #e2eaff;
         }
 
         .tracker-add {
             width: 100%;
-            margin-top: 14px;
+            margin-top: 12px;
+            padding: 11px;
+            border: none;
+            border-radius: 8px;
+            color: white;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
         }
 
         .tracker-ledger {
-            margin-top: 22px;
+            margin-top: 18px;
         }
 
-        .tracker-ledger-heading {
-            align-items: end;
-            margin-bottom: 10px;
-        }
-
-        .tracker-export-actions {
+        .ledger-heading {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 9px;
         }
 
-        .tracker-export {
-            flex: 0 0 auto;
-            padding: 8px 11px;
-            border: 1px solid #c9d7ff;
-            color: #334b8f;
-            background: #eef3ff;
+        .ledger-heading h4 {
+            color: #20284a;
+            font-size: 1rem;
+        }
+
+        .ledger-heading p {
+            margin-top: 3px;
+            color: #69718d;
+            font-size: 11px;
+        }
+
+        .ledger-table-wrap {
+            overflow-x: auto;
+            border: 1px solid #e1e6f3;
+            border-radius: 9px;
+        }
+
+        .ledger-table {
+            width: 100%;
+            min-width: 470px;
+            border-collapse: collapse;
             font-size: 12px;
         }
 
-        .tracker-export:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.18);
-        }
-
-        .tracker-ledger-heading h3 {
-            color: #20284a;
-            font-size: 1.1rem;
-        }
-
-        .tracker-ledger-table-wrap {
-            overflow-x: auto;
-            border: 1px solid #e1e6f3;
-            border-radius: 10px;
-            background: white;
-        }
-
-        .tracker-ledger-table {
-            width: 100%;
-            min-width: 560px;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .tracker-ledger-table th {
-            padding: 10px 12px;
+        .ledger-table th {
+            padding: 9px 10px;
             color: #69718d;
             background: #f5f7fd;
-            font-size: 11px;
-            letter-spacing: 0.05em;
+            font-size: 10px;
+            letter-spacing: 0.04em;
             text-align: left;
             text-transform: uppercase;
         }
 
-        .tracker-ledger-table td {
-            padding: 12px;
+        .ledger-table td {
+            padding: 10px;
             border-top: 1px solid #edf0f7;
             color: #353d5a;
             vertical-align: top;
         }
 
-        .tracker-ledger-table .damage-cell {
+        .ledger-table .damage-cell {
             color: #c2410c;
             font-weight: 800;
             white-space: nowrap;
         }
 
-        .tracker-ledger-table .effects-cell {
+        .ledger-table .defense-cell {
+            color: #7c3aed;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .ledger-table .effects-cell {
             color: #5d6682;
             white-space: pre-wrap;
         }
 
         .tracker-remove {
-            flex: 0 0 auto;
-            padding: 6px 9px;
+            padding: 5px 8px;
+            border: none;
+            border-radius: 6px;
             color: #a33b4b;
             background: #fff0f2;
-            font-size: 12px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
         }
 
         .tracker-empty {
-            padding: 22px;
+            padding: 19px 12px;
             color: #78819e;
-            font-size: 14px;
+            font-size: 12px;
             text-align: center;
         }
 
-        @media (max-width: 760px) {
-            .battle-tracker {
-                padding: 18px;
+        @media (max-width: 940px) {
+            .hero-ledgers {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 10px;
             }
 
-            .tracker-ledger-heading {
+            .container,
+            .tracker-workspace {
+                padding: 16px;
+            }
+
+            .page-header,
+            .tracker-toolbar,
+            .ledger-heading {
                 flex-direction: column;
                 align-items: stretch;
             }
 
-            .tracker-setup,
-            .tracker-health-overview,
-            .tracker-entry-grid {
+            .page-nav,
+            .tracker-toolbar-actions {
+                justify-content: flex-start;
+            }
+
+            .hero-setup,
+            .entry-grid,
+            .health-overview {
                 grid-template-columns: 1fr;
             }
 
-            .tracker-reset {
-                width: 100%;
-            }
-
             .health-bar-shell {
-                margin: 2px 0 4px;
+                margin: 1px 0 3px;
             }
         }
-
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>⚔️ Battle Tracker</h1>
-        <nav class="page-nav" aria-label="Page navigation">
-            <a href="/">🎲 Roll Calculator</a>
-        </nav>
-        <section class="battle-tracker" aria-labelledby="battleTrackerTitle">
-            <div class="tracker-heading">
+        <header class="page-header">
+            <div>
+                <h1>⚔️ Battle Tracker</h1>
+                <p>Track both heroes as attacks resolve, in any order.</p>
+            </div>
+            <nav class="page-nav" aria-label="Page navigation">
+                <a href="/">🎲 Roll Calculator</a>
+            </nav>
+        </header>
+
+        <main class="tracker-workspace">
+            <div class="tracker-toolbar">
                 <div>
-                    <h2 id="battleTrackerTitle">⚔️ Battle Tracker</h2>
-                    <p>Keep a running health total and record resolved attacks as they happen.</p>
+                    <h2>Two-sided battle log</h2>
+                    <p>Damage crosses over to the opposing hero. Defense damage is recorded against the attacking hero.</p>
+                    <span class="tracker-badge">Free-form log · no turn order</span>
                 </div>
-                <span class="tracker-badge">Free-form log · no turn order</span>
-            </div>
-
-            <div class="tracker-setup">
-                <div class="control-group">
-                    <label for="trackerHeroSelect">Hero or ability set</label>
-                    <select id="trackerHeroSelect">
-                        <option value="">Loading heroes...</option>
-                    </select>
-                </div>
-                <div class="control-group">
-                    <label for="trackerName">Combatant name</label>
-                    <input id="trackerName" type="text" placeholder="e.g. Boss or homebrew character" />
-                </div>
-                <div class="control-group">
-                    <label for="trackerStartingHealth">Starting health</label>
-                    <input id="trackerStartingHealth" type="number" min="1" step="1" value="50" />
-                </div>
-                <button class="tracker-reset" type="button" onclick="resetBattleTracker()">Start / reset battle</button>
-            </div>
-
-            <div class="tracker-health-overview" aria-live="polite">
-                <div class="health-card">
-                    <span>Current health · <span id="trackerCombatantLabel">Combatant</span></span>
-                    <strong id="trackerCurrentHealth">50</strong>
-                    <small id="trackerHealthLabel">of 50 health</small>
-                </div>
-                <div class="health-bar-shell" aria-hidden="true">
-                    <div id="trackerHealthBar" class="health-bar"></div>
-                </div>
-                <div class="tracker-stat">
-                    <span>Total damage</span>
-                    <strong id="trackerTotalDamage">0</strong>
+                <div class="tracker-toolbar-actions">
+                    <button class="tracker-reset" type="button" onclick="resetBattle()">Reset both ledgers</button>
+                    <button class="tracker-export" type="button" onclick="exportTrackerLog('csv')">⇩ Export CSV</button>
+                    <button class="tracker-export" type="button" onclick="exportTrackerLog('json')">⇩ Export JSON</button>
                 </div>
             </div>
 
-            <div class="tracker-entry">
-                <div class="tracker-entry-grid">
-                    <div class="control-group">
-                        <label for="trackerAbility">Resolved ability</label>
-                        <select id="trackerAbility">
-                            <option value="">Choose an ability</option>
-                        </select>
-                    </div>
-                    <div class="control-group">
-                        <label for="trackerDamage">Damage dealt</label>
-                        <input id="trackerDamage" type="number" min="0" step="1" value="0" />
-                    </div>
-                    <div class="control-group">
-                        <label for="trackerEffects">Other effects triggered</label>
-                        <input id="trackerEffects" type="text" placeholder="e.g. Stun, 1 card, status applied" />
-                    </div>
-                </div>
-                <div id="trackerCustomAbilityWrap" class="control-group tracker-custom-ability" hidden>
-                    <label for="trackerCustomAbility">Custom ability name</label>
-                    <input id="trackerCustomAbility" type="text" placeholder="Name this resolved attack" />
-                </div>
-                <div id="trackerSuggestions" class="tracker-suggestions" aria-live="polite"></div>
-                <button class="tracker-add" type="button" onclick="addBattleTrackerEntry()">＋ Add resolved attack to ledger</button>
-            </div>
+            <div class="hero-ledgers">
+                <article class="hero-ledger" data-side-index="0">
+                    <header class="hero-ledger-header">
+                        <div>
+                            <span>Hero 1</span>
+                            <h3 id="side0HeaderName">Combatant 1</h3>
+                        </div>
+                        <span>Attacker ledger</span>
+                    </header>
+                    <div class="hero-ledger-content">
+                        <div class="hero-setup">
+                            <div class="control-group">
+                                <label for="side0HeroSelect">Hero / ability set</label>
+                                <select id="side0HeroSelect">
+                                    <option value="">Loading heroes...</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="side0Name">Combatant name</label>
+                                <input id="side0Name" type="text" placeholder="e.g. Boss or custom name">
+                            </div>
+                            <div class="control-group">
+                                <label for="side0StartingHealth">Starting health</label>
+                                <input id="side0StartingHealth" type="number" min="1" step="1" value="50">
+                            </div>
+                        </div>
 
-            <div class="tracker-ledger">
-                <div class="tracker-ledger-heading">
-                    <div>
-                        <h3>Battle ledger</h3>
-                        <p>Rows can be added or removed in any order.</p>
+                        <div class="health-overview" aria-live="polite">
+                            <div class="health-stat">
+                                <span>Current health</span>
+                                <strong id="side0CurrentHealth">50</strong>
+                                <small id="side0HealthLabel">of 50 health</small>
+                            </div>
+                            <div class="health-bar-shell" aria-hidden="true">
+                                <div id="side0HealthBar" class="health-bar"></div>
+                            </div>
+                            <div class="health-stat">
+                                <span>Damage dealt</span>
+                                <strong id="side0DamageDealt">0</strong>
+                                <small id="side0IncomingSummary">Damage received: 0 · Defense: 0</small>
+                            </div>
+                        </div>
+
+                        <div class="entry-composer">
+                            <div class="entry-grid">
+                                <div class="control-group">
+                                    <label for="side0Ability">Resolved ability</label>
+                                    <select id="side0Ability">
+                                        <option value="">Choose an ability</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label for="side0Damage">Damage dealt</label>
+                                    <input id="side0Damage" type="number" min="0" step="1" value="0">
+                                </div>
+                                <div class="control-group">
+                                    <label for="side0Defense">Defense damage received</label>
+                                    <input id="side0Defense" type="number" min="0" step="1" value="0">
+                                </div>
+                            </div>
+                            <div class="control-group entry-effects">
+                                <label for="side0Effects">Other effects triggered</label>
+                                <input id="side0Effects" type="text" placeholder="e.g. Stun, 1 card, status applied">
+                            </div>
+                            <div id="side0Suggestions" class="tracker-suggestions" aria-live="polite"></div>
+                            <button class="tracker-add" type="button" onclick="addEntry(0)">＋ Add Hero 1 attack</button>
+                        </div>
+
+                        <div class="tracker-ledger">
+                            <div class="ledger-heading">
+                                <div>
+                                    <h4>Hero 1 ledger</h4>
+                                    <p>Defense damage here reduces Hero 1 health.</p>
+                                </div>
+                            </div>
+                            <div id="side0Ledger" class="ledger-table-wrap">
+                                <div class="tracker-empty">No attacks logged yet.</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="tracker-export-actions" aria-label="Export battle log">
-                        <button class="tracker-export" type="button" onclick="exportTrackerLog('csv')">⇩ Export CSV</button>
-                        <button class="tracker-export" type="button" onclick="exportTrackerLog('json')">⇩ Export JSON</button>
+                </article>
+
+                <article class="hero-ledger" data-side-index="1">
+                    <header class="hero-ledger-header">
+                        <div>
+                            <span>Hero 2</span>
+                            <h3 id="side1HeaderName">Combatant 2</h3>
+                        </div>
+                        <span>Attacker ledger</span>
+                    </header>
+                    <div class="hero-ledger-content">
+                        <div class="hero-setup">
+                            <div class="control-group">
+                                <label for="side1HeroSelect">Hero / ability set</label>
+                                <select id="side1HeroSelect">
+                                    <option value="">Loading heroes...</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <label for="side1Name">Combatant name</label>
+                                <input id="side1Name" type="text" placeholder="e.g. Rival or custom name">
+                            </div>
+                            <div class="control-group">
+                                <label for="side1StartingHealth">Starting health</label>
+                                <input id="side1StartingHealth" type="number" min="1" step="1" value="50">
+                            </div>
+                        </div>
+
+                        <div class="health-overview" aria-live="polite">
+                            <div class="health-stat">
+                                <span>Current health</span>
+                                <strong id="side1CurrentHealth">50</strong>
+                                <small id="side1HealthLabel">of 50 health</small>
+                            </div>
+                            <div class="health-bar-shell" aria-hidden="true">
+                                <div id="side1HealthBar" class="health-bar"></div>
+                            </div>
+                            <div class="health-stat">
+                                <span>Damage dealt</span>
+                                <strong id="side1DamageDealt">0</strong>
+                                <small id="side1IncomingSummary">Damage received: 0 · Defense: 0</small>
+                            </div>
+                        </div>
+
+                        <div class="entry-composer">
+                            <div class="entry-grid">
+                                <div class="control-group">
+                                    <label for="side1Ability">Resolved ability</label>
+                                    <select id="side1Ability">
+                                        <option value="">Choose an ability</option>
+                                    </select>
+                                </div>
+                                <div class="control-group">
+                                    <label for="side1Damage">Damage dealt</label>
+                                    <input id="side1Damage" type="number" min="0" step="1" value="0">
+                                </div>
+                                <div class="control-group">
+                                    <label for="side1Defense">Defense damage received</label>
+                                    <input id="side1Defense" type="number" min="0" step="1" value="0">
+                                </div>
+                            </div>
+                            <div class="control-group entry-effects">
+                                <label for="side1Effects">Other effects triggered</label>
+                                <input id="side1Effects" type="text" placeholder="e.g. Stun, 1 card, status applied">
+                            </div>
+                            <div id="side1Suggestions" class="tracker-suggestions" aria-live="polite"></div>
+                            <button class="tracker-add" type="button" onclick="addEntry(1)">＋ Add Hero 2 attack</button>
+                        </div>
+
+                        <div class="tracker-ledger">
+                            <div class="ledger-heading">
+                                <div>
+                                    <h4>Hero 2 ledger</h4>
+                                    <p>Defense damage here reduces Hero 2 health.</p>
+                                </div>
+                            </div>
+                            <div id="side1Ledger" class="ledger-table-wrap">
+                                <div class="tracker-empty">No attacks logged yet.</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div id="trackerLedger" class="tracker-ledger-table-wrap">
-                    <div class="tracker-empty">No resolved attacks yet. Add the first entry above.</div>
-                </div>
+                </article>
             </div>
-        </section>
+        </main>
     </div>
 
     <script src="/js/telemetry-client.js"></script>
     <script>
-        let currentHero = null;
-        const customTrackerHeroValue = '__custom__';
         const apiFetch = window.telemetryClient.apiFetch;
         const trackVisit = window.telemetryClient.trackVisit;
-
-        let trackerState = {
-            hero: null,
-            name: 'Combatant',
-            startingHealth: 50,
-            entries: []
-        };
-        let trackerSuggestions = [];
-
-        // Evaluation config (mirrors EvaluationConfig model)
-        let evalConfig = {
-            healValue: 1,
-            cardValue: 3,
-            cpValue: 1,
-            defaultTokenValue: 2,
-            enemyDefenseDelta: 3,
-            tokenValues: {}
-        };
+        const customHeroValue = '__custom__';
+        const sides = [
+            { hero: null, name: 'Combatant 1', startingHealth: 50, entries: [] },
+            { hero: null, name: 'Combatant 2', startingHealth: 50, entries: [] }
+        ];
+        let heroes = [];
+        let suggestionState = [{}, {}];
 
         function escapeHtml(value) {
             return String(value ?? '')
@@ -530,38 +677,61 @@
                 .replace(/'/g, '&#039;');
         }
 
-        function getTrackerAbility() {
-            const value = document.getElementById('trackerAbility').value;
-            if (value === 'custom') {
-                return {
-                    name: document.getElementById('trackerCustomAbility').value.trim(),
-                    custom: true
-                };
-            }
+        function sideElement(sideIndex, suffix) {
+            return document.getElementById('side' + sideIndex + suffix);
+        }
 
-            if (!value || !trackerState.hero?.objectives) {
+        function sideTitle(sideIndex) {
+            return sides[sideIndex].name || ('Combatant ' + (sideIndex + 1));
+        }
+
+        function getSideSummary(sideIndex) {
+            const side = sides[sideIndex];
+            const opponent = sides[sideIndex === 0 ? 1 : 0];
+            const damageDealt = side.entries.reduce((sum, entry) => sum + entry.damage, 0);
+            const defenseReceived = side.entries.reduce((sum, entry) => sum + entry.defenseDamage, 0);
+            const damageReceived = opponent.entries.reduce((sum, entry) => sum + entry.damage, 0);
+            const totalHealthLoss = defenseReceived + damageReceived;
+
+            return {
+                damageDealt,
+                defenseReceived,
+                damageReceived,
+                currentHealth: Math.max(0, side.startingHealth - totalHealthLoss),
+                healthPercent: side.startingHealth > 0
+                    ? Math.min(100, Math.max(0, ((side.startingHealth - totalHealthLoss) / side.startingHealth) * 100))
+                    : 0
+            };
+        }
+
+        function getSelectedAbility(sideIndex) {
+            const value = sideElement(sideIndex, 'Ability').value;
+            if (value === 'custom') {
+                return { name: 'Custom attack', custom: true };
+            }
+            if (!value || !sides[sideIndex].hero?.objectives) {
                 return null;
             }
-
-            return trackerState.hero.objectives[parseInt(value, 10)] || null;
+            return sides[sideIndex].hero.objectives[parseInt(value, 10)] || null;
         }
 
-        function populateTrackerAbilities() {
-            const select = document.getElementById('trackerAbility');
-            const objectives = trackerState.hero?.objectives || [];
-            select.innerHTML = '<option value="">Choose an ability</option>' + objectives.map((objective, index) => {
-                const damage = Number(objective.damage || 0);
-                const suffix = damage > 0 ? ` · ${damage} damage` : '';
-                return `<option value="${index}">${escapeHtml(objective.name)}${suffix}</option>`;
-            }).join('') + '<option value="custom">Custom ability</option>';
-            document.getElementById('trackerCustomAbilityWrap').hidden = true;
-            renderTrackerSuggestions();
+        function populateAbilities(sideIndex) {
+            const select = sideElement(sideIndex, 'Ability');
+            const objectives = sides[sideIndex].hero?.objectives || [];
+            select.innerHTML = '<option value="">Choose an ability</option>' +
+                objectives.map((objective, index) => {
+                    const damage = Number(objective.damage || 0);
+                    const suffix = damage > 0 ? ' · ' + damage + ' damage' : '';
+                    return '<option value="' + index + '">' + escapeHtml(objective.name) + suffix + '</option>';
+                }).join('') +
+                '<option value="custom">Custom attack</option>';
+            renderSuggestions(sideIndex);
         }
 
-        function renderTrackerSuggestions() {
-            const container = document.getElementById('trackerSuggestions');
-            const ability = getTrackerAbility();
-            trackerSuggestions = [];
+        function renderSuggestions(sideIndex) {
+            const container = sideElement(sideIndex, 'Suggestions');
+            const ability = getSelectedAbility(sideIndex);
+            suggestionState[sideIndex] = {};
 
             if (!ability) {
                 container.innerHTML = '<span class="tracker-suggestions-label">Suggestions appear when an ability is selected.</span>';
@@ -569,181 +739,195 @@
             }
 
             if (ability.custom) {
-                container.innerHTML = '<span class="tracker-suggestions-label">Custom ability: enter damage and effects manually.</span>';
+                container.innerHTML = '<span class="tracker-suggestions-label">Custom attack: enter damage and effects manually.</span>';
                 return;
             }
 
+            const suggestions = [];
             if (Number(ability.damage || 0) > 0) {
-                trackerSuggestions.push({
-                    type: 'damage',
-                    value: Number(ability.damage),
-                    label: `Use ${Number(ability.damage)} damage`
-                });
+                suggestions.push({ type: 'damage', value: Number(ability.damage), label: 'Use ' + Number(ability.damage) + ' damage' });
             }
 
-            const effectLabels = [];
+            const effects = [];
             if (Number(ability.heal || 0) !== 0) {
-                effectLabels.push(ability.heal > 0 ? `Heal +${ability.heal}` : `Self-damage ${ability.heal}`);
+                effects.push(ability.heal > 0 ? 'Heal +' + ability.heal : 'Self-damage ' + ability.heal);
             }
             if (Number(ability.cards || 0) !== 0) {
-                effectLabels.push(`${ability.cards} card${ability.cards === 1 ? '' : 's'}`);
+                effects.push(ability.cards + ' card' + (ability.cards === 1 ? '' : 's'));
             }
             if (Number(ability.cp || 0) !== 0) {
-                effectLabels.push(`${ability.cp > 0 ? '+' : ''}${ability.cp} CP`);
+                effects.push((ability.cp > 0 ? '+' : '') + ability.cp + ' CP');
             }
-            (ability.tokens || []).forEach(token => effectLabels.push(token));
-
-            if (effectLabels.length > 0) {
-                trackerSuggestions.push({
+            (ability.tokens || []).forEach(token => effects.push(token));
+            if (effects.length > 0) {
+                suggestions.push({
                     type: 'effects',
-                    value: effectLabels.join(', '),
-                    label: `Add ${effectLabels.join(' · ')}`
+                    value: effects.join(', '),
+                    label: 'Add ' + effects.join(' · ')
                 });
             }
 
-            if (trackerSuggestions.length === 0) {
+            suggestionState[sideIndex] = suggestions;
+            if (suggestions.length === 0) {
                 container.innerHTML = '<span class="tracker-suggestions-label">No extra effects are listed for this ability.</span>';
                 return;
             }
 
-            container.innerHTML = '<span class="tracker-suggestions-label">Suggested from ability:</span>' + trackerSuggestions.map((suggestion, index) =>
-                `<button type="button" class="tracker-chip" data-suggestion-index="${index}">${escapeHtml(suggestion.label)}</button>`
-            ).join('');
+            container.innerHTML = '<span class="tracker-suggestions-label">Suggested from ability:</span>' +
+                suggestions.map((suggestion, index) =>
+                    '<button type="button" class="tracker-chip" data-suggestion-index="' + index + '">' +
+                    escapeHtml(suggestion.label) + '</button>'
+                ).join('');
             container.querySelectorAll('[data-suggestion-index]').forEach(button => {
-                button.addEventListener('click', () => applyTrackerSuggestion(trackerSuggestions[parseInt(button.dataset.suggestionIndex, 10)]));
+                button.addEventListener('click', () => {
+                    const suggestion = suggestionState[sideIndex][parseInt(button.dataset.suggestionIndex, 10)];
+                    if (suggestion.type === 'damage') {
+                        sideElement(sideIndex, 'Damage').value = suggestion.value;
+                        sideElement(sideIndex, 'Damage').focus();
+                    } else {
+                        const input = sideElement(sideIndex, 'Effects');
+                        input.value = input.value.trim()
+                            ? input.value.trim() + ', ' + suggestion.value
+                            : suggestion.value;
+                        input.focus();
+                    }
+                });
             });
         }
 
-        function applyTrackerSuggestion(suggestion) {
-            if (!suggestion) return;
-
-            if (suggestion.type === 'damage') {
-                document.getElementById('trackerDamage').value = suggestion.value;
-                document.getElementById('trackerDamage').focus();
-                return;
-            }
-
-            const effectsInput = document.getElementById('trackerEffects');
-            effectsInput.value = effectsInput.value.trim()
-                ? `${effectsInput.value.trim()}, ${suggestion.value}`
-                : suggestion.value;
-            effectsInput.focus();
-        }
-
-        function renderBattleTracker() {
-            const totalDamage = trackerState.entries.reduce((sum, entry) => sum + entry.damage, 0);
-            const currentHealth = Math.max(0, trackerState.startingHealth - totalDamage);
-            const healthPercent = trackerState.startingHealth > 0
-                ? Math.min(100, (currentHealth / trackerState.startingHealth) * 100)
-                : 0;
-
-            document.getElementById('trackerCombatantLabel').textContent = trackerState.name || 'Combatant';
-            document.getElementById('trackerCurrentHealth').textContent = currentHealth;
-            document.getElementById('trackerHealthLabel').textContent = currentHealth > 0
-                ? `of ${trackerState.startingHealth} health`
+        function renderSide(sideIndex) {
+            const side = sides[sideIndex];
+            const summary = getSideSummary(sideIndex);
+            sideElement(sideIndex, 'HeaderName').textContent = sideTitle(sideIndex);
+            sideElement(sideIndex, 'CurrentHealth').textContent = summary.currentHealth;
+            sideElement(sideIndex, 'HealthLabel').textContent = summary.currentHealth > 0
+                ? 'of ' + side.startingHealth + ' health'
                 : 'defeated';
-            document.getElementById('trackerTotalDamage').textContent = totalDamage;
-            const healthBar = document.getElementById('trackerHealthBar');
-            healthBar.style.width = `${healthPercent}%`;
-            healthBar.className = `health-bar${healthPercent === 0 ? ' empty' : healthPercent <= 30 ? ' low' : ''}`;
+            sideElement(sideIndex, 'DamageDealt').textContent = summary.damageDealt;
+            sideElement(sideIndex, 'IncomingSummary').textContent =
+                'Damage received: ' + summary.damageReceived + ' · Defense: ' + summary.defenseReceived;
 
-            const ledger = document.getElementById('trackerLedger');
-            if (trackerState.entries.length === 0) {
-                ledger.innerHTML = '<div class="tracker-empty">No resolved attacks yet. Add the first entry above.</div>';
+            const healthBar = sideElement(sideIndex, 'HealthBar');
+            healthBar.style.width = summary.healthPercent + '%';
+            healthBar.className = 'health-bar' +
+                (summary.healthPercent === 0 ? ' empty' : summary.healthPercent <= 30 ? ' low' : '');
+
+            const ledger = sideElement(sideIndex, 'Ledger');
+            if (side.entries.length === 0) {
+                ledger.innerHTML = '<div class="tracker-empty">No attacks logged yet.</div>';
                 return;
             }
 
-            ledger.innerHTML = `
-                <table class="tracker-ledger-table">
-                    <thead>
-                        <tr><th>#</th><th>Resolved ability</th><th>Damage</th><th>Other effects</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                        ${trackerState.entries.map((entry, index) => `
-                            <tr>
-                                <td>${index + 1}</td>
-                                <td><strong>${escapeHtml(entry.ability)}</strong></td>
-                                <td class="damage-cell">${entry.damage}</td>
-                                <td class="effects-cell">${escapeHtml(entry.effects || '—')}</td>
-                                <td><button type="button" class="tracker-remove" data-entry-id="${entry.id}">Remove</button></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>`;
-
+            ledger.innerHTML =
+                '<table class="ledger-table">' +
+                    '<thead><tr><th>#</th><th>Resolved ability</th><th>Damage dealt</th><th>Defense received</th><th>Other effects</th><th></th></tr></thead>' +
+                    '<tbody>' +
+                    side.entries.map((entry, index) =>
+                        '<tr>' +
+                            '<td>' + (index + 1) + '</td>' +
+                            '<td><strong>' + escapeHtml(entry.ability) + '</strong></td>' +
+                            '<td class="damage-cell">' + entry.damage + '</td>' +
+                            '<td class="defense-cell">' + entry.defenseDamage + '</td>' +
+                            '<td class="effects-cell">' + escapeHtml(entry.effects || '—') + '</td>' +
+                            '<td><button type="button" class="tracker-remove" data-entry-id="' + entry.id + '">Remove</button></td>' +
+                        '</tr>'
+                    ).join('') +
+                    '</tbody>' +
+                '</table>';
             ledger.querySelectorAll('[data-entry-id]').forEach(button => {
-                button.addEventListener('click', () => removeBattleTrackerEntry(button.dataset.entryId));
+                button.addEventListener('click', () => removeEntry(sideIndex, button.dataset.entryId));
             });
         }
 
-        function resetBattleTracker() {
-            const startingHealth = parseInt(document.getElementById('trackerStartingHealth').value, 10);
-            if (!Number.isInteger(startingHealth) || startingHealth < 1) {
-                alert('Starting health must be a whole number greater than 0.');
-                return;
-            }
-
-            trackerState.startingHealth = startingHealth;
-            trackerState.name = document.getElementById('trackerName').value.trim() || 'Combatant';
-            trackerState.entries = [];
-            renderBattleTracker();
+        function renderAll() {
+            renderSide(0);
+            renderSide(1);
         }
 
-        function addBattleTrackerEntry() {
-            const ability = getTrackerAbility();
-            const abilityName = ability?.name || document.getElementById('trackerCustomAbility').value.trim();
-            const damage = parseInt(document.getElementById('trackerDamage').value, 10);
-
-            if (!abilityName) {
-                alert('Choose an ability or enter a custom ability name.');
-                return;
-            }
-            if (!Number.isInteger(damage) || damage < 0) {
-                alert('Damage dealt must be a whole number of 0 or more.');
-                return;
+        function resetBattle() {
+            for (let sideIndex = 0; sideIndex < sides.length; sideIndex++) {
+                const health = parseInt(sideElement(sideIndex, 'StartingHealth').value, 10);
+                if (!Number.isInteger(health) || health < 1) {
+                    alert('Starting health for both heroes must be a whole number greater than 0.');
+                    return;
+                }
             }
 
-            trackerState.entries.push({
-                id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-                ability: abilityName,
+            sides.forEach((side, sideIndex) => {
+                side.startingHealth = parseInt(sideElement(sideIndex, 'StartingHealth').value, 10);
+                side.name = sideElement(sideIndex, 'Name').value.trim() || ('Combatant ' + (sideIndex + 1));
+                side.entries = [];
+            });
+            renderAll();
+        }
+
+        function addEntry(sideIndex) {
+            const ability = getSelectedAbility(sideIndex);
+            const damage = parseInt(sideElement(sideIndex, 'Damage').value, 10);
+            const defenseDamage = parseInt(sideElement(sideIndex, 'Defense').value, 10);
+
+            if (!ability) {
+                alert('Choose a resolved ability before adding an attack.');
+                return;
+            }
+            if (!Number.isInteger(damage) || damage < 0 || !Number.isInteger(defenseDamage) || defenseDamage < 0) {
+                alert('Damage and defense damage must be whole numbers of 0 or more.');
+                return;
+            }
+
+            sides[sideIndex].entries.push({
+                id: Date.now() + '-' + Math.random().toString(16).slice(2),
+                ability: ability.name,
                 damage,
-                effects: document.getElementById('trackerEffects').value.trim()
+                defenseDamage,
+                effects: sideElement(sideIndex, 'Effects').value.trim()
             });
-            renderBattleTracker();
-            document.getElementById('trackerDamage').value = '0';
-            document.getElementById('trackerEffects').value = '';
+            renderAll();
+            sideElement(sideIndex, 'Damage').value = '0';
+            sideElement(sideIndex, 'Defense').value = '0';
+            sideElement(sideIndex, 'Effects').value = '';
         }
 
-        function removeBattleTrackerEntry(entryId) {
-            trackerState.entries = trackerState.entries.filter(entry => entry.id !== entryId);
-            renderBattleTracker();
+        function removeEntry(sideIndex, entryId) {
+            sides[sideIndex].entries = sides[sideIndex].entries.filter(entry => entry.id !== entryId);
+            renderAll();
         }
 
-        function getTrackerExportPayload() {
-            const totalDamage = trackerState.entries.reduce((sum, entry) => sum + entry.damage, 0);
+        function getExportPayload() {
             return {
-                combatantName: trackerState.name || 'Combatant',
-                abilitySet: trackerState.hero?.name || 'Custom ability set',
-                startingHealth: trackerState.startingHealth,
-                currentHealth: Math.max(0, trackerState.startingHealth - totalDamage),
-                totalDamage,
-                entries: trackerState.entries.map((entry, index) => ({
-                    number: index + 1,
-                    ability: entry.ability,
-                    damage: entry.damage,
-                    effects: entry.effects || ''
-                }))
+                exportedAt: new Date().toISOString(),
+                noTurnOrder: true,
+                sides: sides.map((side, sideIndex) => {
+                    const summary = getSideSummary(sideIndex);
+                    return {
+                        side: 'Hero ' + (sideIndex + 1),
+                        combatantName: sideTitle(sideIndex),
+                        abilitySet: side.hero?.name || 'Custom ability set',
+                        startingHealth: side.startingHealth,
+                        currentHealth: summary.currentHealth,
+                        damageDealt: summary.damageDealt,
+                        damageReceived: summary.damageReceived,
+                        defenseDamageReceived: summary.defenseReceived,
+                        entries: side.entries.map((entry, index) => ({
+                            number: index + 1,
+                            ability: entry.ability,
+                            damageDealt: entry.damage,
+                            defenseDamageReceived: entry.defenseDamage,
+                            effects: entry.effects || ''
+                        }))
+                    };
+                })
             };
         }
 
-        function getTrackerFilenamePart(value) {
+        function filenamePart(value) {
             return String(value || 'combatant')
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/^-|-$/g, '') || 'combatant';
         }
 
-        function downloadTrackerFile(content, filename, mimeType) {
+        function downloadFile(content, filename, mimeType) {
             const blob = new Blob([content], { type: mimeType });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -755,113 +939,125 @@
             window.setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
-        function escapeCsvCell(value) {
+        function csvCell(value) {
             const text = String(value ?? '');
-            return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+            return /[",\r\n]/.test(text) ? '"' + text.replace(/"/g, '""') + '"' : text;
         }
 
         function exportTrackerLog(format) {
-            const payload = getTrackerExportPayload();
-            const filenamePart = getTrackerFilenamePart(payload.combatantName);
+            const payload = getExportPayload();
+            const fileBase = 'battle-log-' + filenamePart(payload.sides[0].combatantName) + '-vs-' + filenamePart(payload.sides[1].combatantName);
 
             if (format === 'json') {
-                downloadTrackerFile(
-                    JSON.stringify(payload, null, 2),
-                    `${filenamePart}-battle-log.json`,
-                    'application/json'
-                );
+                downloadFile(JSON.stringify(payload, null, 2), fileBase + '.json', 'application/json');
                 return;
             }
 
             const rows = [
                 ['Battle Tracker Log'],
-                ['Combatant', payload.combatantName],
-                ['Ability set', payload.abilitySet],
-                ['Starting health', payload.startingHealth],
-                ['Current health', payload.currentHealth],
-                ['Total damage', payload.totalDamage],
+                ['Exported at', payload.exportedAt],
                 [],
-                ['#', 'Resolved ability', 'Damage', 'Other effects'],
-                ...payload.entries.map(entry => [entry.number, entry.ability, entry.damage, entry.effects])
+                ...payload.sides.flatMap(side => [
+                    [side.side],
+                    ['Combatant', side.combatantName],
+                    ['Ability set', side.abilitySet],
+                    ['Starting health', side.startingHealth],
+                    ['Current health', side.currentHealth],
+                    ['Damage dealt', side.damageDealt],
+                    ['Damage received', side.damageReceived],
+                    ['Defense damage received', side.defenseDamageReceived],
+                    [],
+                    ['#', 'Resolved ability', 'Damage dealt', 'Defense damage received', 'Other effects'],
+                    ...side.entries.map(entry => [
+                        entry.number,
+                        entry.ability,
+                        entry.damageDealt,
+                        entry.defenseDamageReceived,
+                        entry.effects
+                    ]),
+                    []
+                ])
             ];
-            const csv = rows.map(row => row.map(escapeCsvCell).join(',')).join('\r\n');
-            downloadTrackerFile(`\ufeff${csv}\r\n`, `${filenamePart}-battle-log.csv`, 'text/csv;charset=utf-8');
+            const csv = rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+            downloadFile('\ufeff' + csv + '\r\n', fileBase + '.csv', 'text/csv;charset=utf-8');
         }
 
-        async function loadTrackerHero(heroId) {
-            if (heroId === customTrackerHeroValue) {
-                trackerState.hero = null;
-                trackerState.name = '';
-                document.getElementById('trackerName').value = '';
-                populateTrackerAbilities();
-                renderBattleTracker();
+        async function loadHeroForSide(sideIndex, heroId) {
+            if (heroId === customHeroValue) {
+                sides[sideIndex].hero = null;
+                sides[sideIndex].name = 'Combatant ' + (sideIndex + 1);
+                sideElement(sideIndex, 'Name').value = '';
+                populateAbilities(sideIndex);
+                renderAll();
                 return;
             }
 
             try {
-                const hero = currentHero?.id === heroId
-                    ? currentHero
-                    : await (await apiFetch(`/api/heroes/${heroId}`)).json();
-                trackerState.hero = hero;
-                trackerState.name = hero.name;
-                document.getElementById('trackerName').value = hero.name;
-                populateTrackerAbilities();
-                renderBattleTracker();
+                const response = await apiFetch('/api/heroes/' + heroId);
+                const hero = await response.json();
+                sides[sideIndex].hero = hero;
+                sides[sideIndex].name = hero.name;
+                sideElement(sideIndex, 'Name').value = hero.name;
+                populateAbilities(sideIndex);
+                renderAll();
             } catch (error) {
-                console.error('Error loading tracker hero:', error);
+                console.error('Error loading hero for tracker:', error);
             }
         }
-
 
         async function loadHeroes() {
             try {
                 const response = await apiFetch('/api/heroes');
-                const heroes = await response.json();
-                const trackerSelect = document.getElementById('trackerHeroSelect');
-                trackerSelect.innerHTML = heroes.map(hero =>
-                    `<option value="${hero.id}">${hero.name}</option>`
-                ).join('') + `<option value="${customTrackerHeroValue}">Custom ability set</option>`;
+                heroes = await response.json();
+                for (let sideIndex = 0; sideIndex < sides.length; sideIndex++) {
+                    const select = sideElement(sideIndex, 'HeroSelect');
+                    select.innerHTML = heroes.map(hero =>
+                        '<option value="' + hero.id + '">' + escapeHtml(hero.name) + '</option>'
+                    ).join('') + '<option value="' + customHeroValue + '">Custom name / ability set</option>';
+                }
 
                 if (heroes.length > 0) {
-                    trackerSelect.value = heroes[0].id;
-                    await loadTrackerHero(heroes[0].id);
+                    sideElement(0, 'HeroSelect').value = heroes[0].id;
+                    await loadHeroForSide(0, heroes[0].id);
+                    const secondHero = heroes.length > 1 ? heroes[1] : heroes[0];
+                    sideElement(1, 'HeroSelect').value = secondHero.id;
+                    await loadHeroForSide(1, secondHero.id);
                 } else {
-                    await loadTrackerHero(customTrackerHeroValue);
+                    await loadHeroForSide(0, customHeroValue);
+                    await loadHeroForSide(1, customHeroValue);
                 }
             } catch (error) {
                 console.error('Error loading tracker heroes:', error);
-                document.getElementById('trackerHeroSelect').innerHTML = `<option value="${customTrackerHeroValue}">Custom ability set</option>`;
-                await loadTrackerHero(customTrackerHeroValue);
+                for (let sideIndex = 0; sideIndex < sides.length; sideIndex++) {
+                    sideElement(sideIndex, 'HeroSelect').innerHTML =
+                        '<option value="' + customHeroValue + '">Custom name / ability set</option>';
+                    await loadHeroForSide(sideIndex, customHeroValue);
+                }
             }
         }
-        document.getElementById('trackerHeroSelect').addEventListener('change', (e) => {
-            loadTrackerHero(e.target.value);
-        });
 
-        document.getElementById('trackerAbility').addEventListener('change', (e) => {
-            document.getElementById('trackerCustomAbilityWrap').hidden = e.target.value !== 'custom';
-            renderTrackerSuggestions();
-            if (e.target.value === 'custom') {
-                document.getElementById('trackerCustomAbility').focus();
-            }
-        });
+        for (let sideIndex = 0; sideIndex < sides.length; sideIndex++) {
+            sideElement(sideIndex, 'HeroSelect').addEventListener('change', event => {
+                loadHeroForSide(sideIndex, event.target.value);
+            });
+            sideElement(sideIndex, 'Ability').addEventListener('change', () => {
+                renderSuggestions(sideIndex);
+            });
+            sideElement(sideIndex, 'Name').addEventListener('input', event => {
+                sides[sideIndex].name = event.target.value.trim() || ('Combatant ' + (sideIndex + 1));
+                renderAll();
+            });
+            sideElement(sideIndex, 'StartingHealth').addEventListener('input', event => {
+                if (sides[sideIndex].entries.length > 0) return;
+                const health = parseInt(event.target.value, 10);
+                if (Number.isInteger(health) && health > 0) {
+                    sides[sideIndex].startingHealth = health;
+                    renderAll();
+                }
+            });
+        }
 
-        document.getElementById('trackerName').addEventListener('input', (e) => {
-            trackerState.name = e.target.value.trim() || 'Combatant';
-            renderBattleTracker();
-        });
-
-        document.getElementById('trackerStartingHealth').addEventListener('input', (e) => {
-            if (trackerState.entries.length > 0) return;
-            const startingHealth = parseInt(e.target.value, 10);
-            if (Number.isInteger(startingHealth) && startingHealth > 0) {
-                trackerState.startingHealth = startingHealth;
-                renderBattleTracker();
-            }
-        });
-
-
-        renderBattleTracker();
+        renderAll();
         trackVisit('battle-tracker');
         loadHeroes();
     </script>
