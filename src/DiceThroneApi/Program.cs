@@ -1,10 +1,14 @@
 using DiceThroneApi.Services;
+using DiceThroneApi.Mcp;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddMcpServer()
+    .WithHttpTransport(options => options.Stateless = true)
+    .WithTools<DiceThroneMcpTools>();
 
 builder.Services.AddCors(options =>
 {
@@ -37,5 +41,6 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
+app.MapMcp("/mcp");
 
 app.Run();

@@ -84,6 +84,10 @@ Open your browser to the displayed URL to access the interactive web interface.
 - `GET /api/telemetry` - View aggregated telemetry totals (all environments; uses in-memory fallback if flat-file storage is unavailable)
 - `POST /api/telemetry/visit` - Record a page visit (all environments; uses in-memory fallback if flat-file storage is unavailable)
 
+### MCP
+
+The site also exposes a stateless Streamable HTTP MCP server at `/mcp`. It advertises `simulate_roll`, `calculate_probability`, and `set_dice`, returning structured results. Point an MCP client at `http://localhost:5022/mcp` while the app is running.
+
 ### Agent CLI
 
 The `DiceThroneCli` project exposes the same calculation services without requiring a running web server. Successful commands emit JSON on stdout; failures emit a JSON error on stderr and exit with code 2.
