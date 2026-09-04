@@ -12,6 +12,47 @@ namespace DiceThroneApi.Mcp;
 [McpServerToolType]
 public sealed class DiceThroneMcpTools
 {
+    [McpServerTool(Name = "create_deck", UseStructuredContent = true)]
+    [Description("Create a tracked deck from cards. Each card has a name, cost, playPhase, and effect. The returned deckId is required for every later deck operation. Card order is preserved until shuffled.")]
+    public static DeckSnapshot CreateDeck(DeckService decks, [Description("Cards to add to the deck. Example: { name: 'So Wild', cost: 2, playPhase: 'Any', effect: 'Change any 1 die value' }.")] List<Card> cards)
+        => decks.Create(cards);
+
+    [McpServerTool(Name = "shuffle_deck", UseStructuredContent = true)]
+    [Description("Shuffle a deck. Shuffling hides and invalidates all previously revealed top cards.")]
+    public static DeckSnapshot ShuffleDeck(DeckService decks, string deckId) => decks.Shuffle(deckId);
+
+    [McpServerTool(Name = "draw_cards", UseStructuredContent = true)]
+    [Description("Draw cards from a deck. Drawn cards are returned and placed in a pending-draw zone until put into hand or discard.")]
+    public static IReadOnlyList<Card> DrawCards(DeckService decks, string deckId, int count = 1) => decks.Draw(deckId, count);
+
+    [McpServerTool(Name = "put_cards", UseStructuredContent = true)]
+    [Description("Put cards from the pending-draw zone into hand, discard, or inPlay. Cards must have been drawn from this deck and not already placed.")]
+    public static DeckSnapshot PutCards(DeckService decks, string deckId, List<string> cards, string destination = "hand")
+        => decks.Put(deckId, cards, destination);
+
+    [McpServerTool(Name = "move_cards", UseStructuredContent = true)]
+    [Description("Move cards between deck, pending, hand, discard, and inPlay. For deck as source, provide count to move cards from the top without revealing the remaining deck. For other sources, provide card names. Use position top or bottom when the destination is deck.")]
+    public static DeckSnapshot MoveCards(DeckService decks, string deckId, string source, string destination, List<string>? cards = null, int? count = null, string position = "top")
+        => decks.Move(deckId, source, destination, cards, count, position);
+
+    [McpServerTool(Name = "move_discard_into_deck", UseStructuredContent = true)]
+    [Description("Move every discarded card into the deck. Optionally shuffle afterward.")]
+    public static DeckSnapshot MoveDiscardIntoDeck(DeckService decks, string deckId, bool shuffle = false)
+        => decks.MoveDiscardIntoDeck(deckId, shuffle);
+
+    [McpServerTool(Name = "place_cards", UseStructuredContent = true)]
+    [Description("Move cards from hand, discard, or inPlay to the top or bottom of the deck. This changes deck order and clears reveal knowledge.")]
+    public static DeckSnapshot PlaceCards(DeckService decks, string deckId, List<string> cards, string source, string position)
+        => decks.Place(deckId, cards, source, position);
+
+    [McpServerTool(Name = "reveal_cards", UseStructuredContent = true)]
+    [Description("Reveal the next cards without removing them. Only cards explicitly revealed remain visible in later deck status results, and shuffling clears that knowledge.")]
+    public static IReadOnlyList<Card> RevealCards(DeckService decks, string deckId, int count = 1) => decks.Reveal(deckId, count);
+
+    [McpServerTool(Name = "deck_status", UseStructuredContent = true)]
+    [Description("Return deck zone counts and cards previously revealed from the top. It never exposes unrevealed deck contents or the next card.")]
+    public static DeckSnapshot DeckStatus(DeckService decks, string deckId) => decks.GetSnapshot(deckId);
+
     [McpServerTool(Name = "simulate_roll", UseStructuredContent = true)]
     [Description("Roll Dice Throne dice for a hero and return the resulting dice plus ranked objective suggestions.")]
     public static async Task<RollToolResult> SimulateRoll(

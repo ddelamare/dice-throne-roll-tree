@@ -86,7 +86,7 @@ Open your browser to the displayed URL to access the interactive web interface.
 
 ### MCP
 
-The site also exposes a stateless Streamable HTTP MCP server at `/mcp`. It advertises `simulate_roll`, `calculate_probability`, and `set_dice`, returning structured results. Point an MCP client at `http://localhost:5022/mcp` while the app is running.
+The site also exposes a Streamable HTTP MCP server at `/mcp`. It advertises roll/probability tools plus server-tracked deck tools: `create_deck`, `shuffle_deck`, `draw_cards`, `put_cards`, `move_cards`, `move_discard_into_deck`, `place_cards`, `reveal_cards`, and `deck_status`. Cards have `name`, `cost`, `playPhase`, and `effect` fields; for example, `{ "name": "So Wild", "cost": 2, "playPhase": "Any", "effect": "Change any 1 die value" }`. Decks track `deck`, `pending`, `hand`, `discard`, and `inPlay` zones; `move_cards` can move cards between any of them. `create_deck` returns an opaque `deckId` required by subsequent calls. Unrevealed deck contents are never returned; shuffling clears previously revealed-card knowledge. Point an MCP client at `http://localhost:5022/mcp` while the app is running.
 
 ### Agent CLI
 

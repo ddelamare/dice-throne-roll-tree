@@ -27,6 +27,7 @@ builder.Services.AddSingleton<MonteCarloSimulator>();
 builder.Services.AddSingleton<DiceRollAdvisor>();
 builder.Services.AddSingleton<HeroService>();
 builder.Services.AddSingleton<TelemetryService>();
+builder.Services.AddSingleton<DeckService>();
 
 var app = builder.Build();
 
