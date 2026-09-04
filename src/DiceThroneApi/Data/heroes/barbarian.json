@@ -1,6 +1,7 @@
 {
   "id": "barbarian",
   "name": "Barbarian",
+  "tokenValues": { "Stun": 4 },
   "objectives": [
     { "name": "Smack (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Smack (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },

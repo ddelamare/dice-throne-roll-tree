@@ -71,8 +71,8 @@ internal static class Program
         var dice = ParseDice(o.Required("dice"));
         ValidateRollInputs(dice.Count, o.Int("rerolls", 2));
         ValidateMethod(o.String("method", "analytic"));
-        var objectives = await LoadObjectives(o, parser);
-        var advice = advisor.GetAdvice(dice, o.Int("rerolls", 2), objectives, o.String("method", "analytic"), eval: ParseEvaluation(o));
+        var selection = await LoadObjectives(o, parser);
+        var advice = advisor.GetAdvice(dice, o.Int("rerolls", 2), selection.Objectives, o.String("method", "analytic"), eval: ParseEvaluation(o, selection.TokenValues));
         return new { command = "advice", dice, rollsRemaining = o.Int("rerolls", 2), advice };
     }
 
@@ -81,13 +81,13 @@ internal static class Program
         var dice = ParseDice(o.Required("dice"));
         ValidateRollInputs(dice.Count, o.Int("rerolls", 2));
         ValidateMethod(o.String("method", "analytic"));
-        var objectives = await LoadObjectives(o, parser);
-        if (objectives.Count < 2)
+        var selection = await LoadObjectives(o, parser);
+        if (selection.Objectives.Count < 2)
             throw new CliException("compare requires at least two --objective values.");
 
         var rolls = o.Int("rerolls", 2);
-        var advice = advisor.GetAdvice(dice, rolls, objectives, o.String("method", "analytic"), eval: ParseEvaluation(o));
-        var best = advisor.GetBestOverallStrategy(dice, rolls, objectives, ParseEvaluation(o));
+        var advice = advisor.GetAdvice(dice, rolls, selection.Objectives, o.String("method", "analytic"), eval: ParseEvaluation(o, selection.TokenValues));
+        var best = advisor.GetBestOverallStrategy(dice, rolls, selection.Objectives, ParseEvaluation(o, selection.TokenValues));
         return new { command = "compare", dice, rollsRemaining = rolls, best, strategies = advice };
     }
 
@@ -100,8 +100,9 @@ internal static class Program
             throw new CliException("rolltree requires at least 2 rolls remaining.");
 
         var heroId = o.String("hero", "forgemaster");
-        var objectives = await LoadObjectives(CliOptions.Parse(new[] { "--hero", heroId }), parser);
-        var eval = ParseEvaluation(o);
+        var selection = await LoadObjectives(CliOptions.Parse(new[] { "--hero", heroId }), parser);
+        var objectives = selection.Objectives;
+        var eval = ParseEvaluation(o, selection.TokenValues);
         var entries = new List<RollTreeEntry>();
 
         var startingDice = o.Has("start-dice")
@@ -223,24 +224,24 @@ internal static class Program
     {
         var service = new HeroService(new CliEnvironment(AppContext.BaseDirectory), parser);
         var heroes = await service.GetAllHeroesAsync();
-        return new { command = "heroes", heroes = heroes.Select(h => new { h.Id, h.Name, objectives = h.Objectives.Select(o => new { o.Name, o.Notation, o.Damage, o.Heal, o.Cards, o.Cp, o.Tokens }) }) };
+        return new { command = "heroes", heroes = heroes.Select(h => new { h.Id, h.Name, tokenValues = h.TokenValues, objectives = h.Objectives.Select(o => new { o.Name, o.Notation, o.Damage, o.Heal, o.Cards, o.Cp, o.Tokens }) }) };
     }
 
-    private static async Task<List<RollObjective>> LoadObjectives(CliOptions o, DiceNotationParser parser)
+    private static async Task<ObjectiveSelection> LoadObjectives(CliOptions o, DiceNotationParser parser)
     {
         if (o.Has("hero"))
         {
             var service = new HeroService(new CliEnvironment(AppContext.BaseDirectory), parser);
             var hero = await service.GetHeroByIdAsync(o.Required("hero"));
             if (hero == null) throw new CliException($"Hero '{o.Required("hero")}' was not found.");
-            return hero.Objectives;
+            return new ObjectiveSelection(hero.Objectives, hero.TokenValues);
         }
 
         var values = o.All("objective");
         if (values.Count == 0)
             throw new CliException("Provide --hero <id> or one or more --objective 'name|notation|damage' values.");
 
-        return values.Select((value, index) =>
+        return new ObjectiveSelection(values.Select((value, index) =>
         {
             var parts = value.Split('|');
             if (parts.Length < 2 || parts.Length > 3)
@@ -253,17 +254,24 @@ internal static class Program
                 objective.Damage = damage;
             }
             return objective;
-        }).ToList();
+        }).ToList(), new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase));
     }
 
-    private static EvaluationConfig ParseEvaluation(CliOptions o) => new()
+    private static EvaluationConfig ParseEvaluation(CliOptions o, IReadOnlyDictionary<string, double>? heroTokenValues = null)
     {
-        HealValue = o.Double("heal-value", 1),
+        var eval = new EvaluationConfig
+        {
+            HealValue = o.Double("heal-value", 1),
         CardValue = o.Double("card-value", 3),
         CpValue = o.Double("cp-value", 1),
         DefaultTokenValue = o.Double("token-value", 2),
         EnemyDefenseDelta = o.Double("enemy-defense", 3)
-    };
+        };
+        eval.ApplyHeroDefaults(heroTokenValues);
+        return eval;
+    }
+
+    private sealed record ObjectiveSelection(List<RollObjective> Objectives, Dictionary<string, double> TokenValues);
 
     private static void ValidateRollInputs(int diceCount, int rerolls)
     {

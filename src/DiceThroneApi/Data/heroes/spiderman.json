@@ -1,6 +1,7 @@
 {
   "id": "spiderman",
   "name": "Miles Morales Spider-Man",
+  "tokenValues": { "Combo": 3, "Webbed": 3, "Invisibility": 1 },
   "objectives": [
     { "name": "Punch (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Punch (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

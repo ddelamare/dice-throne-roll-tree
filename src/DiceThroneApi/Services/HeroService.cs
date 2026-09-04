@@ -61,7 +61,8 @@ public class HeroService
             {
                 Id = heroData.Id,
                 Name = heroData.Name,
-                Objectives = new List<RollObjective>()
+                Objectives = new List<RollObjective>(),
+                TokenValues = heroData.TokenValues ?? new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
             };
 
             foreach (var objData in heroData.Objectives)
@@ -89,6 +90,7 @@ public class HeroService
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public Dictionary<string, double>? TokenValues { get; set; }
         public List<ObjectiveData> Objectives { get; set; } = new();
     }
 

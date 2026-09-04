@@ -1,6 +1,7 @@
 {
   "id": "palelady",
   "name": "Pale Lady",
+  "tokenValues": { "Prey": 3, "Bleed": 3, "Moon Shard": 2.5 },
   "objectives": [
     { "name": "Scratch (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Scratch (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

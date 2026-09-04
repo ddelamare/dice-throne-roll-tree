@@ -46,7 +46,7 @@ public class RollController : ControllerBase
         var rollsRemaining = request.RollsRemaining ?? 2;
         var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
 
-        var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
+        var evaluation = GetEvaluation(request.Evaluation, hero);
         var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
         await TrackOperationAsync("simulate", request.HeroId);
 
@@ -79,7 +79,7 @@ public class RollController : ControllerBase
         var rollsRemaining = request.RollsRemaining ?? 2;
         var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
 
-        var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
+        var evaluation = GetEvaluation(request.Evaluation, hero);
         var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
         await TrackOperationAsync("setdice", request.HeroId);
 
@@ -143,7 +143,7 @@ public class RollController : ControllerBase
         var advice = hero.Objectives
             .Select((objective, index) =>
             {
-                var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
+                var evaluation = GetEvaluation(request.Evaluation, hero);
                 var probability = useMonteCarlo
                     ? _simulator.Simulate(objective, totalDice, MonteCarloConst.StandardIterations)
                     : _calculator.CalculatePreRoll(objective, totalDice, lockedDiceMask);
@@ -194,7 +194,7 @@ public class RollController : ControllerBase
         }
 
         var lockedDiceMask = BuildLockedDiceMask(request.CurrentDice.Count, HasManifestDie(hero.Id));
-        var evaluation = request.Evaluation ?? new DiceThroneApi.Models.EvaluationConfig();
+        var evaluation = GetEvaluation(request.Evaluation, hero);
 
         var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
         await TrackOperationAsync("advice", request.HeroId);
@@ -205,6 +205,15 @@ public class RollController : ControllerBase
     private Task TrackOperationAsync(string operation, string? heroId = null)
     {
         return _telemetryService.RecordOperationAsync(GetVisitorId(), operation, heroId);
+    }
+
+    private static DiceThroneApi.Models.EvaluationConfig GetEvaluation(
+        DiceThroneApi.Models.EvaluationConfig? requested,
+        Hero hero)
+    {
+        var evaluation = requested ?? new DiceThroneApi.Models.EvaluationConfig();
+        evaluation.ApplyHeroDefaults(hero.TokenValues);
+        return evaluation;
     }
 
     private string? GetVisitorId()

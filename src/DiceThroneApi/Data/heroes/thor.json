@@ -1,6 +1,7 @@
 {
   "id": "thor",
   "name": "Thor",
+  "tokenValues": { "Electrokinesis": 1 },
   "objectives": [
     { "name": "Hammered (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Hammered (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

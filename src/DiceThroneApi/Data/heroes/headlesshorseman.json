@@ -1,6 +1,7 @@
 {
   "id": "headlesshorseman",
   "name": "Headless Horseman",
+  "tokenValues": { "Dreadful": 1 },
   "objectives": [
     { "name": "Cleave (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Cleave (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

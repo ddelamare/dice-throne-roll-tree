@@ -85,6 +85,8 @@ Probability is the chance of eventually matching the objective when the calculat
 
 Expected delta converts outcomes into a common decision value. By default, damage is reduced by enemy defense (`3`), healing is worth `1`, cards `3`, CP `1`, and an unspecified token `2`. Override these with `--enemy-defense`, `--heal-value`, `--card-value`, `--cp-value`, and `--token-value` when the problem requires a different valuation. A negative or zero expected delta can be intentional when defense outweighs the objective's damage.
 
+Hero JSON may include a `tokenValues` object, such as `{ "Stun": 4 }`. These values override the default token value for that hero. They are applied when a hero is selected/loaded, while explicitly supplied `EvaluationConfig.TokenValues` entries take precedence. The browser resets token overrides to the selected hero's defaults; the API, CLI, and MCP flows merge hero defaults in the same way.
+
 When comparing strategies, prefer `expectedDelta` when the task asks what to pursue. Prefer `probability` when the task asks for the safest way to complete a specific objective. `baselineProbability` is the all-reroll reference, while `probabilityImprovement` measures the value of the recommended keep decision over that baseline.
 
 ### Recommended agent workflow

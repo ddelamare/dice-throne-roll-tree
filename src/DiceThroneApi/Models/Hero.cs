@@ -5,4 +5,6 @@ public class Hero
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public List<RollObjective> Objectives { get; set; } = new();
+    // Hero-specific overrides for the default token evaluation value.
+    public Dictionary<string, double> TokenValues { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }

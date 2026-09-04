@@ -781,6 +781,8 @@
             try {
                 const response = await apiFetch(`/api/heroes/${heroId}`);
                 currentHero = await response.json();
+                // Selecting a hero resets token overrides to that hero's defaults.
+                evalConfig.tokenValues = { ...(currentHero.tokenValues || {}) };
                 hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
                 manifestDieIndex = hasManifestDie ? 0 : -1;
                 resetTurnDisplay(defaultStatusText);

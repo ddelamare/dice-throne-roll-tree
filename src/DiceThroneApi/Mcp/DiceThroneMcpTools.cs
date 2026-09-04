@@ -29,6 +29,8 @@ public sealed class DiceThroneMcpTools
         var hasManifestDie = hero.Id.Equals("psylocke", StringComparison.OrdinalIgnoreCase);
         var dice = currentDice ?? RollDice(diceCount + (hasManifestDie ? 1 : 0));
         var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
+        evaluation ??= new EvaluationConfig();
+        evaluation.ApplyHeroDefaults(hero.TokenValues);
         var suggestions = advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, method, lockedDiceMask, evaluation);
         await telemetry.RecordOperationAsync(null, "mcp-simulate", heroId);
 
@@ -76,6 +78,8 @@ public sealed class DiceThroneMcpTools
         var hero = await GetHeroOrThrowAsync(heroService, heroId);
         var hasManifestDie = hero.Id.Equals("psylocke", StringComparison.OrdinalIgnoreCase);
         var lockedDiceMask = BuildLockedDiceMask(currentDice.Count, hasManifestDie);
+        evaluation ??= new EvaluationConfig();
+        evaluation.ApplyHeroDefaults(hero.TokenValues);
         var suggestions = advisor.GetAdvice(currentDice, rollsRemaining, hero.Objectives, method, lockedDiceMask, evaluation);
         await telemetry.RecordOperationAsync(null, "mcp-setdice", heroId);
 

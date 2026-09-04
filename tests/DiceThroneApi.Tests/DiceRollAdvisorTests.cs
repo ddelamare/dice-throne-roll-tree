@@ -340,6 +340,24 @@ public class DiceRollAdvisorTests
     // ── ExpectedDelta / EvaluationConfig tests ────────────────────────────────
 
     [Fact]
+    public void EvaluationConfig_HeroTokenDefaultsFillMissingValuesWithoutReplacingOverrides()
+    {
+        var eval = new DiceThroneApi.Models.EvaluationConfig
+        {
+            TokenValues = new Dictionary<string, double> { ["Stun"] = 7.0 }
+        };
+
+        eval.ApplyHeroDefaults(new Dictionary<string, double>
+        {
+            ["Stun"] = 4.0,
+            ["Paralyze"] = 5.0
+        });
+
+        Assert.Equal(7.0, eval.TokenValues["Stun"]);
+        Assert.Equal(5.0, eval.TokenValues["Paralyze"]);
+    }
+
+    [Fact]
     public void GetAdvice_ExpectedDelta_IncludesTokensWithDefaultValue()
     {
         // Objective with 2 tokens — default token value = 2 each, so total delta = 5 damage + 2+2 = 9
