@@ -135,11 +135,11 @@ public class DiceRollAdvisorTests
     [Fact]
     public void GetAdvice_WithMultipleDamageObjectives_PopulatesFallback()
     {
-        // Chase: [66666] (hard, 8 dmg) — fallback should be [6666] (easier, 3 dmg)
+        // Chase: [66666] (hard, 8 dmg) — fallback should be [6666] (easier, 4 dmg)
         var chaseObj = _parser.Parse("Ultimate Attack", "[66666]");
         chaseObj.Damage = 8;
         var fallbackObj = _parser.Parse("Barbaric Roar", "[6666]");
-        fallbackObj.Damage = 3;
+        fallbackObj.Damage = 4;
 
         var dice = new List<int> { 6, 6, 6, 1, 2 };
         var advice = _advisor.GetAdvice(dice, 2, new List<RollObjective> { chaseObj, fallbackObj });
@@ -398,8 +398,8 @@ public class DiceRollAdvisorTests
         var advice = _advisor.GetAdvice(dice, 0, new List<RollObjective> { objective });
 
         var result = advice[0];
-        // delta = 0 + 3*1 + 1*1 = 4
-        Assert.Equal(result.Probability * 4, result.ExpectedDelta, precision: 10);
+        // delta = 0 + 3*1 + 1*3 = 6
+        Assert.Equal(result.Probability * 6, result.ExpectedDelta, precision: 10);
     }
 
     [Fact]
