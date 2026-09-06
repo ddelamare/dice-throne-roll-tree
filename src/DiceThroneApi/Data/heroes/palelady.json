@@ -1,7 +1,8 @@
 {
   "id": "palelady",
   "name": "Pale Lady",
-  "tokenValues": { "Prey": 1.5, "Bleed": 1.5, "Moon Shard": 3 },
+  "tokenValues": { "Prey": 1, "Bleed": 2, "Moon Shard": 0.5 },
+  "tokenThresholdBonuses": { "Moon Shard": { "3": 6 } },
   "objectives": [
     { "name": "Scratch (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Scratch (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

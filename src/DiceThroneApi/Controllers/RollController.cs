@@ -153,13 +153,7 @@ public class RollController : ControllerBase
                 delta += objective.Cards * evaluation.CardValue;
                 delta += objective.Cp * evaluation.CpValue;
                 delta -= objective.TriggersDefense ? evaluation.EnemyDefenseDelta : 0; // Subtract defense delta if this objective triggers defense
-                foreach (var token in objective.Tokens ?? new List<string>())
-                {
-                    if (evaluation.TokenValues != null && evaluation.TokenValues.TryGetValue(token, out var val))
-                        delta += val;
-                    else
-                        delta += evaluation.DefaultTokenValue;
-                }
+                delta += evaluation.CalculateTokenDelta(objective.Tokens);
 
                 return new RollAdvice
                 {
@@ -212,7 +206,7 @@ public class RollController : ControllerBase
         Hero hero)
     {
         var evaluation = requested ?? new DiceThroneApi.Models.EvaluationConfig();
-        evaluation.ApplyHeroDefaults(hero.TokenValues);
+        evaluation.ApplyHeroDefaults(hero.TokenValues, hero.TokenThresholdBonuses);
         return evaluation;
     }
 

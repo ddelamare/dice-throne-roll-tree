@@ -358,6 +358,43 @@ public class DiceRollAdvisorTests
     }
 
     [Fact]
+    public void EvaluationConfig_TokenThresholdBonusAppliesOnlyToCompleteThresholds()
+    {
+        var eval = new DiceThroneApi.Models.EvaluationConfig
+        {
+            TokenValues = new Dictionary<string, double> { ["Charge"] = 0.75 },
+            TokenThresholdBonuses = new Dictionary<string, Dictionary<int, double>>
+            {
+                ["Charge"] = new Dictionary<int, double> { [4] = 4.0 }
+            }
+        };
+
+        Assert.Equal(2.25, eval.CalculateTokenDelta(new[] { "Charge", "Charge", "Charge" }));
+        Assert.Equal(7.0, eval.CalculateTokenDelta(new[] { "Charge", "Charge", "Charge", "Charge" }));
+        Assert.Equal(14.0, eval.CalculateTokenDelta(Enumerable.Repeat("Charge", 8)));
+    }
+
+    [Fact]
+    public void EvaluationConfig_HeroThresholdDefaultsFillMissingMilestonesWithoutReplacingOverrides()
+    {
+        var eval = new DiceThroneApi.Models.EvaluationConfig
+        {
+            TokenThresholdBonuses = new Dictionary<string, Dictionary<int, double>>
+            {
+                ["Charge"] = new Dictionary<int, double> { [4] = 9.0 }
+            }
+        };
+
+        eval.ApplyHeroDefaults(null, new Dictionary<string, Dictionary<int, double>>
+        {
+            ["Charge"] = new Dictionary<int, double> { [4] = 4.0, [8] = 7.0 }
+        });
+
+        Assert.Equal(9.0, eval.TokenThresholdBonuses["Charge"][4]);
+        Assert.Equal(7.0, eval.TokenThresholdBonuses["Charge"][8]);
+    }
+
+    [Fact]
     public void GetAdvice_ExpectedDelta_IncludesTokensWithDefaultValue()
     {
         // Objective with 2 tokens — default token value = 2 each, so total delta = 5 damage + 2+2 = 9

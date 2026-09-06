@@ -1,7 +1,7 @@
 {
   "id": "scarletwitch",
   "name": "Scarlet Witch",
-  "tokenValues": { "Conjure": 2.5, "Crackle": 2, "Probability Manipulation": 2.5, "Reality Warp": 3 },
+  "tokenValues": { "Conjure": 2, "Crackle": 1, "Probability Manipulation": 2, "Reality Warp": 3 },
   "objectives": [
     { "name": "Hex Bolt (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Hex Bolt (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },

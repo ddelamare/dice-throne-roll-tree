@@ -159,7 +159,7 @@ public class DiceRollAdvisor
 
     private double ComputeDelta(RollObjective objective, DiceThroneApi.Models.EvaluationConfig eval)
     {
-        // Sum base components: damage + heal + cards*cardValue + cp*cpValue + per-token values
+        // Sum base components: damage + heal + cards*cardValue + cp*cpValue + token effects.
         double delta = 0.0;
         delta += objective.Damage;
         delta += objective.Heal * eval.HealValue;
@@ -167,17 +167,7 @@ public class DiceRollAdvisor
         delta += objective.Cp * eval.CpValue;
         delta -= objective.TriggersDefense ? eval.EnemyDefenseDelta : 0; // Subtract defense delta if this objective triggers defense
 
-        foreach (var token in objective.Tokens ?? new List<string>())
-        {
-            if (eval.TokenValues != null && eval.TokenValues.TryGetValue(token, out var val))
-            {
-                delta += val;
-            }
-            else
-            {
-                delta += eval.DefaultTokenValue;
-            }
-        }
+        delta += eval.CalculateTokenDelta(objective.Tokens);
 
         return delta;
     }

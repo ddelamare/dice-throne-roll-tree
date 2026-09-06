@@ -1,7 +1,7 @@
 {
   "id": "rogue",
   "name": "Rogue",
-  "tokenValues": { "Influence": 2.5, "Skyward": 2.5 },
+  "tokenValues": { "Influence": 2.5, "Skyward": 2 },
   "objectives": [
     { "name": "Brawl (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Brawl (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

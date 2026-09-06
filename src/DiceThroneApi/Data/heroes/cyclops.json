@@ -1,7 +1,8 @@
 {
   "id": "cyclops",
   "name": "Cyclops",
-  "tokenValues": { "Battle Plan": 2, "Focus Fire": 3, "Support": 2 },
+  "tokenValues": { "Battle Plan": 1.25, "Focus Fire": 2.5, "Support": 1.5 },
+  "tokenThresholdBonuses": { "Battle Plan": { "3": 2 }, "Support": { "3": 1.5 } },
   "objectives": [
     { "name": "Hand To Hand (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Hand To Hand (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

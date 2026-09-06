@@ -1,7 +1,8 @@
 {
   "id": "necromancer",
   "name": "Necromancer",
-  "tokenValues": { "Corpse": 1.5, "Decrepify": 2.5, "Resurrect": 4 },
+  "tokenValues": { "Corpse": 1, "Decrepify": 2.5, "Resurrect": 4.5 },
+  "tokenThresholdBonuses": { "Corpse": { "3": 2 } },
   "objectives": [
     { "name": "Shear (3)", "notation": "[(123)(123)(123)]", "damage": 3 },
     { "name": "Shear (4)", "notation": "[(123)(123)(123)(123)]", "damage": 4 },

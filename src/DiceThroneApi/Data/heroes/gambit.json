@@ -1,7 +1,8 @@
 {
   "id": "gambit",
   "name": "Gambit",
-  "tokenValues": { "Molecular Acceleration": 1.5, "Dissolution": 2, "Disruption": 2.5 },
+  "tokenValues": { "Molecular Acceleration": 0.75, "Dissolution": 2, "Disruption": 2.5 },
+  "tokenThresholdBonuses": { "Molecular Acceleration": { "4": 4 } },
   "objectives": [
     { "name": "Bo Staff (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Bo Staff (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

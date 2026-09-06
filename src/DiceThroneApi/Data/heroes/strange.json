@@ -1,7 +1,7 @@
 {
   "id": "strange",
   "name": "Doctor Strange",
-  "tokenValues": { "Crimson Bands": 2.5, "Deja Vu": 3.5, "Premonition": 2 },
+  "tokenValues": { "Crimson Bands": 2.5, "Deja Vu": 3.5, "Premonition": 1.5 },
   "objectives": [
     { "name": "Augury", "notation": "[(34)(34)66]", "damage": 8, "tokens": ["Deja Vu"] },
     { "name": "Universal Awareness", "notation": "[(34)(34)(34)(34)]", "damage": 0, "cards": 1, "tokens": ["Deja Vu", "Premonition", "Premonition"] },

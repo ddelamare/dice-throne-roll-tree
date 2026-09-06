@@ -1,49 +1,48 @@
 # Hero token delta values
 
-These are strategic heuristics for the advisor's `expectedDelta` calculation. They are not official card values and do not mean that a token is worth that many immediate damage. A token value is the estimated conditional value of gaining one token when an objective succeeds; repeated tokens in an objective multiply that value.
+These are strategic heuristics for the advisor's `expectedDelta` calculation. They are not official balance values and do not mean that a token is worth that many immediate damage points.
 
-The scale is deliberately close to the existing evaluator defaults:
+The values are based on the token's actual payoff, not its label or whether it is positive/negative. The base value is the incremental value of one token. A threshold entry is an additional bonus for each complete threshold in the tokens granted by that objective:
 
-- `1-1.5`: setup, bookkeeping, or a situational resource
-- `2-2.5`: useful recurring resource, moderate control, or conditional defense
-- `3-3.5`: strong control, reliable defense, or an engine that materially improves later turns
-- `4`: swingy premium value such as stun, a major lockout, or a strong companion denial effect
+`token delta = token count × base value + floor(token count / threshold) × threshold bonus`
 
-This is a standard 1v1, base-board estimate. It does not model current health, cards in hand, upgrades, existing resource stacks, opponent matchup, team play, or whether the token can be used immediately. Those conditions can make a token worth substantially more or less.
+Threshold bonuses model effects such as a charged Ace Card or a three-token attack modifier. They are deliberately additive and conservative; the advisor does not yet know the hero's current token stack, upgrade state, hand, health, or matchup. A threshold involving tokens already on the board therefore remains an approximation until that state is supplied.
 
 ## Values and strategy summary
 
 | Hero | Token delta values | Strategy implication |
 | --- | --- | --- |
-| Barbarian | `Stun 4` | Prioritize aggressive attacks and stun chains; Fortitude is the attrition fallback because he has little damage prevention. |
-| Black Panther | `Kinetic Energy 1.5`, `Vibranium Suit 3` | Trade damage to build Kinetic Energy, then convert the charge into scaling attacks; preserve the Suit for a meaningful hit. |
-| Black Widow | `Agility 2.5`, `Time Bomb 3` | Build upgrades and plant bombs over time; Agility covers her early-game softness while the upgrade engine compounds. |
-| Cyclops | `Battle Plan 2`, `Focus Fire 3`, `Support 2` | Set up Focus Fire early; Battle Plan and Support are flexible economy that enable rerolls, cards, CP, and team utility. |
-| Druid | `Regenerate 2.5`, `Shape Shift 2` | Shift into the form that fits the moment, using Regenerate for the long game and Bear form when survival matters. |
-| Duelist | `Disarm 3`, `Guard Break 2`, `Step 1` | Advance the Footwork track and use Disarm/Guard Break to win key exchanges; Step is positioning value rather than direct output. |
-| Forgemaster | `Mine 2.5`, `Ore 2.5` | Mine and bank Ore before forcing the grind; Armor is the real defensive engine and the dice attacks are the tempo layer. |
-| Gambit | `Molecular Acceleration 1.5`, `Dissolution 2`, `Disruption 2.5` | Charge Ace Cards steadily, then explode them at the right time; Disruption taxes the opponent while Dissolution provides flexible recovery or cleansing. |
-| Headless Horseman | `Dreadful 3`, `Grim Pursuit 3` | Build Dreadful early because it scales both offense and defense; save Grim Pursuit for extra rolls or a high-value damage conversion. |
-| Iceman | `Dice Cube 2.5`, `Ice Shard 2.5` | Lock the opponent's lowest die and accumulate Shards for damage and Glide chains; the engine rewards planning across turns. |
-| Jean Grey | `Acuity 1.5`, `Flame Blast 1.5`, `Force Field 3` | Use Jean turns for economy and defense, then spend Flame Blast on Dark Phoenix burst turns; Force Field is premium survival. |
-| Loki | `Bag of Tricks 1.5`, `Illusion 4`, `Spellbound 3` | Win through disruption rather than raw damage: lock important abilities, use Bag of Tricks for resource pressure, and keep Illusion for dangerous attacks. |
-| Necromancer | `Corpse 1.5`, `Decrepify 2.5`, `Resurrect 4` | Build the Undead swarm before chasing damage; Decrepify slows an opponent and Resurrect is a powerful but costly insurance policy. |
-| Pale Lady | `Prey 1.5`, `Bleed 1.5`, `Moon Shard 3` | Accumulate Moon Shards to time the Werewolf transformation; Prey and Bleed are useful chip but secondary to the transformation window. |
-| Pale Lady Werewolf | `Prey 1.5`, `Bleed 1.5`, `Moon Shard 3` | Exploit the short Werewolf window for undefendable burst, using Prey/Bleed to extend pressure rather than replacing the transformation plan. |
-| Psylocke | `Paralyze 4`, `Agility 2.5`, `Infiltration 2.5` | Press the tempo with the Manifest die; Paralyze shuts down status engines while Agility and Infiltration protect key exchanges. |
-| Pyromancer | `Fire Mastery 2.5`, `Burn 2`, `Knockdown 3`, `Stun 4` | Build Fire Mastery and detonate before it cools off; Burn, Knockdown, and Stun compensate for her weak defensive profile. |
-| Raveness | `Feather 2.5`, `Hex 4` | Feed and manipulate Nevermore with Feathers; Hex is a high-impact control payoff against dice that rely on sixes. |
-| Rogue | `Influence 2.5`, `Skyward 2.5` | Drain the opponent's rerolls and convert incoming damage into Ionic Energy; Skyward gives her a conditional defensive swing. |
-| Scarlet Witch | `Conjure 2.5`, `Crackle 2`, `Probability Manipulation 2.5`, `Reality Warp 3` | Stack status effects and preserve dice control for the right conversion; Crackle is strongest when several statuses are already present. |
-| Miles Morales Spider-Man | `Combo 3`, `Webbed 3`, `Invisibility 2.5` | Maintain tempo through a second offensive phase, make the next hit undefendable with Webbed, and reserve Invisibility for otherwise unavoidable attacks. |
-| Storm | `Lightning 2.5`, `Tornado 2.5`, `Wind Shear 3` | Charge abilities before spending them; Tornado expands future rolls and Wind Shear combines meaningful prevention with counter damage. |
-| Doctor Strange | `Deja Vu 3.5`, `Premonition 2`, `Crimson Bands 2.5` | Prepare spells and manage the hand; Deja Vu is a premium second chance, while Crimson Bands is matchup-sensitive control. |
-| Sun Elf | `Sun Dial 2.5`, `Charged Gem 2`, `Sun Marked 2` | Ramp the Dial on Dusk turns and cash it out on Dawn turns; Charged Gem and Sun Marked add flexible economy and sustain. |
-| Thor | `Electrokinesis 1.5`, `Guard Break 2` | Keep Electrokinesis flowing so later attacks scale; use Guard Break when making a large attack matters more than saving the token. |
-| Wolverine | `Rage 3`, `Alpha 2` | Fight the attrition game with healing and Rage-powered attacks; Alpha is useful pressure but less reliable than Rage's direct conversion. |
+| Barbarian | `Stun 5` | Stun is a premium tempo payoff because it removes an opponent turn and supports Barbarian's burst plan; keep pressure up while using Fortitude as the fallback. |
+| Black Panther | `Kinetic Energy 0.5; +9 at 8`, `Vibranium Suit 3` | Kinetic Energy is mostly incremental attack scaling until the eight-token burst; Suit is immediate damage prevention, so do not value them alike. |
+| Black Widow | `Agility 2`, `Time Bomb 2.5` | Agility protects the setup turns; Time Bomb is valuable but delayed and opponent-dependent, so it is discounted from a guaranteed payoff. |
+| Cyclops | `Battle Plan 1.25; +2 at 3`, `Focus Fire 2.5`, `Support 1.5; +1.5 at 3` | Battle Plan and Support are flexible leadership resources, with extra value when enough are banked to unlock the stronger spend; Focus Fire is a persistent offensive engine. |
+| Druid | `Regenerate 2`, `Shape Shift 1.5` | Regenerate is delayed healing and Shape Shift is flexible form access; both are useful, but neither should outrank a reliable attack by default. |
+| Duelist | `Disarm 3.5`, `Guard Break 2`, `Step 0.75` | Disarm can deny the opponent's economy, Guard Break is a probabilistic attack-quality improvement, and Step is mainly setup for the Footwork engine. |
+| Forgemaster | `Mine 1.5`, `Ore 2.5` | Mine is setup; Ore is closer to the payoff because it fuels the defensive and offensive forge loop. |
+| Gambit | `Molecular Acceleration 0.75; +4 at 4`, `Dissolution 2`, `Disruption 2.5` | Molecular Acceleration is normally charge bookkeeping, but a full four-token charge can convert into an Ace Card explosion; Disruption is reliable opponent taxation and Dissolution is flexible recovery/cleansing. |
+| Headless Horseman | `Dreadful 1.25`, `Grim Pursuit 2.5` | Dreadful compounds the board's offense/defense and is worth steady collection; Grim Pursuit is a higher-impact but more situational roll resource. |
+| Iceman | `Dice Cube 2`, `Ice Shard 0.75; +4 at 4, +3 at 5` | Dice Cube is immediate control. Ice Shards are cheap individually but become much more valuable at the four-Shard combo threshold and again at five when they can support another Glide. |
+| Jean Grey | `Acuity 0.75; +3 at 4`, `Flame Blast 1; +1 at 3`, `Force Field 3.5` | Acuity is setup for Dark Phoenix, Flame Blast is a modest incremental modifier with a meaningful three-token attack spend, and Force Field is reliable survival. |
+| Loki | `Bag of Tricks 1`, `Illusion 4`, `Spellbound 3` | Bag of Tricks is flexible economy; Illusion and Spellbound are high-value control because they can deny or distort the opponent's best line. |
+| Necromancer | `Corpse 1; +2 at 3`, `Decrepify 2.5`, `Resurrect 4.5` | Corpses are setup for the undead engine, with a breakpoint when enough are assembled; Decrepify is recurring control and Resurrect is premium insurance. |
+| Pale Lady | `Prey 1`, `Bleed 2`, `Moon Shard 0.5; +6 at 3` | Bleed is worth its recurring damage, while Moon Shards are low-value until the three-Shard Werewolf transition becomes available. |
+| Pale Lady Werewolf | `Prey 1`, `Bleed 2`, `Moon Shard 0.5; +6 at 3` | The Werewolf side makes the transformation window the priority; Prey and Bleed extend pressure but do not replace the shard breakpoint. |
+| Psylocke | `Paralyze 4.5`, `Agility 2`, `Infiltration 2` | Paralyze is a major tempo denial effect; Agility and Infiltration are valuable defensive/positioning resources but are more conditional. |
+| Pyromancer | `Burn 2`, `Fire Mastery 1.5`, `Knockdown 3`, `Stun 5` | Fire Mastery is a setup track whose value depends on cashing it out before it cools; Burn, Knockdown, and Stun are more immediate attack or tempo payoffs. |
+| Raveness | `Feather 1; +2 at 3`, `Hex 4` | Feathers are setup for Nevermore and gain value when enough are assembled; Hex is a high-impact control payoff against important dice. |
+| Rogue | `Influence 2.5`, `Skyward 2` | Influence directly constrains the opponent's future options; Skyward is a conditional defensive swing, so it is slightly less reliable. |
+| Scarlet Witch | `Conjure 2`, `Crackle 1`, `Probability Manipulation 2`, `Reality Warp 3` | Conjure and Reality Warp support high-impact spell lines; Crackle is deliberately discounted because its payoff depends on statuses already in play. |
+| Miles Morales Spider-Man | `Combo 4`, `Webbed 3`, `Invisibility 2` | Combo is the core extra-offensive-phase engine, Webbed converts the next attack into a reliable hit, and Invisibility is strongest when it protects a key turn rather than as generic defense. |
+| Storm | `Lightning 0.5; +1 at 2`, `Tornado 1.5`, `Wind Shear 3` | Lightning is low-value until two charges can be converted into isolated damage; Tornado improves future roll access, while Wind Shear has a direct defensive/offensive payoff. |
+| Doctor Strange | `Deja Vu 3.5`, `Premonition 1.5`, `Crimson Bands 2.5` | Deja Vu is a premium second chance, Premonition is preparation, and Crimson Bands is powerful control whose value depends on the opponent's hand. |
+| Sun Elf | `Sun Dial 1.25`, `Charged Gem 1.5`, `Sun Marked 1.5` | Sun Dial is a timing resource that should be saved for the favorable side of the board cycle; the other tokens are flexible sustain/setup rather than raw damage. |
+| Thor | `Electrokinesis 1`, `Guard Break 2` | Electrokinesis compounds future attacks, while Guard Break is a conditional way to improve one important attack. |
+| Wolverine | `Rage 3`, `Alpha 1.5` | Rage is a strong repeatable attrition resource; Alpha helps the attack plan but is less dependable than Rage's direct conversion. |
 
 ## Research basis
 
-The strategy notes were synthesized from the [Dice Slayer hero map](https://diceslayer.com/map/) and its hero pages, including the [Barbarian guide](https://diceslayer.com/heroes/barbarian/), [Gambit guide](https://diceslayer.com/heroes/gambit/), [Headless Horseman guide](https://diceslayer.com/heroes/headless-horseman/), [Doctor Strange guide](https://diceslayer.com/heroes/doctor-strange/), [Forgemaster guide](https://diceslayer.com/heroes/forgemaster/), and [Thor guide](https://diceslayer.com/heroes/thor/). Token mechanics were cross-checked against the map's status-effect index and the [Dice Throne rulebook](https://files.roxley.com/Dice-Throne-Rulebook-v2.0.pdf).
+The strategy framing was synthesized from the [BoardGameGeek Dice Throne Strategy series](https://boardgamegeek.com/thread/2642022/dice-throne-strategy) and the [BoardGameGeek Dice Throne strategy forum index](https://boardgamegeek.com/boardgame/268201/dice-throne/forums/67), which links the character-specific guides for the roster. I also used the detailed [Pale Lady / Werewolf guide](https://boardgamegeek.com/thread/3627338/character-strategy-series-pale-lady-werewolf), [Iceman guide](https://boardgamegeek.com/thread/3477180/character-strategy-series-iceman), [Spider-Man guide](https://boardgamegeek.com/thread/2949057/character-strategy-series-spider-man), and the [Marvel Dice Throne: X-Men overview](https://boardgamegeek.com/thread/3720014/marvel-dice-throne-x-men-two-boxes-eight-heroes-bo). These guides emphasize engine timing, resource breakpoints, control, defense quality, and matchup-dependent value.
 
-The external strategy material is community analysis, not a game-balance specification. The values should therefore be tuned as the advisor gains stateful modeling. In particular, tokens that scale with existing stacks, a specific form, a prepared spell, an Ace Card, a companion, or an opponent's exact board state should not be treated as universally fixed-value resources.
+Strategy-video cross-checks came from UNDEFENDABLE's [Season 1 quick-guide video](https://www.youtube.com/watch?v=GerT25zGqwU), [Barbarian guide](https://www.youtube.com/watch?v=HI05Hlt6xo0), and [Spider-Man guide](https://www.youtube.com/watch?v=gNsYPgCQ1fY). The videos are used for practical game-plan context; the values above remain explicit heuristics inferred from those plans and the token effects represented in the hero data.
+
+This is intentionally not a universal tier list. The best token value changes with current health, opponent defense, hand/CP, existing stacks, upgrades, and whether the token can be spent immediately. The next refinement would be to pass those state variables into the evaluator instead of increasing the static map further.

@@ -1,7 +1,7 @@
 {
   "id": "blackwidow",
   "name": "Black Widow",
-  "tokenValues": { "Agility": 2.5, "Time Bomb": 3 },
+  "tokenValues": { "Agility": 2, "Time Bomb": 2.5 },
   "objectives": [
     { "name": "Baton Strike (3)", "notation": "[(345)(345)(345)]", "damage": 5 },
     { "name": "Baton Strike (4)", "notation": "[(345)(345)(345)(345)]", "damage": 6 },

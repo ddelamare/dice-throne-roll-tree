@@ -1,7 +1,7 @@
 {
   "id": "psylocke",
   "name": "Psylocke",
-  "tokenValues": { "Paralyze": 4, "Agility": 2.5, "Infiltration": 2.5 },
+  "tokenValues": { "Paralyze": 4.5, "Agility": 2, "Infiltration": 2 },
   "objectives": [
     { "name": "Lunge (3)", "notation": "[(12)(12)(12)]", "damage": 5 },
     { "name": "Lunge (4)", "notation": "[(12)(12)(12)(12)]", "damage": 6 },

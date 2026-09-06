@@ -1,7 +1,8 @@
 {
   "id": "storm",
   "name": "Storm",
-  "tokenValues": { "Lightning": 2.5, "Tornado": 2.5, "Wind Shear": 3 },
+  "tokenValues": { "Lightning": 0.5, "Tornado": 1.5, "Wind Shear": 3 },
+  "tokenThresholdBonuses": { "Lightning": { "2": 1 } },
   "objectives": [
     { "name": "Lightning Field (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Lightning Field (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
