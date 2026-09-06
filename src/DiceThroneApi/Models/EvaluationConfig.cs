@@ -11,44 +11,15 @@ public class EvaluationConfig
     public double EnemyDefenseDelta { get; set; } = 3.0; // How much to subtract from damage when calculating expected value (to account for enemy defense)
     public Dictionary<string, double> TokenValues { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
-    // Additional value awarded each time a token count reaches a configured milestone.
-    // The base TokenValues entry remains useful for incremental effects.
-    public Dictionary<string, Dictionary<int, double>> TokenThresholdBonuses { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-
     public void ApplyHeroDefaults(IReadOnlyDictionary<string, double>? heroTokenValues)
-        => ApplyHeroDefaults(heroTokenValues, null);
-
-    public void ApplyHeroDefaults(
-        IReadOnlyDictionary<string, double>? heroTokenValues,
-        IReadOnlyDictionary<string, Dictionary<int, double>>? heroTokenThresholdBonuses)
     {
-        if (heroTokenValues != null)
-        {
-            foreach (var (token, value) in heroTokenValues)
-            {
-                // Request/UI supplied values always win over hero defaults.
-                if (!TokenValues.ContainsKey(token))
-                    TokenValues[token] = value;
-            }
-        }
+        if (heroTokenValues == null) return;
 
-        if (heroTokenThresholdBonuses != null)
+        foreach (var (token, value) in heroTokenValues)
         {
-            foreach (var (token, bonuses) in heroTokenThresholdBonuses)
-            {
-                if (!TryGetThresholdBonuses(token, out var configured))
-                {
-                    TokenThresholdBonuses[token] = new Dictionary<int, double>(bonuses);
-                    continue;
-                }
-
-                // Explicit request/UI milestones win; fill only missing milestones.
-                foreach (var (threshold, bonus) in bonuses)
-                {
-                    if (!configured.ContainsKey(threshold))
-                        configured[threshold] = bonus;
-                }
-            }
+            // Request/UI supplied values always win over hero defaults.
+            if (!TokenValues.ContainsKey(token))
+                TokenValues[token] = value;
         }
     }
 
@@ -63,17 +34,7 @@ public class EvaluationConfig
             .GroupBy(token => token, StringComparer.OrdinalIgnoreCase))
         {
             var token = group.Key;
-            var count = group.Count();
-            delta += count * (TryGetTokenValue(token, out var value) ? value : DefaultTokenValue);
-
-            if (TryGetThresholdBonuses(token, out var bonuses))
-            {
-                foreach (var (threshold, bonus) in bonuses)
-                {
-                    if (threshold > 0)
-                        delta += count / threshold * bonus;
-                }
-            }
+            delta += group.Count() * (TryGetTokenValue(token, out var value) ? value : DefaultTokenValue);
         }
 
         return delta;
@@ -86,16 +47,6 @@ public class EvaluationConfig
 
         var match = TokenValues.FirstOrDefault(entry => entry.Key.Equals(token, StringComparison.OrdinalIgnoreCase));
         value = match.Value;
-        return !string.IsNullOrEmpty(match.Key);
-    }
-
-    private bool TryGetThresholdBonuses(string token, out Dictionary<int, double> bonuses)
-    {
-        if (TokenThresholdBonuses.TryGetValue(token, out bonuses!))
-            return true;
-
-        var match = TokenThresholdBonuses.FirstOrDefault(entry => entry.Key.Equals(token, StringComparison.OrdinalIgnoreCase));
-        bonuses = match.Value!;
         return !string.IsNullOrEmpty(match.Key);
     }
 }

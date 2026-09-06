@@ -206,7 +206,7 @@ public class RollController : ControllerBase
         Hero hero)
     {
         var evaluation = requested ?? new DiceThroneApi.Models.EvaluationConfig();
-        evaluation.ApplyHeroDefaults(hero.TokenValues, hero.TokenThresholdBonuses);
+        evaluation.ApplyHeroDefaults(hero.TokenValues);
         return evaluation;
     }
 

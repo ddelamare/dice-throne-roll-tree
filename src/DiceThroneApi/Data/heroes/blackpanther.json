@@ -1,8 +1,7 @@
 {
   "id": "blackpanther",
   "name": "Black Panther",
-  "tokenValues": { "Kinetic Energy": 0.5, "Vibranium Suit": 3 },
-  "tokenThresholdBonuses": { "Kinetic Energy": { "8": 9 } },
+  "tokenValues": { "Kinetic Energy": 1.5, "Vibranium Suit": 3 },
   "objectives": [
     { "name": "Vibranium Claws (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Vibranium Claws (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

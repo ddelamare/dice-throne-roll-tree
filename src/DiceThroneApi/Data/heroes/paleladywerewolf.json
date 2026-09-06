@@ -1,8 +1,7 @@
 {
   "id": "paleladywerewolf",
   "name": "Pale Lady Werewolf",
-  "tokenValues": { "Prey": 1, "Bleed": 2, "Moon Shard": 0.5 },
-  "tokenThresholdBonuses": { "Moon Shard": { "3": 6 } },
+  "tokenValues": { "Prey": 1, "Bleed": 2, "Moon Shard": 2.5 },
   "objectives": [
     { "name": "Shred (3)", "notation": "[(123)(123)(123)]", "damage": 4, "bypassDefense": true },
     { "name": "Shred (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5, "bypassDefense": true },

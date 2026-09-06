@@ -7,5 +7,4 @@ public class Hero
     public List<RollObjective> Objectives { get; set; } = new();
     // Hero-specific overrides for the default token evaluation value.
     public Dictionary<string, double> TokenValues { get; set; } = new(StringComparer.OrdinalIgnoreCase);
-    public Dictionary<string, Dictionary<int, double>> TokenThresholdBonuses { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 }

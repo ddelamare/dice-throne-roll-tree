@@ -1,8 +1,7 @@
 {
   "id": "iceman",
   "name": "Iceman",
-  "tokenValues": { "Dice Cube": 2, "Ice Shard": 0.75 },
-  "tokenThresholdBonuses": { "Ice Shard": { "4": 4, "5": 3 } },
+  "tokenValues": { "Dice Cube": 2, "Ice Shard": 2 },
   "objectives": [
     { "name": "Frostbite (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Frostbite (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
