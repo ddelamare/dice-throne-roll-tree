@@ -1,6 +1,7 @@
 {
   "id": "raveness",
   "name": "Raveness",
+  "tokenValues": { "Feather": 2.5, "Hex": 4 },
   "objectives": [
     { "name": "Peck (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Peck (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },

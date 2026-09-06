@@ -1,6 +1,7 @@
 {
   "id": "forgemaster",
   "name": "Forgemaster",
+  "tokenValues": { "Mine": 2.5, "Ore": 2.5 },
   "objectives": [
     { "name": "Pick Axe (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
     { "name": "Pick Axe (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },

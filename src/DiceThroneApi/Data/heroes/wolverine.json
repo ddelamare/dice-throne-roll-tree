@@ -1,6 +1,7 @@
 {
   "id": "wolverine",
   "name": "Wolverine",
+  "tokenValues": { "Alpha": 2, "Rage": 3 },
   "objectives": [
     { "name": "Adamantium Claws (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Adamantium Claws (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

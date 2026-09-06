@@ -1,7 +1,7 @@
 {
   "id": "loki",
   "name": "Loki",
-  "tokenValues": { "Illusion": 4 },
+  "tokenValues": { "Bag of Tricks": 1.5, "Illusion": 4, "Spellbound": 3 },
   "objectives": [
     { "name": "Mockery (3)", "notation": "[(12)(12)(12)]", "damage": 6 },
     { "name": "Mockery (4)", "notation": "[(12)(12)(12)(12)]", "damage": 7 },

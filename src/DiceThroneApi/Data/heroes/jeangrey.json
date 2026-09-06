@@ -1,6 +1,7 @@
 {
   "id": "jeangrey",
   "name": "Jean Grey",
+  "tokenValues": { "Acuity": 1.5, "Flame Blast": 1.5, "Force Field": 3 },
   "objectives": [
     { "name": "Mind Attack (3)", "notation": "[(123)(123)(123)]", "damage": 4, "tokens": ["Acuity"] },
     { "name": "Mind Attack (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 , "tokens": ["Acuity"] },

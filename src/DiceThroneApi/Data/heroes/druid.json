@@ -1,6 +1,7 @@
 {
   "id": "druid",
   "name": "Druid",
+  "tokenValues": { "Regenerate": 2.5, "Shape Shift": 2 },
   "objectives": [
     { "name": "Ferocity (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Ferocity (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

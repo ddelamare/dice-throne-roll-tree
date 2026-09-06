@@ -1,6 +1,7 @@
 {
   "id": "sunelf",
   "name": "Sun Elf",
+  "tokenValues": { "Charged Gem": 2, "Sun Dial": 2.5, "Sun Marked": 2 },
   "objectives": [
     { "name": "Light Staff (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Light Staff (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

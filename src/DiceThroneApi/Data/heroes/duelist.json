@@ -1,6 +1,7 @@
 {
   "id": "duelist",
   "name": "Duelist",
+  "tokenValues": { "Disarm": 3, "Guard Break": 2, "Step": 1 },
   "objectives": [
     { "name": "Blade Flurry (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
     { "name": "Blade Flurry (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },

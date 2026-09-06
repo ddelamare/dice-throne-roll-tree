@@ -1,6 +1,7 @@
 {
   "id": "pyromancer",
   "name": "Pyromancer",
+  "tokenValues": { "Burn": 2, "Fire Mastery": 2.5, "Knockdown": 3, "Stun": 4 },
   "objectives": [
     { "name": "Fireball (3)", "notation": "[(123)(123)(123)]", "damage": 3 },
     { "name": "Fireball (4)", "notation": "[(123)(123)(123)(123)]", "damage": 4 },
