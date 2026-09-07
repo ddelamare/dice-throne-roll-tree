@@ -14,8 +14,8 @@ public class ProbabilityCalculator
     // hero objectives, a small range of dice counts (≤7), and at most a handful of reroll
     // depths — so unbounded growth is not a concern in practice.
     //
-    // _globalMemo: caches OptimalProbability(histogram, rerollsLeft, objective) — the inner
-    //   recursive DP state.  Key = (histogram+rerolls encoded as a long, objective notation).
+    // _globalMemo: caches the inner recursive DP state. The key encodes unlocked and locked
+    //   histograms, rerolls, and the objective notation.
     //
     // _calculateCache: caches the final result of Calculate(objective, totalDice, rerolls) so
     //   that repeated fresh-turn lookups (e.g. hero selection screen) are instant.
@@ -94,7 +94,21 @@ public class ProbabilityCalculator
     // Optimization 1: long memo key; Optimization 2: histogram state
     private double OptimalProbability(int[] histogram, int rerollsLeft, RollObjective objective)
     {
-        var dice = HistogramToDice(histogram);
+        return OptimalProbability(histogram, new int[6], rerollsLeft, objective);
+    }
+
+    /// <summary>
+    /// Calculates the optimal probability while preserving dice that cannot be rerolled.
+    /// The locked histogram is kept in every recursive state; only the unlocked histogram
+    /// participates in future keep/reroll choices.
+    /// </summary>
+    private double OptimalProbability(
+        int[] unlockedHistogram,
+        int[] lockedHistogram,
+        int rerollsLeft,
+        RollObjective objective)
+    {
+        var dice = MergeHistograms(unlockedHistogram, lockedHistogram);
 
         if (_matcher.IsMatch(dice, objective))
         {
@@ -106,25 +120,28 @@ public class ProbabilityCalculator
             return 0.0;
         }
 
-        // Optimization 1: encode histogram + rerollsLeft into a single long (3 bits per face, 3 bits for rerolls)
-        var key = (EncodeKey(histogram, rerollsLeft), objective.Notation);
+        // Optimization 1: encode both histograms and rerollsLeft into a single long memo key.
+        var key = (EncodeKey(unlockedHistogram, lockedHistogram, rerollsLeft), objective.Notation);
 
         if (_globalMemo.TryGetValue(key, out var cached))
         {
             return cached;
         }
 
-        var totalDice = 0;
-        for (int f = 0; f < 6; f++) totalDice += histogram[f];
+        var totalUnlockedDice = unlockedHistogram.Sum();
+        if (totalUnlockedDice == 0)
+        {
+            return 0.0;
+        }
 
         var bestProb = 0.0;
 
         // Optimization 2: enumerate keep strategies as histogram choices (∏(cᵢ+1) vs 2ⁿ bitmasks)
-        foreach (var keepHistogram in EnumerateKeepStrategies(histogram))
+        foreach (var keepHistogram in EnumerateKeepStrategies(unlockedHistogram))
         {
             var keptCount = 0;
             for (int f = 0; f < 6; f++) keptCount += keepHistogram[f];
-            var rerollCount = totalDice - keptCount;
+            var rerollCount = totalUnlockedDice - keptCount;
 
             if (rerollCount == 0)
             {
@@ -141,7 +158,7 @@ public class ProbabilityCalculator
                 for (int f = 0; f < 6; f++)
                     newHistogram[f] = keepHistogram[f] + rerollHistogram[f];
 
-                prob += multiplicity * OptimalProbability(newHistogram, rerollsLeft - 1, objective);
+                prob += multiplicity * OptimalProbability(newHistogram, lockedHistogram, rerollsLeft - 1, objective);
             }
 
             prob /= totalOutcomes;
@@ -167,7 +184,14 @@ public class ProbabilityCalculator
     {
         bestKeep = new List<bool>();
         var requiredKeepMask = NormalizeKeepMask(requiredKeep, currentDice.Count);
-        var requiredFaceCounts = GetRequiredFaceCounts(currentDice, requiredKeepMask);
+        var lockedDice = currentDice
+            .Where((_, index) => requiredKeepMask[index])
+            .ToList();
+        var unlockedDice = currentDice
+            .Where((_, index) => !requiredKeepMask[index])
+            .ToList();
+        var lockedHistogram = DiceToHistogram(lockedDice);
+        var unlockedHistogram = DiceToHistogram(unlockedDice);
 
         if (_matcher.IsMatch(currentDice, objective))
         {
@@ -181,20 +205,14 @@ public class ProbabilityCalculator
             return 0.0;
         }
 
-        var histogram = DiceToHistogram(currentDice);
         var bestProb = 0.0;
         int[]? bestKeepHistogram = null;
 
-        foreach (var keepHistogram in EnumerateKeepStrategies(histogram))
+        foreach (var keepHistogram in EnumerateKeepStrategies(unlockedHistogram))
         {
-            if (!SatisfiesRequiredFaceCounts(keepHistogram, requiredFaceCounts))
-            {
-                continue;
-            }
-
             var keptCount = 0;
             for (int f = 0; f < 6; f++) keptCount += keepHistogram[f];
-            var rerollCount = currentDice.Count - keptCount;
+            var rerollCount = unlockedDice.Count - keptCount;
 
             // Rerolling all dice is a valid strategy, but rerolling none is not.
             if (rerollCount == 0)
@@ -211,7 +229,7 @@ public class ProbabilityCalculator
                 for (int f = 0; f < 6; f++)
                     newHistogram[f] = keepHistogram[f] + rerollHistogram[f];
 
-                prob += multiplicity * OptimalProbability(newHistogram, rerollsLeft - 1, objective);
+                prob += multiplicity * OptimalProbability(newHistogram, lockedHistogram, rerollsLeft - 1, objective);
             }
 
             prob /= totalOutcomes;
@@ -227,7 +245,12 @@ public class ProbabilityCalculator
                 var fallbackProb = 0.0;
                 foreach (var fallback in fallbacks)
                 {
-                    fallbackProb = CalculateWithForcedKeep(currentDice, rerollsLeft, fallback, HistogramKeepToMask(currentDice, keepHistogram));
+                    fallbackProb = CalculateWithForcedKeep(
+                        currentDice,
+                        rerollsLeft,
+                        fallback,
+                        HistogramKeepToMask(currentDice, keepHistogram, requiredKeepMask),
+                        requiredKeepMask);
                     if (fallbackProb > bestProb)
                     {
                         bestKeepHistogram = keepHistogram;
@@ -253,15 +276,24 @@ public class ProbabilityCalculator
         List<int> currentDice,
         int rollsRemaining,
         RollObjective objective,
-        List<bool> forcedKeep)
+        List<bool> forcedKeep,
+        List<bool>? lockedDiceMask = null)
     {
-        var keptDice = currentDice
-            .Zip(forcedKeep, (d, k) => (d, k))
-            .Where(x => x.k)
-            .Select(x => x.d)
+        var normalizedForcedKeep = NormalizeKeepMask(forcedKeep, currentDice.Count);
+        var normalizedLockedMask = NormalizeKeepMask(lockedDiceMask, currentDice.Count);
+        for (int i = 0; i < currentDice.Count; i++)
+        {
+            normalizedForcedKeep[i] |= normalizedLockedMask[i];
+        }
+
+        var lockedDice = currentDice
+            .Where((_, index) => normalizedLockedMask[index])
+            .ToList();
+        var keptUnlockedDice = currentDice
+            .Where((_, index) => normalizedForcedKeep[index] && !normalizedLockedMask[index])
             .ToList();
 
-        var rerollCount = currentDice.Count - keptDice.Count;
+        var rerollCount = currentDice.Count - normalizedForcedKeep.Count(keep => keep);
 
         if (rerollCount == 0)
         {
@@ -273,7 +305,8 @@ public class ProbabilityCalculator
             return _matcher.IsMatch(currentDice, objective) ? 1.0 : 0.0;
         }
 
-        var keptHistogram = DiceToHistogram(keptDice);
+        var keptHistogram = DiceToHistogram(keptUnlockedDice);
+        var lockedHistogram = DiceToHistogram(lockedDice);
         var totalProb = 0.0;
         var totalOutcomes = (long)Math.Pow(6, rerollCount);
 
@@ -283,7 +316,7 @@ public class ProbabilityCalculator
             for (int f = 0; f < 6; f++)
                 newHistogram[f] = keptHistogram[f] + rerollHistogram[f];
 
-            totalProb += multiplicity * OptimalProbability(newHistogram, rollsRemaining - 1, objective);
+            totalProb += multiplicity * OptimalProbability(newHistogram, lockedHistogram, rollsRemaining - 1, objective);
         }
 
         return totalProb / totalOutcomes;
@@ -308,19 +341,33 @@ public class ProbabilityCalculator
         return dice;
     }
 
-    // Encode a histogram and rerollsLeft into a long for use as a memo key.
-    // Layout: 3 bits per face count (bits 0–17) followed by 3 bits for rerollsLeft (bits 18–20).
-    // Constraints: each histogram[f] must be 0–7 (valid for ≤7 total dice) and rerollsLeft
-    // must be 0–7. Keys are unique within those bounds, which covers all supported game inputs.
-    private static long EncodeKey(int[] h, int rerollsLeft)
+    // Encode unlocked and locked histograms plus rerollsLeft into a long for use as a memo key.
+    // Layout: 3 bits per face for unlocked (bits 0–17), locked (bits 18–35), then rerolls
+    // (bits 36–38). Each count and rerollsLeft is 0–7 for supported game inputs.
+    private static long EncodeKey(int[] unlocked, int[] locked, int rerollsLeft)
     {
-        return (long)h[0]
-             | ((long)h[1] << 3)
-             | ((long)h[2] << 6)
-             | ((long)h[3] << 9)
-             | ((long)h[4] << 12)
-             | ((long)h[5] << 15)
-             | ((long)rerollsLeft << 18);
+        var key = 0L;
+        for (int f = 0; f < 6; f++)
+        {
+            key |= (long)unlocked[f] << (f * 3);
+            key |= (long)locked[f] << (18 + f * 3);
+        }
+
+        return key | ((long)rerollsLeft << 36);
+    }
+
+    private static List<int> MergeHistograms(int[] first, int[] second)
+    {
+        var dice = new List<int>();
+        for (int f = 0; f < 6; f++)
+        {
+            for (int i = 0; i < first[f] + second[f]; i++)
+            {
+                dice.Add(f + 1);
+            }
+        }
+
+        return dice;
     }
 
     // Enumerate all keep strategies: for each face f, choose 0..histogram[f] dice to keep.
@@ -453,7 +500,7 @@ public class ProbabilityCalculator
     private static List<bool> HistogramKeepToMask(List<int> dice, int[] keepHistogram, List<bool>? requiredKeepMask = null)
     {
         requiredKeepMask ??= Enumerable.Repeat(false, dice.Count).ToList();
-        var keepCount = new int[6];
+        var unlockedKeepCount = new int[6];
         var result = new List<bool>(dice.Count);
 
         for (int i = 0; i < dice.Count; i++)
@@ -464,12 +511,11 @@ public class ProbabilityCalculator
             if (requiredKeepMask[i])
             {
                 result.Add(true);
-                keepCount[face]++;
             }
-            else if (keepCount[face] < keepHistogram[face])
+            else if (unlockedKeepCount[face] < keepHistogram[face])
             {
                 result.Add(true);
-                keepCount[face]++;
+                unlockedKeepCount[face]++;
             }
             else
             {
@@ -500,29 +546,4 @@ public class ProbabilityCalculator
         return normalized;
     }
 
-    private static int[] GetRequiredFaceCounts(List<int> dice, List<bool> requiredKeepMask)
-    {
-        var faceCounts = new int[6];
-        for (int i = 0; i < dice.Count && i < requiredKeepMask.Count; i++)
-        {
-            if (requiredKeepMask[i])
-            {
-                faceCounts[dice[i] - 1]++;
-            }
-        }
-        return faceCounts;
-    }
-
-    private static bool SatisfiesRequiredFaceCounts(int[] keepHistogram, int[] requiredFaceCounts)
-    {
-        for (int f = 0; f < 6; f++)
-        {
-            if (keepHistogram[f] < requiredFaceCounts[f])
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
 }

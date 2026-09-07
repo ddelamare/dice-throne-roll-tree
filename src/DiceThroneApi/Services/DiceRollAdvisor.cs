@@ -82,7 +82,7 @@ public class DiceRollAdvisor
                 foreach (var other in others)
                 {
                     var fallbackProb = _calculator.CalculateWithForcedKeep(
-                        currentDice, rollsRemaining, other, a.DiceToKeep);
+                        currentDice, rollsRemaining, other, a.DiceToKeep, lockedDiceMask);
                     var expected = fallbackProb * ComputeDelta(other, eval);
                     if (fallbackProb > bestFallbackProb)
                     {
@@ -190,7 +190,7 @@ public class DiceRollAdvisor
             ? new List<bool>(lockedDiceMask)
             : Enumerable.Repeat(false, currentDice.Count).ToList();
 
-        return _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep);
+        return _calculator.CalculateWithForcedKeep(currentDice, rollsRemaining, objective, baselineKeep, lockedDiceMask);
     }
 
     private List<bool> GreedyKeep(List<int> dice, RollObjective objective)

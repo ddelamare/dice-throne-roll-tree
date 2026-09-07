@@ -144,4 +144,27 @@ public class ProbabilityCalculatorTests
         Assert.True(bestKeep[0]);
         Assert.InRange(probability, 0.0, 1.0);
     }
+
+    [Fact]
+    public void CalculateBestKeep_WithLockedIrrelevantDie_MatchesWithoutDie()
+    {
+        var objective = _parser.Parse("Test", "[6666]");
+        var withManifestDie = new List<int> { 4, 6, 6, 6, 1, 1 };
+        var withoutManifestDie = new List<int> { 6, 6, 6, 1, 1 };
+        var lockedManifestMask = new List<bool> { true, false, false, false, false, false };
+
+        var lockedProbability = _calculator.CalculateBestKeep(
+            withManifestDie,
+            2,
+            objective,
+            out _,
+            lockedManifestMask);
+        var normalProbability = _calculator.CalculateBestKeep(
+            withoutManifestDie,
+            2,
+            objective,
+            out _);
+
+        Assert.Equal(normalProbability, lockedProbability, precision: 10);
+    }
 }

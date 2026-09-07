@@ -137,6 +137,45 @@ public class RollControllerTests
     }
 
     [Fact]
+    public async Task Advice_LockedIrrelevantManifestDie_MatchesExcludedProbability()
+    {
+        using var env = CreateTestEnvironment();
+        var parser = new DiceNotationParser();
+        var matcher = new ObjectiveMatcher();
+        var calculator = new ProbabilityCalculator(matcher);
+        var simulator = new MonteCarloSimulator(matcher);
+        var advisor = new DiceRollAdvisor(calculator, simulator);
+        var heroService = new HeroService(env, parser);
+        var telemetry = new TelemetryService(env);
+        var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry);
+        var dice = new List<int> { 4, 6, 6, 6, 1, 1 };
+
+        var includedResult = Assert.IsType<OkObjectResult>(await controller.GetAdvice(new AdviceRequest
+        {
+            HeroId = "psylocke",
+            CurrentDice = dice,
+            RollsRemaining = 2,
+            Method = "analytic"
+        }));
+        var includedAdvice = Assert.IsType<List<RollAdvice>>(includedResult.Value);
+        var includedBladeDance = includedAdvice.Single(advice => advice.ObjectiveName == "Blade Dance");
+
+        var excludedResult = Assert.IsType<OkObjectResult>(await controller.GetAdvice(new AdviceRequest
+        {
+            HeroId = "psylocke",
+            CurrentDice = dice,
+            RollsRemaining = 2,
+            Method = "analytic",
+            ExcludeManifestDie = true
+        }));
+        var excludedAdvice = Assert.IsType<List<RollAdvice>>(excludedResult.Value);
+        var excludedBladeDance = excludedAdvice.Single(advice => advice.ObjectiveName == "Blade Dance");
+
+        Assert.Equal(0.5177469135802468, includedBladeDance.Probability, precision: 10);
+        Assert.Equal(excludedBladeDance.Probability, includedBladeDance.Probability, precision: 10);
+    }
+
+    [Fact]
     public async Task Simulate_RecordsTelemetryForOperationAndHero()
     {
         using var env = CreateTestEnvironment();
