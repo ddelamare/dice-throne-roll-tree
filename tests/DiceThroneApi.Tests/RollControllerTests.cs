@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using DiceThroneApi.Controllers;
+using DiceThroneApi.Models;
 using DiceThroneApi.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -92,6 +93,47 @@ public class RollControllerTests
 
         var document = System.Text.Json.JsonDocument.Parse(System.Text.Json.JsonSerializer.Serialize(okResult.Value));
         Assert.Equal(1, document.RootElement.GetProperty("rollsRemaining").GetInt32());
+    }
+
+    [Fact]
+    public async Task Advice_ExcludeManifestDie_DoesNotUsePsylockeManifestDie()
+    {
+        using var env = CreateTestEnvironment();
+        var parser = new DiceNotationParser();
+        var matcher = new ObjectiveMatcher();
+        var calculator = new ProbabilityCalculator(matcher);
+        var simulator = new MonteCarloSimulator(matcher);
+        var advisor = new DiceRollAdvisor(calculator, simulator);
+        var heroService = new HeroService(env, parser);
+        var telemetry = new TelemetryService(env);
+        var controller = new RollController(heroService, advisor, calculator, simulator, parser, telemetry);
+        var dice = new List<int> { 6, 6, 6, 6, 6, 1 };
+
+        var includedResult = Assert.IsType<OkObjectResult>(await controller.GetAdvice(new AdviceRequest
+        {
+            HeroId = "psylocke",
+            CurrentDice = dice,
+            RollsRemaining = 0,
+            Method = "analytic"
+        }));
+        var includedAdvice = Assert.IsType<List<RollAdvice>>(includedResult.Value);
+        var includedOtherworlder = includedAdvice.Single(advice => advice.ObjectiveName == "Otherworlder!");
+
+        var excludedResult = Assert.IsType<OkObjectResult>(await controller.GetAdvice(new AdviceRequest
+        {
+            HeroId = "psylocke",
+            CurrentDice = dice,
+            RollsRemaining = 0,
+            Method = "analytic",
+            ExcludeManifestDie = true
+        }));
+        var excludedAdvice = Assert.IsType<List<RollAdvice>>(excludedResult.Value);
+        var excludedOtherworlder = excludedAdvice.Single(advice => advice.ObjectiveName == "Otherworlder!");
+
+        Assert.Equal(1.0, includedOtherworlder.Probability);
+        Assert.Equal(0.0, excludedOtherworlder.Probability);
+        Assert.Equal(dice.Count, excludedOtherworlder.DiceToKeep.Count);
+        Assert.True(excludedOtherworlder.DiceToKeep[0]);
     }
 
     [Fact]

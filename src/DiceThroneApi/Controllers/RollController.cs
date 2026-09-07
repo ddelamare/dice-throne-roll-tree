@@ -44,10 +44,19 @@ public class RollController : ControllerBase
         var totalDiceToRoll = request.DiceCount + (hasManifestDie ? 1 : 0);
         var dice = request.CurrentDice ?? RollDice(totalDiceToRoll);
         var rollsRemaining = request.RollsRemaining ?? 2;
-        var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
+        var excludeManifestDie = request.ExcludeManifestDie && hasManifestDie;
+        var calculationDice = GetCalculationDice(dice, hasManifestDie, excludeManifestDie);
+        var lockedDiceMask = GetLockedDiceMask(dice, hasManifestDie, excludeManifestDie);
 
         var evaluation = GetEvaluation(request.Evaluation, hero);
-        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
+        var suggestions = GetAdviceWithManifestMapping(
+            calculationDice,
+            rollsRemaining,
+            hero.Objectives,
+            request.Method ?? "analytic",
+            lockedDiceMask,
+            evaluation,
+            excludeManifestDie);
         await TrackOperationAsync("simulate", request.HeroId);
 
         return Ok(new
@@ -77,10 +86,19 @@ public class RollController : ControllerBase
         var hasManifestDie = HasManifestDie(hero.Id);
         var dice = request.CurrentDice;
         var rollsRemaining = request.RollsRemaining ?? 2;
-        var lockedDiceMask = BuildLockedDiceMask(dice.Count, hasManifestDie);
+        var excludeManifestDie = request.ExcludeManifestDie && hasManifestDie;
+        var calculationDice = GetCalculationDice(dice, hasManifestDie, excludeManifestDie);
+        var lockedDiceMask = GetLockedDiceMask(dice, hasManifestDie, excludeManifestDie);
 
         var evaluation = GetEvaluation(request.Evaluation, hero);
-        var suggestions = _advisor.GetAdvice(dice, rollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
+        var suggestions = GetAdviceWithManifestMapping(
+            calculationDice,
+            rollsRemaining,
+            hero.Objectives,
+            request.Method ?? "analytic",
+            lockedDiceMask,
+            evaluation,
+            excludeManifestDie);
         await TrackOperationAsync("setdice", request.HeroId);
 
         return Ok(new
@@ -134,10 +152,13 @@ public class RollController : ControllerBase
         }
 
         var hasManifestDie = HasManifestDie(hero.Id);
-        var totalDice = request.DiceCount + (hasManifestDie ? 1 : 0);
-        var lockedDiceMask = BuildLockedDiceMask(totalDice, hasManifestDie);
+        var excludeManifestDie = request.ExcludeManifestDie && hasManifestDie;
+        var totalDice = request.DiceCount + (hasManifestDie && !excludeManifestDie ? 1 : 0);
+        var lockedDiceMask = hasManifestDie && !excludeManifestDie
+            ? BuildLockedDiceMask(totalDice, hasManifestDie)
+            : null;
         var requestedMethod = request.Method ?? "analytic";
-        var useMonteCarlo = requestedMethod.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) && !hasManifestDie;
+        var useMonteCarlo = requestedMethod.Equals("montecarlo", StringComparison.OrdinalIgnoreCase) && (!hasManifestDie || excludeManifestDie);
         var calculationMethod = useMonteCarlo ? "Monte Carlo" : "Analytic";
 
         var advice = hero.Objectives
@@ -187,10 +208,20 @@ public class RollController : ControllerBase
             return NotFound("Hero not found");
         }
 
-        var lockedDiceMask = BuildLockedDiceMask(request.CurrentDice.Count, HasManifestDie(hero.Id));
+        var hasManifestDie = HasManifestDie(hero.Id);
+        var excludeManifestDie = request.ExcludeManifestDie && hasManifestDie;
+        var calculationDice = GetCalculationDice(request.CurrentDice, hasManifestDie, excludeManifestDie);
+        var lockedDiceMask = GetLockedDiceMask(request.CurrentDice, hasManifestDie, excludeManifestDie);
         var evaluation = GetEvaluation(request.Evaluation, hero);
 
-        var advice = _advisor.GetAdvice(request.CurrentDice, request.RollsRemaining, hero.Objectives, request.Method ?? "analytic", lockedDiceMask, evaluation);
+        var advice = GetAdviceWithManifestMapping(
+            calculationDice,
+            request.RollsRemaining,
+            hero.Objectives,
+            request.Method ?? "analytic",
+            lockedDiceMask,
+            evaluation,
+            excludeManifestDie);
         await TrackOperationAsync("advice", request.HeroId);
 
         return Ok(advice);
@@ -233,6 +264,43 @@ public class RollController : ControllerBase
         return lockedDiceMask;
     }
 
+    private static List<int> GetCalculationDice(List<int> dice, bool hasManifestDie, bool excludeManifestDie)
+    {
+        return hasManifestDie && excludeManifestDie && dice.Count > 0
+            ? dice.Skip(1).ToList()
+            : dice;
+    }
+
+    private static List<bool>? GetLockedDiceMask(List<int> dice, bool hasManifestDie, bool excludeManifestDie)
+    {
+        return hasManifestDie && !excludeManifestDie
+            ? BuildLockedDiceMask(dice.Count, hasManifestDie)
+            : null;
+    }
+
+    private List<RollAdvice> GetAdviceWithManifestMapping(
+        List<int> calculationDice,
+        int rollsRemaining,
+        List<RollObjective> objectives,
+        string method,
+        List<bool>? lockedDiceMask,
+        EvaluationConfig evaluation,
+        bool excludeManifestDie)
+    {
+        var advice = _advisor.GetAdvice(calculationDice, rollsRemaining, objectives, method, lockedDiceMask, evaluation);
+        if (!excludeManifestDie)
+        {
+            return advice;
+        }
+
+        foreach (var suggestion in advice)
+        {
+            suggestion.DiceToKeep.Insert(0, true);
+        }
+
+        return advice;
+    }
+
     private List<int> RollDice(int count)
     {
         var result = new List<int>();
@@ -252,6 +320,7 @@ public class SimulateRequest
     public int? RollsRemaining { get; set; }
     public string? Method { get; set; }
     public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
+    public bool ExcludeManifestDie { get; set; }
 }
 
 public class ProbabilityRequest
@@ -269,6 +338,7 @@ public class AdviceRequest
     public int RollsRemaining { get; set; }
     public string? Method { get; set; }
     public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
+    public bool ExcludeManifestDie { get; set; }
 }
 
 public class SetDiceRequest
@@ -278,6 +348,7 @@ public class SetDiceRequest
     public int? RollsRemaining { get; set; }
     public string? Method { get; set; }
     public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
+    public bool ExcludeManifestDie { get; set; }
 }
 
 public class PreRollAdviceRequest
@@ -286,4 +357,5 @@ public class PreRollAdviceRequest
     public int DiceCount { get; set; } = 5;
     public string? Method { get; set; }
     public DiceThroneApi.Models.EvaluationConfig? Evaluation { get; set; }
+    public bool ExcludeManifestDie { get; set; }
 }

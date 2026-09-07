@@ -72,6 +72,24 @@
             margin-bottom: 5px;
             color: #555;
         }
+
+        .checkbox-label {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            margin-top: 28px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+            accent-color: #667eea;
+            cursor: pointer;
+        }
         
         select, input {
             padding: 10px;
@@ -538,6 +556,13 @@
                     <option value="boardOrder">Board Order</option>
                 </select>
             </div>
+
+            <div class="control-group" id="manifestDieOption" style="display:none;">
+                <label class="checkbox-label" for="excludeManifestDie">
+                    <input type="checkbox" id="excludeManifestDie">
+                    Exclude Manifest Die from probability calculations
+                </label>
+            </div>
         </div>
         
         <div class="button-group">
@@ -668,6 +693,19 @@
             };
         }
 
+        function getExcludeManifestDiePayload() {
+            return hasManifestDie && document.getElementById('excludeManifestDie').checked;
+        }
+
+        function updateManifestDieOption() {
+            const option = document.getElementById('manifestDieOption');
+            const checkbox = document.getElementById('excludeManifestDie');
+            option.style.display = hasManifestDie ? '' : 'none';
+            if (!hasManifestDie) {
+                checkbox.checked = false;
+            }
+        }
+
         function evalModalOpen() {
             document.getElementById('menuContainer').classList.remove('show');
             // Populate inputs from current config
@@ -714,23 +752,40 @@
             evalModalClose();
             // Re-fetch advice with new weights if we have current dice
             if (currentDice.length > 0) {
-                const method = document.getElementById('methodSelect').value;
-                apiFetch('/api/roll/advice', {
+                recalculateCurrentAdvice();
+            } else if (currentSuggestions.length > 0) {
+                renderObjectives(currentSuggestions, false);
+            }
+        }
+
+        async function recalculateCurrentAdvice() {
+            if (!currentHero || currentDice.length === 0 || isBusy) return;
+
+            isBusy = true;
+            updateActionButtons();
+            document.getElementById('objectives').innerHTML = '<div class="loading">Calculating probabilities...</div>';
+
+            try {
+                const response = await apiFetch('/api/roll/advice', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         heroId: currentHero.id,
                         currentDice,
                         rollsRemaining,
-                        method,
+                        method: document.getElementById('methodSelect').value,
+                        excludeManifestDie: getExcludeManifestDiePayload(),
                         evaluation: getEvaluationPayload()
                     })
-                })
-                .then(r => r.json())
-                .then(suggestions => { updateDisplay(suggestions); })
-                .catch(() => {});
-            } else if (currentSuggestions.length > 0) {
-                renderObjectives(currentSuggestions, false);
+                });
+
+                updateDisplay(await response.json());
+            } catch (error) {
+                console.error('Error recalculating probabilities:', error);
+                document.getElementById('objectives').innerHTML = '<div class="error">Error calculating probabilities</div>';
+            } finally {
+                isBusy = false;
+                updateActionButtons();
             }
         }
 
@@ -810,6 +865,8 @@
                 evalConfig.tokenValues = { ...(currentHero.tokenValues || {}) };
                 hasManifestDie = currentHero?.id?.toLowerCase() === 'psylocke';
                 manifestDieIndex = hasManifestDie ? 0 : -1;
+                document.getElementById('excludeManifestDie').checked = false;
+                updateManifestDieOption();
                 resetTurnDisplay(defaultStatusText);
             } catch (error) {
                 console.error('Error loading hero:', error);
@@ -829,12 +886,18 @@
             }
         });
 
+        document.getElementById('excludeManifestDie').addEventListener('change', () => {
+            recalculateCurrentAdvice();
+        });
+
         function updateActionButtons() {
             document.getElementById('rollBtn').disabled = isBusy || !currentHero;
             const rerollBtn = document.getElementById('rerollBtn');
             if (rerollBtn) rerollBtn.disabled = isBusy || rollsRemaining <= 0 || currentDice.length === 0;
             const menuButton = document.getElementById('menuButton');
             if (menuButton) menuButton.disabled = isBusy || !currentHero;
+            const manifestCheckbox = document.getElementById('excludeManifestDie');
+            if (manifestCheckbox) manifestCheckbox.disabled = isBusy || !hasManifestDie;
         }
 
         function clearDiceDisplay() {
@@ -942,6 +1005,7 @@
                         heroId: currentHero.id,
                         diceCount: diceCount,
                         method: method,
+                        excludeManifestDie: getExcludeManifestDiePayload(),
                         evaluation: getEvaluationPayload()
                     })
                 });
@@ -988,6 +1052,7 @@
                         heroId: currentHero.id,
                         diceCount: diceCount,
                         method: method,
+                        excludeManifestDie: getExcludeManifestDiePayload(),
                         evaluation: getEvaluationPayload()
                     })
                 });
@@ -1049,6 +1114,7 @@
                         currentDice: currentDice,
                         rollsRemaining: rollsRemaining,
                         method: method,
+                        excludeManifestDie: getExcludeManifestDiePayload(),
                         evaluation: getEvaluationPayload()
                     })
                 });
@@ -1123,6 +1189,7 @@
                         currentDice: currentDice,
                         rollsRemaining: rollsRemaining,
                         method: document.getElementById('methodSelect').value,
+                        excludeManifestDie: getExcludeManifestDiePayload(),
                         evaluation: getEvaluationPayload()
                     })
                 });
