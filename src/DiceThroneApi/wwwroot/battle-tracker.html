@@ -417,6 +417,51 @@
             font-weight: 700;
         }
 
+        .tracker-edit,
+        .tracker-save,
+        .tracker-cancel {
+            padding: 5px 8px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tracker-edit {
+            color: #334b8f;
+            background: #eef3ff;
+        }
+
+        .tracker-save {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .tracker-cancel {
+            color: #64748b;
+            background: #f1f5f9;
+        }
+
+        .ledger-edit-input {
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 72px;
+            padding: 6px 7px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            color: #353d5a;
+            background: #fff;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .ledger-edit-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
         .tracker-empty {
             padding: 19px 12px;
             color: #78819e;
@@ -663,8 +708,8 @@
         const customHeroValue = '__custom__';
         const naraxusValue = '__naraxus__';
         const sides = [
-            { hero: null, name: 'Combatant 1', startingHealth: 50, entries: [] },
-            { hero: null, name: 'Combatant 2', startingHealth: 50, entries: [] }
+            { hero: null, name: 'Combatant 1', startingHealth: 50, entries: [], editingEntryId: null },
+            { hero: null, name: 'Combatant 2', startingHealth: 50, entries: [], editingEntryId: null }
         ];
         let heroes = [];
         let suggestionState = [{}, {}];
@@ -727,6 +772,20 @@
                 }).join('') +
                 '<option value="custom">Custom attack</option>';
             renderSuggestions(sideIndex);
+        }
+
+        function editableAbilityOptions(sideIndex, selectedAbility) {
+            const objectives = sides[sideIndex].hero?.objectives || [];
+            const hasSelectedObjective = objectives.some(objective => objective.name === selectedAbility);
+            const selectedValue = hasSelectedObjective ? selectedAbility : selectedAbility === 'Custom attack' ? 'custom' : '';
+            return '<option value="">Choose an ability</option>' +
+                objectives.map(objective =>
+                    '<option value="' + escapeHtml(objective.name) + '"' +
+                        (selectedValue === objective.name ? ' selected' : '') + '>' +
+                        escapeHtml(objective.name) +
+                    '</option>'
+                ).join('') +
+                '<option value="custom"' + (selectedValue === 'custom' ? ' selected' : '') + '>Custom attack</option>';
         }
 
         function renderSuggestions(sideIndex) {
@@ -823,20 +882,45 @@
                 '<table class="ledger-table">' +
                     '<thead><tr><th>#</th><th>Resolved ability</th><th>Damage dealt</th><th>Defense damage / healing</th><th>Other effects</th><th></th></tr></thead>' +
                     '<tbody>' +
-                    side.entries.map((entry, index) =>
-                        '<tr>' +
+                    side.entries.map((entry, index) => {
+                        if (side.editingEntryId === entry.id) {
+                            return '<tr data-edit-row-id="' + entry.id + '">' +
+                                '<td>' + (index + 1) + '</td>' +
+                                '<td><select class="ledger-edit-input" data-edit-field="ability">' + editableAbilityOptions(sideIndex, entry.ability) + '</select></td>' +
+                                '<td><input class="ledger-edit-input" data-edit-field="damage" type="number" min="0" step="1" value="' + entry.damage + '"></td>' +
+                                '<td><input class="ledger-edit-input" data-edit-field="defense" type="number" step="1" value="' + entry.defenseDamage + '"></td>' +
+                                '<td><input class="ledger-edit-input" data-edit-field="effects" type="text" value="' + escapeHtml(entry.effects || '') + '"></td>' +
+                                '<td><div class="ledger-edit-actions">' +
+                                    '<button type="button" class="tracker-save" data-save-entry-id="' + entry.id + '">Save</button>' +
+                                    '<button type="button" class="tracker-cancel" data-cancel-entry-id="' + entry.id + '">Cancel</button>' +
+                                '</div></td>' +
+                            '</tr>';
+                        }
+                        return '<tr>' +
                             '<td>' + (index + 1) + '</td>' +
                             '<td><strong>' + escapeHtml(entry.ability) + '</strong></td>' +
                             '<td class="damage-cell">' + entry.damage + '</td>' +
                             '<td class="defense-cell">' + entry.defenseDamage + '</td>' +
                             '<td class="effects-cell">' + escapeHtml(entry.effects || '—') + '</td>' +
-                            '<td><button type="button" class="tracker-remove" data-entry-id="' + entry.id + '">Remove</button></td>' +
-                        '</tr>'
-                    ).join('') +
+                            '<td><div class="ledger-edit-actions">' +
+                                '<button type="button" class="tracker-edit" data-edit-entry-id="' + entry.id + '">Edit</button>' +
+                                '<button type="button" class="tracker-remove" data-entry-id="' + entry.id + '">Remove</button>' +
+                            '</div></td>' +
+                        '</tr>';
+                    }).join('') +
                     '</tbody>' +
                 '</table>';
+            ledger.querySelectorAll('[data-edit-entry-id]').forEach(button => {
+                button.addEventListener('click', () => editEntry(sideIndex, button.dataset.editEntryId));
+            });
             ledger.querySelectorAll('[data-entry-id]').forEach(button => {
                 button.addEventListener('click', () => removeEntry(sideIndex, button.dataset.entryId));
+            });
+            ledger.querySelectorAll('[data-save-entry-id]').forEach(button => {
+                button.addEventListener('click', () => saveEntryEdit(sideIndex, button.dataset.saveEntryId));
+            });
+            ledger.querySelectorAll('[data-cancel-entry-id]').forEach(button => {
+                button.addEventListener('click', () => cancelEntryEdit(sideIndex));
             });
         }
 
@@ -858,6 +942,7 @@
                 side.startingHealth = parseInt(sideElement(sideIndex, 'StartingHealth').value, 10);
                 side.name = sideElement(sideIndex, 'Name').value.trim() || ('Combatant ' + (sideIndex + 1));
                 side.entries = [];
+                side.editingEntryId = null;
             });
             renderAll();
         }
@@ -889,8 +974,52 @@
             sideElement(sideIndex, 'Effects').value = '';
         }
 
+        function editEntry(sideIndex, entryId) {
+            const entry = sides[sideIndex].entries.find(candidate => candidate.id === entryId);
+            if (!entry) return;
+            sides[sideIndex].editingEntryId = entryId;
+            renderSide(sideIndex);
+            const row = sideElement(sideIndex, 'Ledger').querySelector('[data-edit-row-id="' + entryId + '"]');
+            row?.querySelector('[data-edit-field="ability"]')?.focus();
+        }
+
+        function saveEntryEdit(sideIndex, entryId) {
+            const row = sideElement(sideIndex, 'Ledger').querySelector('[data-edit-row-id="' + entryId + '"]');
+            const entry = sides[sideIndex].entries.find(candidate => candidate.id === entryId);
+            if (!row || !entry) return;
+
+            const abilityValue = row.querySelector('[data-edit-field="ability"]').value;
+            const damage = parseInt(row.querySelector('[data-edit-field="damage"]').value, 10);
+            const defenseDamage = parseInt(row.querySelector('[data-edit-field="defense"]').value, 10);
+            const effects = row.querySelector('[data-edit-field="effects"]').value.trim();
+
+            if (!abilityValue) {
+                alert('Choose a resolved ability before saving the attack.');
+                return;
+            }
+            if (!Number.isInteger(damage) || damage < 0 || !Number.isInteger(defenseDamage)) {
+                alert('Damage must be a whole number of 0 or more. Defense damage / healing must be a whole number; use a negative value for healing.');
+                return;
+            }
+
+            entry.ability = abilityValue === 'custom' ? 'Custom attack' : abilityValue;
+            entry.damage = damage;
+            entry.defenseDamage = defenseDamage;
+            entry.effects = effects;
+            sides[sideIndex].editingEntryId = null;
+            renderAll();
+        }
+
+        function cancelEntryEdit(sideIndex) {
+            sides[sideIndex].editingEntryId = null;
+            renderSide(sideIndex);
+        }
+
         function removeEntry(sideIndex, entryId) {
             sides[sideIndex].entries = sides[sideIndex].entries.filter(entry => entry.id !== entryId);
+            if (sides[sideIndex].editingEntryId === entryId) {
+                sides[sideIndex].editingEntryId = null;
+            }
             renderAll();
         }
 
