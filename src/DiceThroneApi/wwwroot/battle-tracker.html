@@ -661,6 +661,7 @@
         const apiFetch = window.telemetryClient.apiFetch;
         const trackVisit = window.telemetryClient.trackVisit;
         const customHeroValue = '__custom__';
+        const naraxusValue = '__naraxus__';
         const sides = [
             { hero: null, name: 'Combatant 1', startingHealth: 50, entries: [] },
             { hero: null, name: 'Combatant 2', startingHealth: 50, entries: [] }
@@ -983,6 +984,17 @@
         }
 
         async function loadHeroForSide(sideIndex, heroId) {
+            if (heroId === naraxusValue) {
+                sides[sideIndex].hero = null;
+                sides[sideIndex].name = 'Naraxus';
+                sides[sideIndex].startingHealth = 65;
+                sideElement(sideIndex, 'Name').value = 'Naraxus';
+                sideElement(sideIndex, 'StartingHealth').value = '65';
+                populateAbilities(sideIndex);
+                renderAll();
+                return;
+            }
+
             if (heroId === customHeroValue) {
                 sides[sideIndex].hero = null;
                 sides[sideIndex].name = 'Combatant ' + (sideIndex + 1);
@@ -1013,7 +1025,9 @@
                     const select = sideElement(sideIndex, 'HeroSelect');
                     select.innerHTML = heroes.map(hero =>
                         '<option value="' + hero.id + '">' + escapeHtml(hero.name) + '</option>'
-                    ).join('') + '<option value="' + customHeroValue + '">Custom name / ability set</option>';
+                    ).join('') +
+                        '<option value="' + naraxusValue + '">Naraxus · Raid Boss</option>' +
+                        '<option value="' + customHeroValue + '">Custom name / ability set</option>';
                 }
 
                 if (heroes.length > 0) {
@@ -1030,6 +1044,7 @@
                 console.error('Error loading tracker heroes:', error);
                 for (let sideIndex = 0; sideIndex < sides.length; sideIndex++) {
                     sideElement(sideIndex, 'HeroSelect').innerHTML =
+                        '<option value="' + naraxusValue + '">Naraxus · Raid Boss</option>' +
                         '<option value="' + customHeroValue + '">Custom name / ability set</option>';
                     await loadHeroForSide(sideIndex, customHeroValue);
                 }
