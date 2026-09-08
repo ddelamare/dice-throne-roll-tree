@@ -529,7 +529,7 @@
                             <div class="health-stat">
                                 <span>Damage dealt</span>
                                 <strong id="side0DamageDealt">0</strong>
-                                <small id="side0IncomingSummary">Damage received: 0 · Defense: 0</small>
+                                <small id="side0IncomingSummary">Damage received: 0 · Defense damage / healing: 0</small>
                             </div>
                         </div>
 
@@ -546,8 +546,8 @@
                                     <input id="side0Damage" type="number" min="0" step="1" value="0">
                                 </div>
                                 <div class="control-group">
-                                    <label for="side0Defense">Defense damage received</label>
-                                    <input id="side0Defense" type="number" min="0" step="1" value="0">
+                                    <label for="side0Defense">Defense damage / healing</label>
+                                    <input id="side0Defense" type="number" step="1" value="0" placeholder="+2 or -2">
                                 </div>
                             </div>
                             <div class="control-group entry-effects">
@@ -562,7 +562,7 @@
                             <div class="ledger-heading">
                                 <div>
                                     <h4>Hero 1 ledger</h4>
-                                    <p>Defense damage here reduces Hero 1 health.</p>
+                                    <p>Positive damages Hero 1; negative values heal Hero 1.</p>
                                 </div>
                             </div>
                             <div id="side0Ledger" class="ledger-table-wrap">
@@ -610,7 +610,7 @@
                             <div class="health-stat">
                                 <span>Damage dealt</span>
                                 <strong id="side1DamageDealt">0</strong>
-                                <small id="side1IncomingSummary">Damage received: 0 · Defense: 0</small>
+                                <small id="side1IncomingSummary">Damage received: 0 · Defense damage / healing: 0</small>
                             </div>
                         </div>
 
@@ -627,8 +627,8 @@
                                     <input id="side1Damage" type="number" min="0" step="1" value="0">
                                 </div>
                                 <div class="control-group">
-                                    <label for="side1Defense">Defense damage received</label>
-                                    <input id="side1Defense" type="number" min="0" step="1" value="0">
+                                    <label for="side1Defense">Defense damage / healing</label>
+                                    <input id="side1Defense" type="number" step="1" value="0" placeholder="+2 or -2">
                                 </div>
                             </div>
                             <div class="control-group entry-effects">
@@ -643,7 +643,7 @@
                             <div class="ledger-heading">
                                 <div>
                                     <h4>Hero 2 ledger</h4>
-                                    <p>Defense damage here reduces Hero 2 health.</p>
+                                    <p>Positive damages Hero 2; negative values heal Hero 2.</p>
                                 </div>
                             </div>
                             <div id="side1Ledger" class="ledger-table-wrap">
@@ -690,17 +690,17 @@
             const side = sides[sideIndex];
             const opponent = sides[sideIndex === 0 ? 1 : 0];
             const damageDealt = side.entries.reduce((sum, entry) => sum + entry.damage, 0);
-            const defenseReceived = side.entries.reduce((sum, entry) => sum + entry.defenseDamage, 0);
+            const defenseEffect = side.entries.reduce((sum, entry) => sum + entry.defenseDamage, 0);
             const damageReceived = opponent.entries.reduce((sum, entry) => sum + entry.damage, 0);
-            const totalHealthLoss = defenseReceived + damageReceived;
+            const totalHealthLoss = defenseEffect + damageReceived;
 
             return {
                 damageDealt,
-                defenseReceived,
+                defenseEffect,
                 damageReceived,
                 currentHealth: Math.max(0, side.startingHealth - totalHealthLoss),
                 healthPercent: side.startingHealth > 0
-                    ? Math.min(100, Math.max(0, ((side.startingHealth - totalHealthLoss) / side.startingHealth) * 100))
+                    ? Math.max(0, ((side.startingHealth - totalHealthLoss) / side.startingHealth) * 100)
                     : 0
             };
         }
@@ -806,7 +806,7 @@
                 : 'defeated';
             sideElement(sideIndex, 'DamageDealt').textContent = summary.damageDealt;
             sideElement(sideIndex, 'IncomingSummary').textContent =
-                'Damage received: ' + summary.damageReceived + ' · Defense: ' + summary.defenseReceived;
+                'Damage received: ' + summary.damageReceived + ' · Defense damage / healing: ' + summary.defenseEffect;
 
             const healthBar = sideElement(sideIndex, 'HealthBar');
             healthBar.style.width = summary.healthPercent + '%';
@@ -821,7 +821,7 @@
 
             ledger.innerHTML =
                 '<table class="ledger-table">' +
-                    '<thead><tr><th>#</th><th>Resolved ability</th><th>Damage dealt</th><th>Defense received</th><th>Other effects</th><th></th></tr></thead>' +
+                    '<thead><tr><th>#</th><th>Resolved ability</th><th>Damage dealt</th><th>Defense damage / healing</th><th>Other effects</th><th></th></tr></thead>' +
                     '<tbody>' +
                     side.entries.map((entry, index) =>
                         '<tr>' +
@@ -871,8 +871,8 @@
                 alert('Choose a resolved ability before adding an attack.');
                 return;
             }
-            if (!Number.isInteger(damage) || damage < 0 || !Number.isInteger(defenseDamage) || defenseDamage < 0) {
-                alert('Damage and defense damage must be whole numbers of 0 or more.');
+            if (!Number.isInteger(damage) || damage < 0 || !Number.isInteger(defenseDamage)) {
+                alert('Damage must be a whole number of 0 or more. Defense damage / healing must be a whole number; use a negative value for healing.');
                 return;
             }
 
@@ -908,12 +908,12 @@
                         currentHealth: summary.currentHealth,
                         damageDealt: summary.damageDealt,
                         damageReceived: summary.damageReceived,
-                        defenseDamageReceived: summary.defenseReceived,
+                        defenseDamageOrHealing: summary.defenseEffect,
                         entries: side.entries.map((entry, index) => ({
                             number: index + 1,
                             ability: entry.ability,
                             damageDealt: entry.damage,
-                            defenseDamageReceived: entry.defenseDamage,
+                            defenseDamageOrHealing: entry.defenseDamage,
                             effects: entry.effects || ''
                         }))
                     };
@@ -966,14 +966,14 @@
                     ['Current health', side.currentHealth],
                     ['Damage dealt', side.damageDealt],
                     ['Damage received', side.damageReceived],
-                    ['Defense damage received', side.defenseDamageReceived],
+                    ['Defense damage / healing', side.defenseDamageOrHealing],
                     [],
-                    ['#', 'Resolved ability', 'Damage dealt', 'Defense damage received', 'Other effects'],
+                    ['#', 'Resolved ability', 'Damage dealt', 'Defense damage / healing', 'Other effects'],
                     ...side.entries.map(entry => [
                         entry.number,
                         entry.ability,
                         entry.damageDealt,
-                        entry.defenseDamageReceived,
+                        entry.defenseDamageOrHealing,
                         entry.effects
                     ]),
                     []
