@@ -593,7 +593,7 @@
                                     </select>
                                 </div>
                                 <div class="control-group">
-                                    <label for="side0Damage">Damage dealt</label>
+                                    <label for="side0Damage">Damage attempted</label>
                                     <input id="side0Damage" type="number" min="0" step="1" value="0">
                                 </div>
                                 <div class="control-group">
@@ -678,7 +678,7 @@
                                     </select>
                                 </div>
                                 <div class="control-group">
-                                    <label for="side1Damage">Damage dealt</label>
+                                    <label for="side1Damage">Damage attempted</label>
                                     <input id="side1Damage" type="number" min="0" step="1" value="0">
                                 </div>
                                 <div class="control-group">
@@ -900,14 +900,14 @@
 
             ledger.innerHTML =
                 '<table class="ledger-table">' +
-                    '<thead><tr><th>#</th><th>Resolved ability</th><th>Damage dealt</th><th>Defense damage prevented</th><th>Defense damage / healing</th><th>Other effects</th><th></th></tr></thead>' +
+                    '<thead><tr><th>#</th><th>Resolved ability</th><th>Damage dealt after prevention</th><th>Defense damage prevented</th><th>Defense damage / healing</th><th>Other effects</th><th></th></tr></thead>' +
                     '<tbody>' +
                     side.entries.map((entry, index) => {
                         if (side.editingEntryId === entry.id) {
                             return '<tr data-edit-row-id="' + entry.id + '">' +
                                 '<td>' + (index + 1) + '</td>' +
                                 '<td><select class="ledger-edit-input" data-edit-field="ability">' + editableAbilityOptions(sideIndex, entry.ability) + '</select></td>' +
-                                '<td><input class="ledger-edit-input" data-edit-field="damage" type="number" min="0" step="1" value="' + entry.damage + '"></td>' +
+                                '<td><input class="ledger-edit-input" data-edit-field="damage" type="number" min="0" step="1" value="' + entry.damage + '" aria-label="Damage attempted" title="Damage attempted"></td>' +
                                 '<td><input class="ledger-edit-input" data-edit-field="prevented" type="number" min="0" step="1" value="' + entry.defenseDamagePrevented + '"></td>' +
                                 '<td><input class="ledger-edit-input" data-edit-field="defense" type="number" step="1" value="' + entry.defenseDamage + '"></td>' +
                                 '<td><input class="ledger-edit-input" data-edit-field="effects" type="text" value="' + escapeHtml(entry.effects || '') + '"></td>' +
