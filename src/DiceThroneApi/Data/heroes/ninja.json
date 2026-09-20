@@ -6,7 +6,7 @@
     { "name": "Slash (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6, "tokens": ["Ninjutsu"] },
     { "name": "Slash (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7, "tokens": ["Ninjutsu"] },
     { "name": "Poison Blade", "notation": "SmallStraight", "damage": 6, "tokens": ["Delayed Poison"] },
-    { "name": "Walk the Line", "notation": "[(45)(45)(45)(45)]", "damage": 7, "bypassDefense": true },
+    { "name": "Walk the Line", "notation": "[(45)(45)(45)(45)]", "damage": 7 },
     { "name": "Death Blossom", "notation": "[(123)(123)(123)(45)(45)]", "damage": 5 },
     { "name": "Smoke Screen", "notation": "[(123)(45)6]", "tokens": ["Smoke Bomb", "Ninjutsu", "Ninjutsu", "Delayed Poison"] },
     { "name": "Shadewalk", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Smoke Bomb", "Delayed Poison"] },
