@@ -1,0 +1,14 @@
+{
+  "id": "alchemist",
+  "name": "Alchemist",
+  "objectives": [
+    { "name": "Transmute", "notation": "[(123)(123)(123)(45)(45)]", "damage": 6, "cp": 1 },
+    { "name": "Hermetics", "notation": "[(45)(45)(45)]", "heal": 2, "tokens": ["Potion", "Potion", "Potion"] },
+    { "name": "Potion Overload", "notation": "[(123)666]", "damage": 7, "tokens": ["Potion", "Potion"] },
+    { "name": "Diffusion (Small)", "notation": "SmallStraight", "damage": 7, "tokens": ["Potion"] },
+    { "name": "Diffusion (Large)", "notation": "LargeStraight", "damage": 8, "cards": 1, "tokens": ["Potion", "Potion"] },
+    { "name": "Catalyst", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Punchify", "Bolsterate", "Cleansitude", "Toxification"] },
+    { "name": "Chain Reaction", "notation": "[(123)(123)(123)(123)6]", "damage": 6 },
+    { "name": "Chemical Trip!", "notation": "[66666]", "damage": 10, "tokens": ["Potion", "Potion", "Potion", "Potion"] }
+  ]
+}
