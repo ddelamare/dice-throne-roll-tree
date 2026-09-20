@@ -2,19 +2,12 @@
   "id": "cursedpirate",
   "name": "Cursed Pirate",
   "objectives": [
-    { "name": "Human - Cutlass Strike", "notation": "[(123)(123)(123)]", "damage": 6, "tokens": ["Powder Keg"] },
-    { "name": "Human - X Marks the Spot", "notation": "[(45)(45)(45)]", "damage": 3, "bypassDefense": true, "cp": 1, "tokens": ["Cursed Doubloon"] },
-    { "name": "Human - Walk the Plank", "notation": "[(123)(45)(45)6]", "damage": 7 },
-    { "name": "Human - Light the Fuse", "notation": "SmallStraight", "damage": 8, "tokens": ["Powder Keg"] },
-    { "name": "Human - Black Spot", "notation": "[6666]", "damage": 7, "bypassDefense": true, "tokens": ["Cursed Doubloon", "Parlay"] },
-    { "name": "Human - Shiver Me Timbers", "notation": "[(123)666]", "damage": 7, "bypassDefense": true },
-    { "name": "Human - Pirate's Touch!", "notation": "[66666]", "damage": 12, "tokens": ["Cursed Doubloon", "Cursed Doubloon", "Parlay", "Powder Keg"] },
-    { "name": "Cursed - Soul Cutlass", "notation": "[(123)(123)(123)]", "damage": 7 },
-    { "name": "Cursed - Dread Mark", "notation": "[(45)(45)(45)]", "damage": 4, "bypassDefense": true, "cp": 2 },
-    { "name": "Cursed - Abyssal Walk", "notation": "[(123)(45)(45)6]", "damage": 8, "tokens": ["Wither"] },
-    { "name": "Cursed - Thar She Blows", "notation": "SmallStraight", "damage": 9, "tokens": ["Wither", "Powder Keg"] },
-    { "name": "Cursed - Black Soul", "notation": "[6666]", "damage": 8, "bypassDefense": true, "tokens": ["Parlay", "Powder Keg", "Wither"] },
-    { "name": "Cursed - The Shivering", "notation": "[(123)6666]", "damage": 8, "bypassDefense": true },
-    { "name": "Cursed - Cursed Touch", "notation": "[66666]", "damage": 13, "tokens": ["Parlay", "Cursed Doubloon", "Wither", "Powder Keg"] }
+    { "name": "Cutlass Strike", "notation": "[(123)(123)(123)]", "damage": 6, "tokens": ["Powder Keg"] },
+    { "name": "X Marks the Spot", "notation": "[(45)(45)(45)]", "damage": 3, "bypassDefense": true, "cp": 1, "tokens": ["Cursed Doubloon"] },
+    { "name": "Walk the Plank", "notation": "[(123)(45)(45)6]", "damage": 7 },
+    { "name": "Light the Fuse", "notation": "SmallStraight", "damage": 8, "tokens": ["Powder Keg"] },
+    { "name": "Black Spot", "notation": "[6666]", "damage": 7, "bypassDefense": true, "tokens": ["Cursed Doubloon", "Parlay"] },
+    { "name": "Shiver Me Timbers", "notation": "[(123)666]", "damage": 7, "bypassDefense": true },
+    { "name": "Pirate's Touch!", "notation": "[66666]", "damage": 12, "tokens": ["Cursed Doubloon", "Cursed Doubloon", "Parlay", "Powder Keg"] }
   ]
 }
