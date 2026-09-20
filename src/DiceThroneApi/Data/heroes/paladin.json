@@ -8,7 +8,7 @@
     { "name": "Holy Attack (Small)", "notation": "SmallStraight", "damage": 6, "heal": 1 },
     { "name": "Holy Attack (Large)", "notation": "LargeStraight", "damage": 8, "heal": 2 },
     { "name": "Righteous Prayer", "notation": "[6666]", "damage": 8, "cp": 2, "tokens": ["Crit"] },
-    { "name": "Holy Light", "notation": "[55]", "heal": 2, "cards": 1, "cp": 1 },
+    { "name": "Holy Light", "notation": "[55]", "heal": 2, "cp": 1 },
     { "name": "Resolute Faith!", "notation": "[66666]", "damage": 10, "heal": 5, "tokens": ["Blessing of Divinity"] }
   ]
 }

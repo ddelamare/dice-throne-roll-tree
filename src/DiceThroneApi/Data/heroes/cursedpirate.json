@@ -2,8 +2,8 @@
   "id": "cursedpirate",
   "name": "Cursed Pirate",
   "objectives": [
-    { "name": "Cutlass Strike", "notation": "[(123)(123)(123)]", "damage": 6, "tokens": ["Powder Keg"] },
-    { "name": "X Marks the Spot", "notation": "[(45)(45)(45)]", "damage": 3, "bypassDefense": true, "cp": 1, "tokens": ["Cursed Doubloon"] },
+    { "name": "Cutlass Strike", "notation": "[(123)(123)(123)]", "damage": 6 },
+    { "name": "X Marks the Spot", "notation": "[(45)(45)(45)]", "damage": 3, "bypassDefense": true, "cp": 1, "cards": 1 },
     { "name": "Walk the Plank", "notation": "[(123)(45)(45)6]", "damage": 7 },
     { "name": "Light the Fuse", "notation": "SmallStraight", "damage": 8, "tokens": ["Powder Keg"] },
     { "name": "Black Spot", "notation": "[6666]", "damage": 7, "bypassDefense": true, "tokens": ["Cursed Doubloon", "Parlay"] },

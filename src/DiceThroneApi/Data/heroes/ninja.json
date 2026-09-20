@@ -2,9 +2,9 @@
   "id": "ninja",
   "name": "Ninja",
   "objectives": [
-    { "name": "Slash (3)", "notation": "[(123)(123)(123)]", "damage": 5, "tokens": ["Ninjutsu"] },
-    { "name": "Slash (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6, "tokens": ["Ninjutsu"] },
-    { "name": "Slash (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7, "tokens": ["Ninjutsu"] },
+    { "name": "Slash (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Slash (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Slash (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
     { "name": "Poison Blade", "notation": "SmallStraight", "damage": 6, "tokens": ["Delayed Poison"] },
     { "name": "Walk the Line", "notation": "[(45)(45)(45)(45)]", "damage": 7 },
     { "name": "Death Blossom", "notation": "[(123)(123)(123)(45)(45)]", "damage": 5 },

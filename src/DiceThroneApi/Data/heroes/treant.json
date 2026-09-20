@@ -9,7 +9,7 @@
     { "name": "Overgrowth", "notation": "[(123)(123)(45)(45)(45)]", "damage": 8 },
     { "name": "Vengeful Vines", "notation": "SmallStraight", "damage": 7, "tokens": ["Barbed Vine"] },
     { "name": "Nature's Grasp", "notation": "[6666]", "damage": 8, "bypassDefense": true, "tokens": ["Spirit", "Spirit"] },
-    { "name": "Call of the Wild", "notation": "LargeStraight", "damage": 9, "tokens": ["Wellspring", "Spirit"] },
+    { "name": "Call of the Wild", "notation": "LargeStraight", "damage": 10, "tokens": ["Wellspring", "Spirit"] },
     { "name": "Wake the Forest!", "notation": "[66666]", "damage": 10, "tokens": ["Wellspring", "Spirit", "Spirit", "Spirit", "Spirit", "Spirit", "Barbed Vine"] }
   ]
 }

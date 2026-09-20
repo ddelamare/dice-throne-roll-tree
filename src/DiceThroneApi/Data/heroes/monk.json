@@ -5,7 +5,7 @@
     { "name": "Fist Strike (3)", "notation": "[(12)(12)(12)]", "damage": 6 },
     { "name": "Fist Strike (4)", "notation": "[(12)(12)(12)(12)]", "damage": 7 },
     { "name": "Fist Strike (5)", "notation": "[(12)(12)(12)(12)(12)]", "damage": 8 },
-    { "name": "Meditate", "notation": "[(45)(45)(45)]", "tokens": ["Chi", "Chi", "Chi", "Chi", "Chi", "Evasive", "Cleanse"] },
+    { "name": "Meditate", "notation": "[(45)(45)(45)]", "tokens": ["Chi", "Chi", "Chi", "Chi", "Chi"] },
     { "name": "Combo Strike", "notation": "[(12)(12)(12)3]", "damage": 7 },
     { "name": "Tempest Rush", "notation": "[333]", "damage": 11 },
     { "name": "Fist of Harmony", "notation": "SmallStraight", "damage": 6, "tokens": ["Chi", "Chi"] },

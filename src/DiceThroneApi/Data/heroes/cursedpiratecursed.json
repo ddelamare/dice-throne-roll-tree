@@ -3,7 +3,7 @@
   "name": "Cursed Pirate Cursed",
   "objectives": [
     { "name": "Soul Cutlass", "notation": "[(123)(123)(123)]", "damage": 7 },
-    { "name": "Dread Mark", "notation": "[(45)(45)(45)]", "damage": 4, "bypassDefense": true, "cp": 2 },
+    { "name": "Dread Mark", "notation": "[(45)(45)(45)]", "damage": 4, "bypassDefense": true, "cp": 2, "cards": 1 },
     { "name": "Abyssal Walk", "notation": "[(123)(45)(45)6]", "damage": 8, "tokens": ["Wither"] },
     { "name": "Thar She Blows", "notation": "SmallStraight", "damage": 9, "tokens": ["Wither", "Powder Keg"] },
     { "name": "Black Soul", "notation": "[6666]", "damage": 8, "bypassDefense": true, "tokens": ["Parlay", "Powder Keg", "Wither"] },
