@@ -1,0 +1,15 @@
+{
+  "id": "treant",
+  "name": "Treant",
+  "objectives": [
+    { "name": "Splinter (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Splinter (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Splinter (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Tend", "notation": "[(45)(45)66]", "cards": 1, "tokens": ["Spirit", "Spirit", "Spirit", "Wellspring", "Barbed Vine"] },
+    { "name": "Overgrowth", "notation": "[(123)(123)(45)(45)(45)]", "damage": 8 },
+    { "name": "Vengeful Vines", "notation": "SmallStraight", "damage": 7, "tokens": ["Barbed Vine"] },
+    { "name": "Nature's Grasp", "notation": "[6666]", "damage": 8, "bypassDefense": true, "tokens": ["Spirit", "Spirit"] },
+    { "name": "Call of the Wild", "notation": "LargeStraight", "damage": 9, "tokens": ["Wellspring", "Spirit"] },
+    { "name": "Wake the Forest!", "notation": "[66666]", "damage": 10, "tokens": ["Wellspring", "Spirit", "Spirit", "Spirit", "Spirit", "Spirit", "Barbed Vine"] }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "shadowthief",
+  "name": "Shadow Thief",
+  "objectives": [
+    { "name": "Dagger Strike (3)", "notation": "[(12)(12)(12)]", "damage": 4 },
+    { "name": "Dagger Strike (4)", "notation": "[(12)(12)(12)(12)]", "damage": 6 },
+    { "name": "Dagger Strike (5)", "notation": "[(12)(12)(12)(12)(12)]", "damage": 8 },
+    { "name": "Shifty Strike", "notation": "SmallStraight", "damage": 4, "cp": 3 },
+    { "name": "Pickpocket (2)", "notation": "[(34)(34)]", "cp": 2 },
+    { "name": "Pickpocket (3)", "notation": "[(34)(34)(34)]", "cp": 3 },
+    { "name": "Pickpocket (4)", "notation": "[(34)(34)(34)(34)]", "cp": 4 },
+    { "name": "Insidious Strike", "notation": "LargeStraight", "damage": 7, "cp": 3 },
+    { "name": "Shadow Dance", "notation": "[666]", "damage": 2, "bypassDefense": true, "tokens": ["Sneak Attack", "Shadows"] },
+    { "name": "Carducopia", "notation": "[55]", "cards": 2 },
+    { "name": "Shadow Shank!", "notation": "[66666]", "damage": 12, "cp": 3, "tokens": ["Shadows"] }
+  ]
+}

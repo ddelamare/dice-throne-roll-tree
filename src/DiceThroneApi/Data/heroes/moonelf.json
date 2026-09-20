@@ -1,0 +1,16 @@
+{
+  "id": "moonelf",
+  "name": "Moon Elf",
+  "objectives": [
+    { "name": "Longbow (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Longbow (4)", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Longbow (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Demising Shot", "notation": "[(123)(123)(123)66]", "damage": 4, "tokens": ["Targeted"] },
+    { "name": "Covered Shot", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7, "tokens": ["Evasive"] },
+    { "name": "Exploding Arrow", "notation": "[(123)666]", "damage": 7, "tokens": ["Blind"] },
+    { "name": "Entangling Shot", "notation": "SmallStraight", "damage": 7, "tokens": ["Entangle"] },
+    { "name": "Eclipse", "notation": "[6666]", "damage": 7, "tokens": ["Blind", "Entangle", "Targeted"] },
+    { "name": "Blinding Shot", "notation": "LargeStraight", "damage": 8, "tokens": ["Blind", "Evasive"] },
+    { "name": "Lunar Eclipse!", "notation": "[66666]", "damage": 12, "bypassDefense": true, "tokens": ["Evasive", "Blind", "Entangle", "Targeted"] }
+  ]
+}
