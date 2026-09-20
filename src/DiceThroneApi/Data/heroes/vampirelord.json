@@ -6,7 +6,7 @@
     { "name": "Glamour", "notation": "[(45)(45)(45)]", "damage": 4, "bypassDefense": true, "cp": 1, "tokens": ["Mesmerize"] },
     { "name": "Sanguimancy", "notation": "[(45)(45)(45)6]", "heal": 2, "tokens": ["Blood Power", "Blood Power", "Blood Power"] },
     { "name": "Rend", "notation": "[(123)(123)(123)66]", "damage": 8 },
-    { "name": "Possess", "notation": "SmallStraight", "damage": 7, "tokens": ["Bleed"] },
+    { "name": "Possess", "notation": "SmallStraight", "damage": 7 },
     { "name": "Blood Thirst", "notation": "[6666]", "damage": 5, "bypassDefense": true, "tokens": ["Blood Power", "Blood Power"] },
     { "name": "Blood Magic", "notation": "LargeStraight", "damage": 8, "tokens": ["Blood Power", "Bleed"] },
     { "name": "Exsanguinate!", "notation": "[66666]", "damage": 10, "cards": 1, "tokens": ["Blood Power", "Blood Power"] }
