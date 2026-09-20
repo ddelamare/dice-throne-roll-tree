@@ -1,0 +1,14 @@
+{
+  "id": "huntress",
+  "name": "Huntress",
+  "objectives": [
+    { "name": "Animalistic", "notation": "[(12)(12)(12)]", "damage": 4 },
+    { "name": "Savage", "notation": "[(34)(34)(34)5]", "damage": 5, "tokens": ["Bleed"] },
+    { "name": "Resuscitate", "notation": "[55]", "heal": 3, "tokens": ["Nyra's Bond"] },
+    { "name": "Feral Instincts", "notation": "[(12)(12)(12)5]", "damage": 2, "bypassDefense": true, "tokens": ["Nyra's Bond"] },
+    { "name": "Onslaught", "notation": "SmallStraight", "damage": 6, "tokens": ["Bleed"] },
+    { "name": "Feral", "notation": "[6666]", "damage": 5, "bypassDefense": true, "heal": 1 },
+    { "name": "Predatory Advance", "notation": "[(12)(12)(34)(34)5]", "damage": 5, "heal": 1 },
+    { "name": "Jungle Fury!", "notation": "[66666]", "damage": 12, "tokens": ["Nyra's Bond", "Bleed", "Bleed"] }
+  ]
+}

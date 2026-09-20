@@ -1,0 +1,14 @@
+{
+  "id": "tactician",
+  "name": "Tactician",
+  "objectives": [
+    { "name": "Saber Strike", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Carpet Bomb", "notation": "[(123)(123)(45)(45)]", "damage": 2, "bypassDefense": true, "tokens": ["Tactical Advantage"] },
+    { "name": "Profiteer", "notation": "[(123)(45)(45)(45)]", "damage": 5, "tokens": ["Tactical Advantage"] },
+    { "name": "Strategic Approach", "notation": "[(123)(123)(123)(45)(45)]", "damage": 7, "tokens": ["Constrict"] },
+    { "name": "Flank", "notation": "SmallStraight", "damage": 6, "tokens": ["Tactical Advantage"] },
+    { "name": "Maneuver", "notation": "[(45)(45)(45)(45)]", "damage": 5, "bypassDefense": true, "tokens": ["Tactical Advantage", "Tactical Advantage", "Tactical Advantage", "Tactical Advantage", "Tactical Advantage"] },
+    { "name": "Exploit", "notation": "LargeStraight", "damage": 9, "tokens": ["Tactical Advantage", "Tactical Advantage", "Constrict"] },
+    { "name": "Higher Ground!", "notation": "[66666]", "damage": 12, "tokens": ["Targeted", "Constrict"] }
+  ]
+}

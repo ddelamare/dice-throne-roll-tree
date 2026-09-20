@@ -1,0 +1,13 @@
+{
+  "id": "artificer",
+  "name": "Artificer",
+  "objectives": [
+    { "name": "Spanner Strike", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Schematics", "notation": "[(45)(45)(45)6]", "heal": 2, "cards": 2, "tokens": ["Synth", "Synth", "Synth", "Synth"] },
+    { "name": "Eureka", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7, "tokens": ["Synth", "Synth", "Synth"] },
+    { "name": "Jolt", "notation": "SmallStraight", "damage": 7, "tokens": ["Synth", "Nanite"] },
+    { "name": "Overclock", "notation": "[6666]", "damage": 6, "bypassDefense": true },
+    { "name": "Zapppp!", "notation": "LargeStraight", "damage": 9, "tokens": ["Nanite"] },
+    { "name": "Maximum Power!", "notation": "[66666]", "damage": 10, "tokens": ["Synth", "Synth", "Nanite"] }
+  ]
+}

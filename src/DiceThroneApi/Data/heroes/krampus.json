@@ -1,0 +1,14 @@
+{
+  "id": "krampus",
+  "name": "Krampus",
+  "objectives": [
+    { "name": "Swat", "notation": "[(123)(123)(123)]", "damage": 6 },
+    { "name": "Scavenge", "notation": "[555]", "cp": 2, "cards": 1, "tokens": ["Gift", "Gift", "Gift"] },
+    { "name": "Bad Tidings", "notation": "[(123)456]", "damage": 6, "tokens": ["Coal", "Coal", "Coal"] },
+    { "name": "Rotter", "notation": "[(123)(123)44]", "damage": 8, "tokens": ["Coal"] },
+    { "name": "Misbehaving", "notation": "SmallStraight", "damage": 7, "tokens": ["Gift"] },
+    { "name": "Spoils", "notation": "[6666]", "damage": 9, "tokens": ["Gift", "Coal", "Coal", "Reject"] },
+    { "name": "Rejection", "notation": "LargeStraight", "damage": 9, "tokens": ["Reject"] },
+    { "name": "Discomfort and Pain!", "notation": "[66666]", "damage": 10, "tokens": ["Gift", "Reject", "Reject", "Reject"] }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "samurai",
+  "name": "Samurai",
+  "objectives": [
+    { "name": "Katana Slice", "notation": "[(123)(123)(123)]", "damage": 6 },
+    { "name": "Wakizashi", "notation": "[(123)(45)66]", "damage": 3, "bypassDefense": true, "tokens": ["Back Strike"] },
+    { "name": "Budo", "notation": "SmallStraight", "damage": 6, "tokens": ["Honor"] },
+    { "name": "Hagakure", "notation": "[6666]", "damage": 5, "bypassDefense": true, "tokens": ["Honor", "Back Strike", "Shame", "Shame"] },
+    { "name": "Solemnity", "notation": "[(123)(123)(45)(45)(45)]", "damage": 7, "tokens": ["Shame"] },
+    { "name": "Masamune", "notation": "LargeStraight", "damage": 7, "tokens": ["Shame", "Back Strike"] },
+    { "name": "Shogun!", "notation": "[66666]", "damage": 13, "tokens": ["Honor", "Shame", "Shame"] }
+  ]
+}

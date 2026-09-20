@@ -1,0 +1,13 @@
+{
+  "id": "gunslinger",
+  "name": "Gunslinger",
+  "objectives": [
+    { "name": "Revolver", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Bounty Hunter", "notation": "[(123)(123)66]", "damage": 1, "bypassDefense": true, "tokens": ["Bounty"] },
+    { "name": "Take Cover", "notation": "[(123)(123)(45)(45)(45)]", "damage": 5, "tokens": ["Evasive"] },
+    { "name": "Showdown", "notation": "SmallStraight", "damage": 6 },
+    { "name": "Deadeye", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Knockdown"] },
+    { "name": "Fan the Hammer", "notation": "LargeStraight", "damage": 7, "tokens": ["Evasive", "Evasive"] },
+    { "name": "Fill 'Em With Lead!", "notation": "[66666]", "damage": 10, "tokens": ["Evasive", "Bounty", "Knockdown"] }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "seraph",
+  "name": "Seraph",
+  "objectives": [
+    { "name": "Holy Blade", "notation": "[(123)(123)(123)]", "damage": 6 },
+    { "name": "Glorious", "notation": "[(123)(123)(123)4]", "damage": 6, "tokens": ["Flight"] },
+    { "name": "Purify", "notation": "[556]", "damage": 5, "bypassDefense": true, "tokens": ["Cleanse"] },
+    { "name": "Holy Smite", "notation": "[(123)456]", "damage": 4, "bypassDefense": true },
+    { "name": "Triumphant", "notation": "SmallStraight", "damage": 7 },
+    { "name": "Highest Power", "notation": "[6666]", "damage": 8, "tokens": ["Flight", "Holy Presence", "Blinding Light"] },
+    { "name": "Archangel's Will", "notation": "LargeStraight", "damage": 8, "tokens": ["Flight", "Blinding Light"] },
+    { "name": "Split the Heavens!", "notation": "[66666]", "damage": 13, "tokens": ["Flight", "Holy Presence", "Blessing of Divinity"] }
+  ]
+}
