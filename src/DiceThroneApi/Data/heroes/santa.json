@@ -1,0 +1,16 @@
+{
+  "id": "santa",
+  "name": "Santa",
+  "objectives": [
+    { "name": "Trim Your Tree (3)", "notation": "[(123)(123)(123)]", "damage": 4 },
+    { "name": "Trim Your Tree (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Trim Your Tree (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 8 },
+    { "name": "Festivities", "notation": "[(123)(123)(123)66]", "damage": 9, "cp": 1, "tokens": ["Egg Nog", "Egg Nog"] },
+    { "name": "Fireside Chat", "notation": "[(45)(45)(45)(45)]", "damage": 7 },
+    { "name": "Naughty or Nice", "notation": "[(123)(123)(45)(45)6]", "damage": 11 },
+    { "name": "Rosey Cheeks", "notation": "SmallStraight", "damage": 8, "tokens": ["Cheer"] },
+    { "name": "Holly Jolly", "notation": "[6666]", "damage": 6, "bypassDefense": true, "tokens": ["Cheer", "Cheer", "Egg Nog", "Egg Nog", "Egg Nog"] },
+    { "name": "Reindeer Games", "notation": "LargeStraight", "damage": 9, "tokens": ["Cheer", "Egg Nog", "Egg Nog"] },
+    { "name": "Comfort and Joy!", "notation": "[66666]", "damage": 10, "tokens": ["Egg Nog", "Egg Nog", "Egg Nog", "Egg Nog"] }
+  ]
+}
