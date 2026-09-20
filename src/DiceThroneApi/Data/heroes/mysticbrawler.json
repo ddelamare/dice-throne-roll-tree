@@ -1,0 +1,14 @@
+{
+  "id": "mysticbrawler",
+  "name": "Mystic Brawler",
+  "objectives": [
+    { "name": "Clobber", "notation": "[(123)(123)(123)(123)]", "damage": 5 },
+    { "name": "Strong Arm", "notation": "[(123)(123)(123)6]", "damage": 7 },
+    { "name": "Strengths of the Ancients", "notation": "[666]", "damage": 7, "bypassDefense": true },
+    { "name": "Spirit Strike", "notation": "SmallStraight", "damage": 7 },
+    { "name": "Healing Wind", "notation": "[(45)(45)(45)6]" },
+    { "name": "Tidal Blow", "notation": "[(123)(123)(123)(45)(45)]", "damage": 7, "tokens": ["Strength of the Ocean"] },
+    { "name": "Tectonic Punch", "notation": "LargeStraight", "damage": 10 },
+    { "name": "Power of the Ancients!", "notation": "[66666]", "damage": 12, "tokens": ["Concussion"] }
+  ]
+}

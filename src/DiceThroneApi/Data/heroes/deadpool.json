@@ -1,0 +1,15 @@
+{
+  "id": "deadpool",
+  "name": "Deadpool",
+  "objectives": [
+    { "name": "Finger Guns (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6, "cp": 1 },
+    { "name": "Finger Guns (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7, "cp": 1 },
+    { "name": "Donut Hole", "notation": "[555]", "damage": 4, "cards": 1, "tokens": ["Donut"], "bypassDefense": true },
+    { "name": "Knife Fight", "notation": "[4455]", "damage": 3, "tokens": ["RPS", "Onomatopoeia"], "bypassDefense": true },
+    { "name": "Besmirched", "notation": "[(123)456]", "damage": 9 },
+    { "name": "Taco Truck", "notation": "SmallStraight", "damage": 9 },
+    { "name": "Merc with a Mouth", "notation": "SmallStraight", "damage": 6, "tokens": ["Donut", "RPS", "Onomatopoeia"], "bypassDefense": true },
+    { "name": "Fiesta", "notation": "LargeStraight", "damage": 9, "tokens": ["RPS", "Donut"] },
+    { "name": "Fourth Wall!", "notation": "[66666]", "damage": 14 }
+  ]
+}
