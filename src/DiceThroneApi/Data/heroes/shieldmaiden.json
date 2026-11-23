@@ -1,0 +1,16 @@
+{
+  "id": "shieldmaiden",
+  "name": "Shield Maiden",
+  "objectives": [
+    { "name": "Bash (3)", "notation": "[(123)(123)(123)]", "damage": 5 },
+    { "name": "Bash (4)", "notation": "[(123)(123)(123)(123)]", "damage": 6 },
+    { "name": "Bash (5)", "notation": "[(123)(123)(123)(123)(123)]", "damage": 7 },
+    { "name": "Protective Ward", "notation": "[(123)(123)66]", "cards": 1, "tokens": ["Block", "Block"] },
+    { "name": "Ram Rush", "notation": "[(123)(45)(45)(45)]", "damage": 6 },
+    { "name": "Rune Your Day", "notation": "[(123)(123)666]", "damage": 3, "tokens": ["Rune Bash"] },
+    { "name": "Buckler Smash", "notation": "SmallStraight", "damage": 9 },
+    { "name": "Charge Forward", "notation": "[6666]", "damage": 7, "bypassDefense": true, "tokens": ["Knockdown"] },
+    { "name": "Destructive Slam", "notation": "LargeStraight", "damage": 11, "tokens": ["Rune Bash"] },
+    { "name": "Freyja's Fighters!", "notation": "[66666]", "damage": 10, "tokens": ["Rune Bash", "Knockdown", "Block"] }
+  ]
+}
